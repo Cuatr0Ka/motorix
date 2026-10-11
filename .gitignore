@@ -1,0 +1,22 @@
+# Secretos y entorno local
+.env
+.env.*
+!.env.example
+
+# Dependencias y compilados
+node_modules/
+server/coverage/
+client/build/
+client/.dart_tool/
+
+# Datos físicos de MySQL (no se versionan)
+database/data/
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+.vscode/
+.idea/
