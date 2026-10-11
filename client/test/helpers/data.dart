@@ -132,6 +132,7 @@ Map<String, dynamic> orderDetailJson(
   int? serviceMileage,
   Map<String, dynamic>? maintenance,
   List<Map<String, dynamic>> parts = const [],
+  Map<String, dynamic>? billing,
 }) {
   double sum(List<Map<String, dynamic>> lines) =>
       lines.fold(0.0, (total, line) => total + double.parse('${line['amount']}'));
@@ -148,6 +149,7 @@ Map<String, dynamic> orderDetailJson(
     'services': services,
     'labor': labor,
     'parts': parts,
+    if (billing != null) 'billing': billing,
     'serviceMileage': serviceMileage,
     'maintenance': maintenance,
     'totals': {
@@ -236,5 +238,103 @@ FakeHandler appointmentsHandler({List<Map<String, dynamic>>? items, FakeHandler?
       return ok(filtered, meta: {'page': 1, 'pageSize': 20, 'total': filtered.length});
     }
     return vehiclesByClient(r);
+  };
+}
+
+// ---- Sprint 4: pagos, tickets y panel ----
+
+Map<String, dynamic> paymentJson(
+  int id, {
+  int orderId = 1,
+  String method = 'EFECTIVO',
+  String status = 'PAGADO',
+  String amount = '1250.00',
+  String? reference,
+  String? checkoutUrl,
+  String? externalPaymentId,
+  String? lastCheckedAt,
+  String clientName = 'Ana Morales',
+  String plate = 'MNO-345-E',
+}) =>
+    {
+      'id': id,
+      'orderId': orderId,
+      'orderFolio': 'OS-${orderId.toString().padLeft(6, '0')}',
+      'amount': amount,
+      'method': method,
+      'status': status,
+      'reference': reference,
+      'externalPaymentId': externalPaymentId,
+      'checkoutUrl': checkoutUrl,
+      'lastCheckedAt': lastCheckedAt,
+      'paidAt': status == 'PAGADO' ? '2030-10-11T15:00:00.000Z' : null,
+      'createdAt': '2030-10-11T14:00:00.000Z',
+      'createdBy': {'id': 2, 'name': 'Recepción del taller'},
+      'client': {'id': 1, 'name': clientName},
+      'vehicle': {'id': 1, 'licensePlate': plate},
+    };
+
+/// Bloque de cobro de una orden; el estado de cobro se deduce de los pagos.
+Map<String, dynamic> billingJson({
+  String total = '1250.00',
+  List<Map<String, dynamic>> payments = const [],
+  bool canCharge = true,
+  bool amountOutdated = false,
+  Map<String, dynamic>? ticket,
+}) {
+  final paid = payments.where((p) => p['status'] == 'PAGADO').toList();
+  final active = payments.where((p) => p['status'] == 'PENDIENTE' || p['status'] == 'PAGADO').toList();
+  return {
+    'total': total,
+    'paidAmount': paid.isEmpty ? '0.00' : paid.first['amount'],
+    'collectionStatus': paid.isNotEmpty ? 'PAGADO' : (active.isNotEmpty ? 'PENDIENTE' : 'SIN_COBRAR'),
+    'amountOutdated': amountOutdated,
+    'canCharge': canCharge && active.isEmpty,
+    'payments': payments,
+    'ticket': ticket,
+  };
+}
+
+/// Ticket de ejemplo. Con `full` trae el contenido completo; sin él, la forma de los listados.
+Map<String, dynamic> ticketJson(
+  int id, {
+  int orderId = 1,
+  bool full = true,
+  List<Map<String, dynamic>> parts = const [
+    {'code': 'BAL-DEL', 'name': 'Balatas delanteras', 'unit': 'juego', 'quantity': 2},
+  ],
+  String clientName = 'Ana Morales',
+  String plate = 'MNO-345-E',
+}) {
+  final base = {
+    'id': id,
+    'folio': 'TK-${id.toString().padLeft(6, '0')}',
+    'orderId': orderId,
+    'orderFolio': 'OS-${orderId.toString().padLeft(6, '0')}',
+    'paymentId': 1,
+    'generatedAt': '2030-10-11T15:10:00.000Z',
+    'generatedBy': {'id': 2, 'name': 'Recepción del taller'},
+  };
+  if (!full) {
+    return {...base, 'client': {'name': clientName}, 'vehicle': {'licensePlate': plate}, 'total': '1250.00'};
+  }
+  return {
+    ...base,
+    'content': {
+      'shop': {'name': 'Taller de Prueba', 'address': 'Calle 1 #23', 'phone': '5555555555'},
+      'customer': {'name': clientName, 'phone': '5512345678'},
+      'vehicle': {'plate': plate, 'brand': 'Honda', 'model': 'Civic', 'year': 2020, 'mileage': 51400},
+      'order': {'folio': 'OS-${orderId.toString().padLeft(6, '0')}', 'entryMileage': 51200, 'serviceMileage': 51400},
+      'services': [
+        {'description': 'Cambio de balatas', 'amount': '850.00'},
+      ],
+      'parts': parts,
+      'labor': [
+        {'description': 'Mano de obra frenos', 'amount': '400.00'},
+      ],
+      'totals': {'services': '850.00', 'labor': '400.00', 'total': '1250.00'},
+      'payment': {'method': 'EFECTIVO', 'status': 'PAGADO', 'paidAt': '2030-10-11T15:00:00.000Z', 'reference': 'TERM-48213'},
+      'generatedAt': '2030-10-11T15:10:00.000Z',
+    },
   };
 }

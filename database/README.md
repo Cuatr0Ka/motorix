@@ -7,8 +7,8 @@ integrante del equipo usa su propia instancia. El backend es el único que acced
 
 | Carpeta / archivo | Propósito |
 |-------------------|-----------|
-| `migrations/` | Scripts SQL numerados e inmutables que definen el esquema (`001` Sprint 1: usuarios, clientes y vehículos; `002` Sprint 2: citas, órdenes de servicio, servicios, mano de obra e historial de estados; `003` Sprint 3: refacciones, movimientos de inventario, refacciones por orden, mantenimientos y kilometraje del servicio) |
-| `seeds/` | Datos iniciales idempotentes (`001`: cuentas, clientes y vehículos de ejemplo; `002`: segundo mecánico `mecanico2`, citas y órdenes de ejemplo en todos los estados; `003`: refacciones con movimientos, órdenes históricas para el historial, refacciones usadas y mantenimientos Normal, Próximo, Vencido y Atendido) |
+| `migrations/` | Scripts SQL numerados e inmutables que definen el esquema (`001` Sprint 1: usuarios, clientes y vehículos; `002` Sprint 2: citas, órdenes de servicio, servicios, mano de obra e historial de estados; `003` Sprint 3: refacciones, movimientos de inventario, refacciones por orden, mantenimientos y kilometraje del servicio; `004` Sprint 4: pagos y tickets) |
+| `seeds/` | Datos iniciales idempotentes (`001`: cuentas, clientes y vehículos de ejemplo; `002`: segundo mecánico `mecanico2`, citas y órdenes de ejemplo en todos los estados; `003`: refacciones con movimientos, órdenes históricas para el historial, refacciones usadas y mantenimientos Normal, Próximo, Vencido y Atendido; `004`: pagos en los cuatro estados y métodos y tickets de órdenes cobradas) |
 | `scripts/` | Scripts de PowerShell para crear, migrar, sembrar y reiniciar la base |
 | `data/` | Directorio de datos local opcional; está en `.gitignore` y NO se versiona |
 

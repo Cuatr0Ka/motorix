@@ -2,6 +2,8 @@ import { Router } from 'express';
 import * as maintenanceController from '../controllers/maintenanceController.js';
 import * as orderController from '../controllers/orderController.js';
 import * as orderPartController from '../controllers/orderPartController.js';
+import * as paymentController from '../controllers/paymentController.js';
+import * as ticketController from '../controllers/ticketController.js';
 import * as orderWorkController from '../controllers/orderWorkController.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { authorize, ROLES } from '../middlewares/authorize.js';
@@ -9,6 +11,7 @@ import { validate } from '../middlewares/validate.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { idParams } from '../validators/common.js';
 import { createMaintenanceSchema } from '../validators/maintenanceValidators.js';
+import { createPaymentSchema } from '../validators/paymentValidators.js';
 import {
   addOrderPartSchema,
   assignMechanicSchema,
@@ -72,6 +75,20 @@ router.post(
   validate({ params: idParams, body: createMaintenanceSchema }),
   asyncHandler(maintenanceController.schedule),
 );
+
+// Cobro de la orden: solo recepción y administración (el mecánico no accede a los pagos).
+const cashier = authorize(ROLES.ADMIN, ROLES.RECEPTIONIST);
+router.get('/:id/payments', cashier, validate({ params: idParams }), asyncHandler(paymentController.listByOrder));
+router.post(
+  '/:id/payments',
+  cashier,
+  validate({ params: idParams, body: createPaymentSchema }),
+  asyncHandler(paymentController.createForOrder),
+);
+
+// Ticket de la orden: se genera una sola vez y solo con un pago Pagado.
+router.post('/:id/ticket', cashier, validate({ params: idParams }), asyncHandler(ticketController.generate));
+router.get('/:id/ticket', cashier, validate({ params: idParams }), asyncHandler(ticketController.getByOrder));
 
 // Refacciones usadas: cada alta, corrección o baja genera su movimiento de inventario en la misma transacción.
 router.post(

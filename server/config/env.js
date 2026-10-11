@@ -70,6 +70,26 @@ export function getMaintenanceConfig(source = process.env) {
   return { warnDays: read('MAINTENANCE_WARN_DAYS', 30), warnKm: read('MAINTENANCE_WARN_KM', 1000) };
 }
 
+/**
+ * Configuración de Mercado Pago (modo de pruebas). El token solo se lee del entorno y nunca se imprime
+ * ni se devuelve. Sin token, el método Mercado Pago queda no disponible.
+ */
+export function getMercadoPagoConfig(source = process.env) {
+  return {
+    accessToken: (source.MERCADOPAGO_ACCESS_TOKEN ?? '').trim(),
+    apiUrl: (source.MERCADOPAGO_API_URL || 'https://api.mercadopago.com').trim().replace(/\/+$/, ''),
+  };
+}
+
+/** Datos del taller que aparecen en el ticket (configurables sin tocar el código). */
+export function getShopConfig(source = process.env) {
+  return {
+    name: (source.SHOP_NAME || 'Motorix Taller Mecánico').trim(),
+    address: (source.SHOP_ADDRESS ?? '').trim(),
+    phone: (source.SHOP_PHONE ?? '').trim(),
+  };
+}
+
 // Configuración perezosa: se valida al primer uso para que las pruebas unitarias de módulos
 // que no tocan la base no necesiten un .env completo.
 let cached;

@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { getConfig } from '../../config/env.js';
 import { query } from '../../config/db.js';
 import { signToken } from '../../utils/jwt.js';
+import { AppError } from '../../utils/AppError.js';
 
 /** Contraseña conocida de las cuentas creadas en pruebas (cumple la política mínima). */
 export const TEST_PASSWORD = 'Prueba2026!';
@@ -15,6 +16,8 @@ export async function resetDatabase() {
   if (!db.database.endsWith('_test')) {
     throw new Error(`Se canceló el reinicio: "${db.database}" no es una base de pruebas.`);
   }
+  await query('DELETE FROM tickets');
+  await query('DELETE FROM payments');
   await query('DELETE FROM inventory_movements');
   await query('DELETE FROM order_parts');
   await query('DELETE FROM maintenance');
@@ -266,4 +269,81 @@ export async function createFinishedOrder(vehicleId, createdBy, mechanicId, over
   const order = await createOrder(vehicleId, createdBy, { mechanicId, status, diagnosis: 'Diagnóstico de prueba', ...rest });
   await createService(order.id);
   return order;
+}
+
+/** Pago de prueba directo en la base (por defecto efectivo, PAGADO, por el total `1250.00`). */
+export async function createPayment(orderId, createdBy, overrides = {}) {
+  const data = {
+    amount: '1250.00',
+    method: 'EFECTIVO',
+    status: 'PAGADO',
+    reference: null,
+    externalReference: null,
+    externalPaymentId: null,
+    checkoutUrl: null,
+    ...overrides,
+  };
+  const paidAt = data.status === 'PAGADO' ? new Date() : null;
+  const result = await query(
+    `INSERT INTO payments (order_id, amount, method, status, reference, external_reference, external_payment_id, checkout_url, paid_at, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [orderId, data.amount, data.method, data.status, data.reference, data.externalReference, data.externalPaymentId, data.checkoutUrl, paidAt, createdBy],
+  );
+  return { id: result.insertId, orderId, ...data };
+}
+
+/** Ticket de prueba directo en la base, con un contenido mínimo válido. */
+export async function createTicket(orderId, paymentId, createdBy, overrides = {}) {
+  const content = overrides.content ?? { order: { folio: `OS-${String(orderId).padStart(6, '0')}` }, totals: { total: '1250.00' } };
+  const result = await query('INSERT INTO tickets (order_id, payment_id, content, generated_by) VALUES (?, ?, ?, ?)', [
+    orderId,
+    paymentId,
+    JSON.stringify(content),
+    createdBy,
+  ]);
+  return { id: result.insertId, orderId, paymentId, content };
+}
+
+/**
+ * Orden TERMINADA lista para cobrar: un servicio de 850.00 y mano de obra de 400.00 (total 1250.00).
+ * Devuelve la orden con su total.
+ */
+export async function createPayableOrder(vehicleId, createdBy, mechanicId, overrides = {}) {
+  const order = await createOrder(vehicleId, createdBy, { mechanicId, status: 'TERMINADO', ...overrides });
+  await createService(order.id);
+  await createLabor(order.id);
+  return { ...order, total: '1250.00' };
+}
+
+/**
+ * Proveedor de pagos simulado para las pruebas (se instala con `setGateway`). Sus respuestas se programan
+ * y cuenta las llamadas; nunca sale a internet.
+ */
+export class FakeGateway {
+  constructor({ configured = true } = {}) {
+    this.configured = configured;
+    this.checkouts = [];
+    this.searches = [];
+    this.operations = []; // [{ id, status }] más reciente primero
+    this.failCheckout = false;
+    this.failSearch = false;
+  }
+
+  isConfigured() {
+    return this.configured;
+  }
+
+  async createCheckout({ reference, amount, title }) {
+    if (!this.configured) throw new AppError(503, 'PROVIDER_NOT_CONFIGURED', 'Mercado Pago no está configurado en este entorno.');
+    if (this.failCheckout) throw new AppError(502, 'PROVIDER_ERROR', 'No se pudo comunicar con Mercado Pago. Inténtalo de nuevo.');
+    this.checkouts.push({ reference, amount, title });
+    return { checkoutUrl: `https://sandbox.mercadopago.simulado/checkout/${reference}` };
+  }
+
+  async findPaymentByReference(reference) {
+    if (!this.configured) throw new AppError(503, 'PROVIDER_NOT_CONFIGURED', 'Mercado Pago no está configurado en este entorno.');
+    if (this.failSearch) throw new AppError(502, 'PROVIDER_ERROR', 'No se pudo comunicar con Mercado Pago. Inténtalo de nuevo.');
+    this.searches.push(reference);
+    return this.operations;
+  }
 }

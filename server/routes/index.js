@@ -2,10 +2,13 @@ import { Router } from 'express';
 import appointmentRoutes from './appointmentRoutes.js';
 import authRoutes from './authRoutes.js';
 import clientRoutes from './clientRoutes.js';
+import dashboardRoutes from './dashboardRoutes.js';
 import maintenanceRoutes from './maintenanceRoutes.js';
 import mechanicRoutes from './mechanicRoutes.js';
 import orderRoutes from './orderRoutes.js';
 import partRoutes from './partRoutes.js';
+import paymentRoutes from './paymentRoutes.js';
+import ticketRoutes from './ticketRoutes.js';
 import userRoutes from './userRoutes.js';
 import vehicleRoutes from './vehicleRoutes.js';
 
@@ -25,5 +28,8 @@ router.use('/orders', orderRoutes);
 router.use('/mechanics', mechanicRoutes);
 router.use('/maintenance', maintenanceRoutes);
 router.use('/parts', partRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/tickets', ticketRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 export default router;

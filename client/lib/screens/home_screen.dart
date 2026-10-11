@@ -14,11 +14,14 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   static const Map<AppSection, String> _descriptions = {
+    AppSection.dashboard: 'Ver los indicadores y la actividad reciente del taller',
     AppSection.clients: 'Registrar y consultar a los propietarios',
     AppSection.vehicles: 'Registrar y consultar los vehículos atendidos',
     AppSection.appointments: 'Programar y consultar la llegada de los vehículos',
     AppSection.orders: 'Crear y dar seguimiento a las órdenes de servicio',
     AppSection.myOrders: 'Consultar y trabajar las órdenes que tienes asignadas',
+    AppSection.payments: 'Consultar los cobros de las órdenes y el estado de Mercado Pago',
+    AppSection.tickets: 'Consultar e imprimir los comprobantes de las órdenes cobradas',
     AppSection.maintenance: 'Ver los mantenimientos próximos y vencidos para avisar al cliente',
     AppSection.inventory: 'Controlar las refacciones, su existencia y las alertas de stock bajo',
     AppSection.users: 'Administrar quién puede usar el sistema',

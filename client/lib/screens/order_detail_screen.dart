@@ -8,16 +8,20 @@ import '../providers/order_detail_provider.dart';
 import '../providers/session_provider.dart';
 import '../services/maintenance_service.dart';
 import '../services/orders_service.dart';
+import '../services/payments_service.dart';
+import '../services/tickets_service.dart';
 import '../utils/formatters.dart';
 import '../utils/status_labels.dart';
 import '../utils/tokens.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/mechanic_selector.dart';
+import '../widgets/order_billing_section.dart';
 import '../widgets/order_maintenance_section.dart';
 import '../widgets/order_parts_section.dart';
 import '../widgets/part_selector.dart';
 import '../widgets/page_header.dart';
 import '../widgets/state_views.dart';
+import 'ticket_screen.dart';
 import '../widgets/status_chip.dart';
 
 /// Detalle de una orden: datos generales, trabajo registrado, totales e historial de estados.
@@ -35,6 +39,8 @@ class OrderDetailScreen extends StatelessWidget {
         context.read<OrdersService>(),
         orderId,
         maintenanceService: context.read<MaintenanceService>(),
+        paymentsService: context.read<PaymentsService>(),
+        ticketsService: context.read<TicketsService>(),
       )..load(),
       child: const _OrderDetailView(),
     );
@@ -109,6 +115,17 @@ class _OrderDetailView extends StatelessWidget {
     _report(context, failure, 'Línea quitada correctamente.');
   }
 
+  OrderBillingActions _billingActions(BuildContext context) {
+    final provider = context.read<OrderDetailProvider>();
+    return OrderBillingActions(
+      onCharge: (method, reference, amount) => provider.createPayment(method, reference: reference, amount: amount),
+      onRefresh: (payment) => provider.refreshPayment(payment.id),
+      onCancel: (payment) => provider.cancelPayment(payment.id),
+      onGenerateTicket: provider.generateTicket,
+      onViewTicket: (ticket) => Navigator.of(context).push<void>(MaterialPageRoute(builder: (_) => TicketScreen(ticketId: ticket.id))),
+    );
+  }
+
   OrderPartsActions _partsActions(BuildContext context) {
     final provider = context.read<OrderDetailProvider>();
     return OrderPartsActions(
@@ -163,6 +180,18 @@ class _OrderDetailView extends StatelessWidget {
   Future<void> _changeStatus(BuildContext context, ServiceOrder order, OrderStatus status) async {
     final provider = context.read<OrderDetailProvider>();
     if (status == OrderStatus.delivered) {
+      // La entrega no depende del cobro, pero se advierte y se pide una confirmación adicional (aclaración 5).
+      final billing = order.billing;
+      if (billing != null && !billing.isPaid) {
+        final deliverUnpaid = await showConfirmDialog(
+          context,
+          title: 'La orden no está cobrada',
+          message: 'La orden ${order.folio} no tiene un pago registrado como Pagado. Puedes entregarla, pero seguirá apareciendo '
+              'como pendiente de cobro.',
+          confirmLabel: 'Entregar de todos modos',
+        );
+        if (!deliverUnpaid || !context.mounted) return;
+      }
       final confirmed = await showConfirmDialog(
         context,
         title: 'Registrar entrega',
@@ -211,6 +240,8 @@ class _OrderDetailView extends StatelessWidget {
                               busy: provider.busy,
                               onChangeStatus: (status) => _changeStatus(context, order, status),
                               extraSections: [
+                                if (order.billing != null)
+                                  OrderBillingSection(order: order, busy: provider.busy, actions: _billingActions(context)),
                                 OrderPartsSection(
                                   parts: order.parts,
                                   busy: provider.busy,

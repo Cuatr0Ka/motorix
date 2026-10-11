@@ -6,16 +6,20 @@ import '../models/service_order.dart';
 import '../services/api_client.dart';
 import '../services/maintenance_service.dart';
 import '../services/orders_service.dart';
+import '../services/payments_service.dart';
+import '../services/tickets_service.dart';
 import '../utils/status_labels.dart';
 
 /// Estado del detalle de una orden: carga, errores y acciones (asignar mecánico, registrar el trabajo,
 /// cambiar el estado). Cada acción devuelve el mensaje de error en español, o null si salió bien; la
 /// orden se actualiza con la respuesta del servidor, que es la fuente de verdad.
 class OrderDetailProvider extends ChangeNotifier {
-  OrderDetailProvider(this.service, this.orderId, {required this.maintenanceService});
+  OrderDetailProvider(this.service, this.orderId, {required this.maintenanceService, required this.paymentsService, required this.ticketsService});
 
   final OrdersService service;
   final MaintenanceService maintenanceService;
+  final PaymentsService paymentsService;
+  final TicketsService ticketsService;
   final int orderId;
 
   ServiceOrder? _order;
@@ -81,6 +85,30 @@ class OrderDetailProvider extends ChangeNotifier {
 
   /// Registra o edita un campo del trabajo (`diagnosis`, `observations` o `recommendations`).
   Future<String?> saveWorkField(String field, String? value) => run(() => service.updateWork(orderId, {field: value}));
+
+  /// Registra el pago de la orden por el importe que vio la persona; el servidor valida que siga siendo el total.
+  Future<String?> createPayment(PaymentMethod method, {String? reference, String? amount}) => run(() async {
+        await paymentsService.create(orderId, method, reference: reference, amount: amount);
+        return service.get(orderId);
+      });
+
+  /// Genera el ticket de la orden (o recupera el existente) y recarga el detalle.
+  Future<String?> generateTicket() => run(() async {
+        await ticketsService.generate(orderId);
+        return service.get(orderId);
+      });
+
+  /// Consulta a Mercado Pago el estado de un cobro pendiente y recarga la orden.
+  Future<String?> refreshPayment(int paymentId) => run(() async {
+        await paymentsService.refresh(paymentId);
+        return service.get(orderId);
+      });
+
+  /// Cancela un cobro pendiente y recarga la orden.
+  Future<String?> cancelPayment(int paymentId) => run(() async {
+        await paymentsService.cancel(paymentId);
+        return service.get(orderId);
+      });
 
   /// Registra el kilometraje del servicio de una orden Terminada.
   Future<String?> setServiceMileage(int mileage) => run(() => service.setServiceMileage(orderId, mileage));

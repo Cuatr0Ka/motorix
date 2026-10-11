@@ -1,6 +1,7 @@
 import '../utils/status_labels.dart';
 import 'maintenance.dart';
 import 'order_work.dart';
+import 'payment.dart';
 
 class OrderClient {
   const OrderClient({required this.id, required this.name});
@@ -94,6 +95,7 @@ class ServiceOrder {
     this.parts = const [],
     this.serviceMileage,
     this.maintenance,
+    this.billing,
     this.totals = OrderTotals.zero,
     this.allowedTransitions = const [],
     this.statusHistory = const [],
@@ -128,6 +130,7 @@ class ServiceOrder {
             .map((e) => OrderPart.fromJson(Map<String, dynamic>.from(e as Map)))
             .toList(),
         serviceMileage: (json['serviceMileage'] as num?)?.toInt(),
+        billing: json['billing'] == null ? null : Billing.fromJson(Map<String, dynamic>.from(json['billing'] as Map)),
         maintenance: json['maintenance'] == null
             ? null
             : Maintenance.fromJson(Map<String, dynamic>.from(json['maintenance'] as Map)),
@@ -165,6 +168,9 @@ class ServiceOrder {
 
   /// Último mantenimiento programado desde esta orden, si existe.
   final Maintenance? maintenance;
+
+  /// Bloque de cobro (solo para administración y recepción; el mecánico no lo recibe).
+  final Billing? billing;
   final OrderTotals totals;
   final List<OrderStatus> allowedTransitions;
   final List<StatusChange> statusHistory;

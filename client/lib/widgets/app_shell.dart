@@ -30,6 +30,12 @@ IconData _iconFor(AppSection section) {
       return Icons.event_repeat_outlined;
     case AppSection.inventory:
       return Icons.inventory_2_outlined;
+    case AppSection.dashboard:
+      return Icons.dashboard_outlined;
+    case AppSection.payments:
+      return Icons.payments_outlined;
+    case AppSection.tickets:
+      return Icons.receipt_long_outlined;
     case AppSection.users:
       return Icons.admin_panel_settings_outlined;
     case AppSection.changePassword:
@@ -55,6 +61,12 @@ IconData _selectedIconFor(AppSection section) {
       return Icons.event_repeat;
     case AppSection.inventory:
       return Icons.inventory_2;
+    case AppSection.dashboard:
+      return Icons.dashboard;
+    case AppSection.payments:
+      return Icons.payments;
+    case AppSection.tickets:
+      return Icons.receipt_long;
     case AppSection.users:
       return Icons.admin_panel_settings;
     case AppSection.changePassword:
@@ -195,11 +207,7 @@ class _Sidebar extends StatelessWidget {
     final sections = NavigationProvider.sectionsFor(user.role);
     final selected = sections.indexOf(navigation.current);
 
-    // El propio NavigationRail anima su ancho (~200 ms) al cambiar `extended`.
-    return ColoredBox(
-      color: AppColors.sidebar,
-      child: ClipRect(
-        child: NavigationRail(
+    final rail = NavigationRail(
           extended: expanded,
           minExtendedWidth: AppLayout.sidebarExpanded,
           minWidth: AppLayout.sidebarCollapsed,
@@ -258,6 +266,20 @@ class _Sidebar extends StatelessWidget {
                   ),
                 ),
               ),
+            ),
+          ),
+        );
+
+    // El propio NavigationRail anima su ancho (~200 ms) al cambiar `extended`. Con ventanas bajas y muchas secciones
+    // (administración) el menú se desplaza en lugar de desbordarse.
+    return ColoredBox(
+      color: AppColors.sidebar,
+      child: ClipRect(
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(child: rail),
             ),
           ),
         ),

@@ -765,6 +765,23 @@ paymentId
 generatedAt
 ```
 
+> **Decisión del Sprint 4:** las entidades `Payment` y `Ticket` usan los campos de la
+> especificación del sprint, no los de la lista inicial de arriba:
+> - `Payment` (`payments`): `order_id`, `amount`, `method` (EFECTIVO, TARJETA, TRANSFERENCIA,
+>   MERCADO_PAGO), `status` (PENDIENTE, PAGADO, RECHAZADO, CANCELADO), `reference` (referencia
+>   opcional capturada), `external_reference`, `external_payment_id`, `checkout_url`,
+>   `last_checked_at`, `paid_at` y `created_by`. Nunca guarda datos de tarjeta ni credenciales.
+>   Una orden tiene a lo sumo un pago vigente (Pendiente o Pagado) y el pago cubre el total.
+> - `Ticket` (`tickets`): `order_id` único, `payment_id`, `content` (instantánea JSON del
+>   contenido tal como se generó), `generated_by` y `generated_at`. El folio (`TK-000012`) se
+>   deriva del identificador. No se generan archivos PDF: el ticket se visualiza e imprime.
+> - El total de cobro es **servicios más mano de obra**; las refacciones se listan con su
+>   cantidad pero no suman importe (los precios de refacciones quedan fuera del MVP).
+> - Mercado Pago se usa en modo de pruebas con un enlace de cobro; el estado se confirma por
+>   consulta bajo demanda (sin avisos automáticos). El token vive solo en `MERCADOPAGO_ACCESS_TOKEN`.
+> - El panel de control es exclusivo del administrador y se calcula con datos reales, sin tablas
+>   de estadísticas.
+
 ------------------------------------------------------------------------
 
 # 13. Reglas de negocio iniciales
@@ -1326,6 +1343,17 @@ Antes de asumirlas como definitivas, el equipo debe decidir:
 
 - **Login**: se acepta usuario o correo electrónico en el mismo campo para todos los roles.
 - **Estándar de usuarios del MVP**: se fijan cuentas iniciales `admin`, `recepcion` y `mecanico` con contraseñas `Admin2026!`, `Recepcion2026!` y `Mecanico2026!` respectivamente, solo para pruebas locales. Se agrega `username` único a la entidad `User`.
+
+### Decisiones resueltas durante el Sprint 4
+
+- **Implementación de tickets**: sin archivos PDF; el ticket se visualiza en pantalla y se imprime con el
+  diálogo de impresión del sistema. Se agregan al cliente las dependencias `printing` (con `pdf`, para armar
+  el documento de impresión en memoria) y `url_launcher` (para abrir el enlace de cobro); el backend no suma
+  dependencias.
+- **Alcance de Mercado Pago**: enlace de cobro (Checkout Pro) en modo de pruebas, consumido con el `fetch` de
+  Node.js desde un adaptador aislado; el estado se confirma por consulta bajo demanda de la recepción.
+- **Panel de control**: solo ADMIN; indicadores a 30 días (vehículos atendidos) y 7 días (citas próximas).
+- **Reembolsos**: fuera del sistema; un pago Pagado no se modifica ni se cancela.
 
 CLAUDE puede proponer opciones para estas decisiones, pero no debe
 introducir dependencias grandes sin justificar su necesidad.

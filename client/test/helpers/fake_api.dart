@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:motorix_client/main.dart';
 import 'package:motorix_client/services/api_client.dart';
+import 'package:motorix_client/models/ticket.dart';
+import 'package:motorix_client/utils/link_opener.dart';
+import 'package:motorix_client/utils/ticket_printer.dart';
 
 /// Petición recibida por la API simulada.
 class FakeRequest {
@@ -86,8 +89,43 @@ void useDesktopWindow(WidgetTester tester, {double width = 1400, double height =
 }
 
 /// Monta la aplicación e inicia sesión con el rol del [api].
-Future<void> pumpAppSignedIn(WidgetTester tester, FakeApi api) async {
-  await tester.pumpWidget(MotorixApp(apiClient: api.client, useGoogleFonts: false));
+/// Abridor de enlaces simulado: guarda las URL que se pidió abrir.
+class FakeLinkOpener extends LinkOpener {
+  FakeLinkOpener({this.succeeds = true});
+
+  final bool succeeds;
+  final List<String> opened = [];
+
+  @override
+  Future<bool> open(String url) async {
+    opened.add(url);
+    return succeeds;
+  }
+}
+
+/// Impresora de tickets simulada: guarda los tickets que se pidió imprimir.
+class FakeTicketPrinter extends TicketPrinter {
+  FakeTicketPrinter({this.succeeds = true});
+
+  final bool succeeds;
+  final List<Ticket> printed = [];
+
+  @override
+  Future<bool> printTicket(Ticket ticket) async {
+    printed.add(ticket);
+    return succeeds;
+  }
+}
+
+Future<void> pumpAppSignedIn(WidgetTester tester, FakeApi api, {LinkOpener? linkOpener, TicketPrinter? ticketPrinter}) async {
+  await tester.pumpWidget(
+    MotorixApp(
+      apiClient: api.client,
+      useGoogleFonts: false,
+      linkOpener: linkOpener ?? FakeLinkOpener(),
+      ticketPrinter: ticketPrinter ?? FakeTicketPrinter(),
+    ),
+  );
   await tester.enterText(find.widgetWithText(TextFormField, 'Usuario o correo'), 'usuario');
   await tester.enterText(find.widgetWithText(TextFormField, 'Contraseña'), 'Correcta2026');
   await tester.tap(find.text('Iniciar sesión').last);

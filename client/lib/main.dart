@@ -3,22 +3,28 @@ import 'package:provider/provider.dart';
 
 import 'providers/appointments_provider.dart';
 import 'providers/clients_provider.dart';
+import 'providers/dashboard_provider.dart';
 import 'providers/maintenance_provider.dart';
 import 'providers/navigation_provider.dart';
 import 'providers/orders_provider.dart';
 import 'providers/parts_provider.dart';
+import 'providers/payments_provider.dart';
 import 'providers/session_provider.dart';
 import 'providers/sidebar_provider.dart';
 import 'providers/stock_alerts_provider.dart';
+import 'providers/tickets_provider.dart';
 import 'providers/users_provider.dart';
 import 'providers/vehicles_provider.dart';
 import 'screens/appointments_list_screen.dart';
 import 'screens/change_password_screen.dart';
+import 'screens/dashboard_screen.dart';
 import 'screens/clients_list_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/inventory_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/maintenance_list_screen.dart';
+import 'screens/payments_list_screen.dart';
+import 'screens/tickets_list_screen.dart';
 import 'screens/orders_list_screen.dart';
 import 'screens/users_screen.dart';
 import 'screens/vehicles_list_screen.dart';
@@ -26,12 +32,17 @@ import 'services/api_client.dart';
 import 'services/appointments_service.dart';
 import 'services/auth_service.dart';
 import 'services/clients_service.dart';
+import 'services/dashboard_service.dart';
 import 'services/maintenance_service.dart';
 import 'services/orders_service.dart';
 import 'services/parts_service.dart';
+import 'services/payments_service.dart';
+import 'services/tickets_service.dart';
 import 'services/users_service.dart';
 import 'services/vehicles_service.dart';
 import 'utils/app_theme.dart';
+import 'utils/link_opener.dart';
+import 'utils/ticket_printer.dart';
 import 'utils/tokens.dart';
 import 'widgets/app_shell.dart';
 
@@ -41,9 +52,21 @@ void main() {
 
 /// Raíz de la aplicación. Recibe el cliente HTTP para poder simularlo en las pruebas.
 class MotorixApp extends StatelessWidget {
-  const MotorixApp({super.key, required this.apiClient, this.useGoogleFonts = true});
+  const MotorixApp({
+    super.key,
+    required this.apiClient,
+    this.useGoogleFonts = true,
+    this.linkOpener = const SystemLinkOpener(),
+    this.ticketPrinter = const SystemTicketPrinter(),
+  });
 
   final ApiClient apiClient;
+
+  /// Abre enlaces en el navegador (se sustituye en las pruebas).
+  final LinkOpener linkOpener;
+
+  /// Imprime tickets con el diálogo del sistema (se sustituye en las pruebas).
+  final TicketPrinter ticketPrinter;
   final bool useGoogleFonts;
 
   @override
@@ -66,6 +89,14 @@ class MotorixApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => MaintenanceProvider(context.read<MaintenanceService>())),
         Provider<OrdersService>(create: (_) => OrdersService(apiClient)),
         ChangeNotifierProvider(create: (context) => OrdersProvider(context.read<OrdersService>())),
+        Provider<DashboardService>(create: (_) => DashboardService(apiClient)),
+        ChangeNotifierProvider(create: (context) => DashboardProvider(context.read<DashboardService>())),
+        Provider<LinkOpener>.value(value: linkOpener),
+        Provider<TicketPrinter>.value(value: ticketPrinter),
+        Provider<TicketsService>(create: (_) => TicketsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => TicketsProvider(context.read<TicketsService>())),
+        Provider<PaymentsService>(create: (_) => PaymentsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => PaymentsProvider(context.read<PaymentsService>())),
         Provider<PartsService>(create: (_) => PartsService(apiClient)),
         ChangeNotifierProvider(create: (context) => PartsProvider(context.read<PartsService>())),
         ChangeNotifierProvider(create: (context) => StockAlertsProvider(context.read<PartsService>())),
@@ -106,6 +137,8 @@ Widget buildSection(BuildContext context, AppSection section) {
   switch (section) {
     case AppSection.home:
       return const HomeScreen();
+    case AppSection.dashboard:
+      return const DashboardScreen();
     case AppSection.clients:
       return const ClientsListScreen();
     case AppSection.vehicles:
@@ -116,6 +149,10 @@ Widget buildSection(BuildContext context, AppSection section) {
       return const OrdersListScreen();
     case AppSection.myOrders:
       return const OrdersListScreen(mine: true);
+    case AppSection.payments:
+      return const PaymentsListScreen();
+    case AppSection.tickets:
+      return const TicketsListScreen();
     case AppSection.maintenance:
       return const MaintenanceListScreen();
     case AppSection.inventory:

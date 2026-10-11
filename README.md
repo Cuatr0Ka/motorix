@@ -2,8 +2,8 @@
 
 Sistema de Gestión para Taller Mecánico. Proyecto académico cuyo MVP se construye en cuatro
 sprints. Este repositorio contiene el **Sprint 1** (base del sistema, autenticación, usuarios,
-clientes y vehículos), el **Sprint 2** (citas y órdenes de servicio) y el **Sprint 3** (historial,
-mantenimiento e inventario).
+clientes y vehículos), el **Sprint 2** (citas y órdenes de servicio), el **Sprint 3** (historial,
+mantenimiento e inventario) y el **Sprint 4** (pagos, tickets y panel de control).
 
 ## Estructura
 
@@ -111,3 +111,22 @@ local; el detalle está en la sección 6 de [`quickstart.md`](specs/003-historia
 Menú por rol: la administración ve además Mantenimientos e Inventario; recepción ve Mantenimientos; el mecánico
 consulta el historial en el detalle del vehículo, registra el kilometraje, el mantenimiento y las refacciones en
 sus órdenes. Los permisos se validan siempre en el backend.
+
+## Estado del Sprint 4
+
+Implementado: cobro de las órdenes Terminadas o Entregadas con efectivo, tarjeta (solo folio de terminal),
+transferencia o Mercado Pago, con un único pago vigente por orden y verificación de que el importe coincide con el
+total de la orden; cancelación de cobros pendientes; entrega de la orden con cobro o sin cobro; tickets de servicio
+(folio `TK-######`, instantánea del cobro, impresión o guardado en PDF) y panel de control con indicadores y
+actividad reciente solo para administración. Los seeds incluyen pagos en los cuatro estados y métodos, y tickets.
+
+Mercado Pago es opcional y funciona solo en entorno de pruebas: el token se define únicamente en `.env`
+(`MERCADOPAGO_ACCESS_TOKEN`) y nunca se guarda en el repositorio. Sin token, los demás métodos siguen funcionando y
+el cobro con Mercado Pago responde que el servicio no está configurado. Los datos del taller del ticket se
+configuran con `SHOP_NAME`, `SHOP_ADDRESS` y `SHOP_PHONE`.
+
+Validado con 1001 pruebas del backend (lógica de pagos, adaptador de Mercado Pago simulado, concurrencia, permisos,
+seguridad, contratos, seeds y rendimiento con 1 000 pagos y tickets) y 265 del cliente.
+
+Menú por rol: la administración ve Panel de control, Cobros y Tickets; recepción ve Cobros y Tickets; el mecánico no
+accede a cobros. Los permisos se validan siempre en el backend.

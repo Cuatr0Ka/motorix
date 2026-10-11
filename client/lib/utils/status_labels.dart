@@ -90,3 +90,52 @@ enum StockStatus {
   static StockStatus fromApi(String? value) =>
       StockStatus.values.firstWhere((s) => s.apiValue == value, orElse: () => StockStatus.sufficient);
 }
+
+/// Estado de un pago. El color nunca es la única señal: cada chip lleva texto.
+enum PaymentStatus {
+  pending('PENDIENTE', 'Pendiente', StatusTone.warning),
+  paid('PAGADO', 'Pagado', StatusTone.success),
+  rejected('RECHAZADO', 'Rechazado', StatusTone.danger),
+  cancelled('CANCELADO', 'Cancelado', StatusTone.neutral);
+
+  const PaymentStatus(this.apiValue, this.label, this.tone);
+
+  final String apiValue;
+  final String label;
+  final StatusTone tone;
+
+  static PaymentStatus fromApi(String? value) =>
+      PaymentStatus.values.firstWhere((s) => s.apiValue == value, orElse: () => PaymentStatus.pending);
+}
+
+/// Método de pago.
+enum PaymentMethod {
+  cash('EFECTIVO', 'Efectivo'),
+  card('TARJETA', 'Tarjeta'),
+  transfer('TRANSFERENCIA', 'Transferencia'),
+  mercadoPago('MERCADO_PAGO', 'Mercado Pago');
+
+  const PaymentMethod(this.apiValue, this.label);
+
+  final String apiValue;
+  final String label;
+
+  static PaymentMethod fromApi(String? value) =>
+      PaymentMethod.values.firstWhere((m) => m.apiValue == value, orElse: () => PaymentMethod.cash);
+}
+
+/// Estado de cobro de una orden: Sin cobrar, Pendiente (cobro de Mercado Pago en curso) o Pagado.
+enum CollectionStatus {
+  unpaid('SIN_COBRAR', 'Sin cobrar', StatusTone.neutral),
+  pending('PENDIENTE', 'Cobro pendiente', StatusTone.warning),
+  paid('PAGADO', 'Pagado', StatusTone.success);
+
+  const CollectionStatus(this.apiValue, this.label, this.tone);
+
+  final String apiValue;
+  final String label;
+  final StatusTone tone;
+
+  static CollectionStatus fromApi(String? value) =>
+      CollectionStatus.values.firstWhere((s) => s.apiValue == value, orElse: () => CollectionStatus.unpaid);
+}

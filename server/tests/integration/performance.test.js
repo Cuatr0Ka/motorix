@@ -302,3 +302,70 @@ describe(`rendimiento de historial, inventario y mantenimientos con ${TOTAL} reg
     }
   });
 });
+
+describe(`rendimiento de pagos, tickets y panel con ${TOTAL} registros (SC-012)`, () => {
+  let admin;
+
+  beforeAll(async () => {
+    admin = await createUserWithToken('ADMIN');
+    const ordenes = await query('SELECT id FROM service_orders ORDER BY id LIMIT ?', [String(TOTAL)]);
+    const metodos = ['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'];
+    const pagos = ordenes.map((orden, i) => [orden.id, (100 + (i % 50)).toFixed(2), metodos[i % 3], usuarioId]);
+    await query(
+      `INSERT INTO payments (order_id, amount, method, status, paid_at, created_by) VALUES ${pagos.map(() => "(?, ?, ?, 'PAGADO', NOW(), ?)").join(', ')}`,
+      pagos.flat(),
+    );
+    const registrados = await query('SELECT id, order_id FROM payments ORDER BY id');
+    const tickets = registrados.map((pago) => [pago.order_id, pago.id, JSON.stringify({ totals: { total: '100.00' }, order: { folio: `OS-${pago.order_id}` } }), usuarioId]);
+    await query(
+      `INSERT INTO tickets (order_id, payment_id, content, generated_by) VALUES ${tickets.map(() => '(?, ?, ?, ?)').join(', ')}`,
+      tickets.flat(),
+    );
+  }, 120000);
+
+  async function medirAdmin(url) {
+    const inicio = performance.now();
+    const res = await request(app).get(url).set(auth(admin.token));
+    return { res, ms: performance.now() - inicio };
+  }
+
+  it('test_el_listado_y_los_filtros_de_pagos_responden_en_menos_de_2_segundos', async () => {
+    for (const url of [
+      '/api/payments',
+      '/api/payments?status=PAGADO',
+      '/api/payments?method=TARJETA',
+      '/api/payments?search=n%C3%BAmero%20500',
+      '/api/payments?search=CAR-05',
+      '/api/payments?page=50&pageSize=20',
+    ]) {
+      const { res, ms } = await medirAdmin(url);
+
+      expect(res.status).toBe(200);
+      expect(ms).toBeLessThan(LIMITE_MS);
+      if (url === '/api/payments') expect(res.body.meta.total).toBe(TOTAL);
+    }
+  });
+
+  it('test_el_listado_y_la_busqueda_de_tickets_responden_en_menos_de_2_segundos', async () => {
+    for (const url of ['/api/tickets', '/api/tickets?search=TK-5', '/api/tickets?search=CAR-05', '/api/tickets?search=n%C3%BAmero%20500', '/api/tickets?page=50&pageSize=20']) {
+      const { res, ms } = await medirAdmin(url);
+
+      expect(res.status).toBe(200);
+      expect(ms).toBeLessThan(LIMITE_MS);
+      if (url === '/api/tickets') expect(res.body.meta.total).toBe(TOTAL);
+    }
+  });
+
+  it('test_el_detalle_de_una_orden_con_cobro_y_el_panel_responden_en_menos_de_2_segundos', async () => {
+    const [{ id }] = await query('SELECT id FROM service_orders ORDER BY id DESC LIMIT 1');
+
+    const detalle = await medirAdmin(`/api/orders/${id}`);
+    const panel = await medirAdmin('/api/dashboard');
+
+    expect(detalle.res.status).toBe(200);
+    expect(detalle.res.body.data.billing).toBeDefined();
+    expect(detalle.ms).toBeLessThan(LIMITE_MS);
+    expect(panel.res.status).toBe(200);
+    expect(panel.ms).toBeLessThan(LIMITE_MS);
+  });
+});

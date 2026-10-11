@@ -8,6 +8,7 @@ import * as userModel from '../models/userModel.js';
 import * as vehicleModel from '../models/vehicleModel.js';
 import { AppError } from '../utils/AppError.js';
 import { presentMaintenance } from './maintenancePresenter.js';
+import { getBilling } from './paymentService.js';
 import { assertEntryMileage } from './mileageRule.js';
 import { ORDER_STATUS_LABELS, allowedFor, assertTransition, canActorTransition } from './orderTransitions.js';
 
@@ -71,6 +72,8 @@ export async function buildDetail(order, actor, connection) {
   // Una orden sin mecánico no puede salir de RECIBIDO: no se ofrece ninguna transición.
   const unassigned = order.mechanicId == null && order.status === 'RECIBIDO';
   const allowedTransitions = unassigned ? [] : allowedFor({ role: actor.role, userId: actor.id, order });
+  // El bloque de cobro solo lo reciben administración y recepción (el mecánico no accede a los pagos).
+  const billing = actor.role === 'MECHANIC' ? undefined : await getBilling(order, connection);
   return {
     ...toSummary(order),
     diagnosis: order.diagnosis,
@@ -88,6 +91,7 @@ export async function buildDetail(order, actor, connection) {
     allowedTransitions,
     statusHistory,
     deliveredAt: order.deliveredAt,
+    ...(billing ? { billing } : {}),
   };
 }
 
