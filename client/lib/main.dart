@@ -3,17 +3,22 @@ import 'package:provider/provider.dart';
 
 import 'providers/appointments_provider.dart';
 import 'providers/clients_provider.dart';
+import 'providers/maintenance_provider.dart';
 import 'providers/navigation_provider.dart';
 import 'providers/orders_provider.dart';
+import 'providers/parts_provider.dart';
 import 'providers/session_provider.dart';
 import 'providers/sidebar_provider.dart';
+import 'providers/stock_alerts_provider.dart';
 import 'providers/users_provider.dart';
 import 'providers/vehicles_provider.dart';
 import 'screens/appointments_list_screen.dart';
 import 'screens/change_password_screen.dart';
 import 'screens/clients_list_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/inventory_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/maintenance_list_screen.dart';
 import 'screens/orders_list_screen.dart';
 import 'screens/users_screen.dart';
 import 'screens/vehicles_list_screen.dart';
@@ -21,7 +26,9 @@ import 'services/api_client.dart';
 import 'services/appointments_service.dart';
 import 'services/auth_service.dart';
 import 'services/clients_service.dart';
+import 'services/maintenance_service.dart';
 import 'services/orders_service.dart';
+import 'services/parts_service.dart';
 import 'services/users_service.dart';
 import 'services/vehicles_service.dart';
 import 'utils/app_theme.dart';
@@ -55,8 +62,13 @@ class MotorixApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => VehiclesProvider(context.read<VehiclesService>())),
         Provider<AppointmentsService>(create: (_) => AppointmentsService(apiClient)),
         ChangeNotifierProvider(create: (context) => AppointmentsProvider(context.read<AppointmentsService>())),
+        Provider<MaintenanceService>(create: (_) => MaintenanceService(apiClient)),
+        ChangeNotifierProvider(create: (context) => MaintenanceProvider(context.read<MaintenanceService>())),
         Provider<OrdersService>(create: (_) => OrdersService(apiClient)),
         ChangeNotifierProvider(create: (context) => OrdersProvider(context.read<OrdersService>())),
+        Provider<PartsService>(create: (_) => PartsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => PartsProvider(context.read<PartsService>())),
+        ChangeNotifierProvider(create: (context) => StockAlertsProvider(context.read<PartsService>())),
         Provider<UsersService>(create: (_) => UsersService(apiClient)),
         ChangeNotifierProvider(create: (context) => UsersProvider(context.read<UsersService>())),
       ],
@@ -104,6 +116,10 @@ Widget buildSection(BuildContext context, AppSection section) {
       return const OrdersListScreen();
     case AppSection.myOrders:
       return const OrdersListScreen(mine: true);
+    case AppSection.maintenance:
+      return const MaintenanceListScreen();
+    case AppSection.inventory:
+      return const InventoryScreen();
     case AppSection.users:
       return const UsersScreen();
     case AppSection.changePassword:

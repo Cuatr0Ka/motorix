@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 
+import '../models/maintenance.dart';
 import '../models/order_work.dart';
 import '../models/service_order.dart';
 import '../services/api_client.dart';
+import '../services/maintenance_service.dart';
 import '../services/orders_service.dart';
 import '../utils/status_labels.dart';
 
@@ -10,9 +12,10 @@ import '../utils/status_labels.dart';
 /// cambiar el estado). Cada acción devuelve el mensaje de error en español, o null si salió bien; la
 /// orden se actualiza con la respuesta del servidor, que es la fuente de verdad.
 class OrderDetailProvider extends ChangeNotifier {
-  OrderDetailProvider(this.service, this.orderId);
+  OrderDetailProvider(this.service, this.orderId, {required this.maintenanceService});
 
   final OrdersService service;
+  final MaintenanceService maintenanceService;
   final int orderId;
 
   ServiceOrder? _order;
@@ -78,6 +81,41 @@ class OrderDetailProvider extends ChangeNotifier {
 
   /// Registra o edita un campo del trabajo (`diagnosis`, `observations` o `recommendations`).
   Future<String?> saveWorkField(String field, String? value) => run(() => service.updateWork(orderId, {field: value}));
+
+  /// Registra el kilometraje del servicio de una orden Terminada.
+  Future<String?> setServiceMileage(int mileage) => run(() => service.setServiceMileage(orderId, mileage));
+
+  /// Programa el próximo mantenimiento y recarga la orden para mostrarlo.
+  Future<String?> scheduleMaintenance(MaintenanceInput input) => run(() async {
+        await maintenanceService.schedule(orderId, input);
+        return service.get(orderId);
+      });
+
+  Future<String?> updateMaintenance(int id, MaintenanceInput input) => run(() async {
+        await maintenanceService.update(id, input);
+        return service.get(orderId);
+      });
+
+  Future<String?> attendMaintenance(int id) => run(() async {
+        await maintenanceService.attend(id);
+        return service.get(orderId);
+      });
+
+  /// Agrega, corrige o quita refacciones de la orden y recarga el detalle (el servidor actualiza el stock).
+  Future<String?> addPart(int partId, int quantity) => run(() async {
+        await service.addPart(orderId, partId, quantity);
+        return service.get(orderId);
+      });
+
+  Future<String?> updatePart(int lineId, int quantity) => run(() async {
+        await service.updatePart(orderId, lineId, quantity);
+        return service.get(orderId);
+      });
+
+  Future<String?> removePart(int lineId) => run(() async {
+        await service.removePart(orderId, lineId);
+        return service.get(orderId);
+      });
 
   Future<String?> addLine(OrderLineKind kind, OrderLineInput input) => _changeLines(() => service.addLine(orderId, kind, input));
 

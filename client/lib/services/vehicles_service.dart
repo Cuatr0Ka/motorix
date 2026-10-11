@@ -1,3 +1,5 @@
+import '../models/history_entry.dart';
+import '../models/maintenance.dart';
 import '../models/paged_result.dart';
 import '../models/vehicle.dart';
 import 'api_client.dart';
@@ -19,6 +21,21 @@ class VehiclesService {
       total: response.total,
       page: (response.meta?['page'] as num?)?.toInt() ?? page,
       pageSize: (response.meta?['pageSize'] as num?)?.toInt() ?? pageSize,
+    );
+  }
+
+  /// Historial de servicios del vehículo (órdenes Terminadas o Entregadas, la más reciente primero).
+  Future<VehicleHistory> history(int vehicleId, {int page = 1, int pageSize = 20}) async {
+    final response = await _api.get('/vehicles/$vehicleId/history', query: {'page': page, 'pageSize': pageSize});
+    final data = response.map;
+    return VehicleHistory(
+      entries: ((data['entries'] as List?) ?? const [])
+          .map((e) => HistoryEntry.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList(),
+      total: response.total,
+      pendingMaintenance: data['pendingMaintenance'] == null
+          ? null
+          : Maintenance.fromJson(Map<String, dynamic>.from(data['pendingMaintenance'] as Map)),
     );
   }
 

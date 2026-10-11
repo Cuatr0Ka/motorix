@@ -128,3 +128,27 @@ export const changeStatusSchema = z.object({
     message: 'El estado no es válido.',
   }),
 });
+
+/** Kilometraje del servicio: entero de 0 a 2 000 000 (la comparación con el de entrada la hace el servicio). */
+export const serviceMileageSchema = z.object({
+  serviceMileage: z
+    .number({ required_error: 'El kilometraje del servicio es obligatorio.', invalid_type_error: 'El kilometraje debe ser un número.' })
+    .int('El kilometraje debe ser un número entero.')
+    .min(0, 'El kilometraje no puede ser negativo.')
+    .max(2000000, 'El kilometraje no puede pasar de 2 000 000.'),
+});
+
+const partQuantity = z
+  .number({ required_error: 'La cantidad es obligatoria.', invalid_type_error: 'La cantidad debe ser un número.' })
+  .int('La cantidad debe ser un número entero.')
+  .min(1, 'La cantidad debe ser al menos 1.')
+  .max(100000, 'La cantidad no puede pasar de 100 000.');
+
+/** Refacción usada en la orden: se suma a la línea existente si ya estaba. */
+export const addOrderPartSchema = z.object({ partId: positiveId('La refacción'), quantity: partQuantity });
+
+/** Corrección de una línea: cantidad nueva total. */
+export const updateOrderPartSchema = z.object({ quantity: partQuantity });
+
+/** Parámetros de una línea de refacción de la orden. */
+export const orderPartParams = lineParams;

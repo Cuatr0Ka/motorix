@@ -2,6 +2,7 @@ import { withTransaction } from '../config/db.js';
 import * as orderModel from '../models/orderModel.js';
 import * as orderWorkModel from '../models/orderWorkModel.js';
 import { AppError } from '../utils/AppError.js';
+import { assertServiceMileage } from './mileageRule.js';
 import { buildDetail, loadOrderForActor } from './orderService.js';
 
 const readOnly = () =>
@@ -69,4 +70,22 @@ export async function removeLine(kind, orderId, lineId, actor) {
     await orderWorkModel.deleteLine(kind, orderId, lineId, connection);
     return { deleted: true, totals: await orderWorkModel.totals(orderId, connection) };
   });
+}
+
+/**
+ * Registra (o corrige) el kilometraje del servicio de una orden Terminada. No puede ser menor al de
+ * entrada y sube el kilometraje actual del vehículo si es mayor. Una orden Entregada es solo lectura.
+ */
+export async function setServiceMileage(id, serviceMileage, actor) {
+  await withTransaction(async (connection) => {
+    const order = await loadOrderForActor(id, actor, connection);
+    const locked = await orderModel.lockById(id, connection);
+    if (locked.status === 'ENTREGADO') throw readOnly();
+    if (locked.status !== 'TERMINADO') {
+      throw AppError.conflict('ORDER_NOT_FINISHED', 'El kilometraje del servicio se registra cuando la orden está Terminada.');
+    }
+    assertServiceMileage({ entry: order.entryMileage, service: serviceMileage });
+    await orderModel.setServiceMileage(id, order.vehicle.id, serviceMileage, connection);
+  });
+  return buildDetail(await loadOrderForActor(id, actor), actor);
 }

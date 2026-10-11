@@ -1,19 +1,26 @@
 import { Router } from 'express';
+import * as maintenanceController from '../controllers/maintenanceController.js';
 import * as orderController from '../controllers/orderController.js';
+import * as orderPartController from '../controllers/orderPartController.js';
 import * as orderWorkController from '../controllers/orderWorkController.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { authorize, ROLES } from '../middlewares/authorize.js';
 import { validate } from '../middlewares/validate.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { idParams } from '../validators/common.js';
+import { createMaintenanceSchema } from '../validators/maintenanceValidators.js';
 import {
+  addOrderPartSchema,
   assignMechanicSchema,
   changeStatusSchema,
   createLineSchema,
   createOrderSchema,
   lineParams,
   listOrdersQuery,
+  orderPartParams,
+  serviceMileageSchema,
   updateLineSchema,
+  updateOrderPartSchema,
   updateWorkSchema,
 } from '../validators/orderValidators.js';
 
@@ -51,6 +58,35 @@ router.patch(
   validate({ params: idParams, body: updateWorkSchema }),
   asyncHandler(orderWorkController.updateWork),
 );
+
+router.put(
+  '/:id/service-mileage',
+  worker,
+  validate({ params: idParams, body: serviceMileageSchema }),
+  asyncHandler(orderWorkController.setServiceMileage),
+);
+
+router.post(
+  '/:id/maintenance',
+  worker,
+  validate({ params: idParams, body: createMaintenanceSchema }),
+  asyncHandler(maintenanceController.schedule),
+);
+
+// Refacciones usadas: cada alta, corrección o baja genera su movimiento de inventario en la misma transacción.
+router.post(
+  '/:id/parts',
+  worker,
+  validate({ params: idParams, body: addOrderPartSchema }),
+  asyncHandler(orderPartController.add),
+);
+router.patch(
+  '/:id/parts/:lineId',
+  worker,
+  validate({ params: orderPartParams, body: updateOrderPartSchema }),
+  asyncHandler(orderPartController.updateQuantity),
+);
+router.delete('/:id/parts/:lineId', worker, validate({ params: orderPartParams }), asyncHandler(orderPartController.remove));
 
 for (const [path, kind] of [
   ['services', 'services'],

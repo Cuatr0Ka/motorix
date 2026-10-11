@@ -54,6 +54,22 @@ export function getJwtConfig(source = process.env) {
   return { jwtSecret: source.JWT_SECRET, jwtExpiresInSeconds: 8 * 60 * 60 };
 }
 
+/**
+ * Márgenes de aviso «Próximo» de los mantenimientos (RN-12: configurables, sin valores universales).
+ * Variables opcionales: MAINTENANCE_WARN_DAYS (30) y MAINTENANCE_WARN_KM (1000).
+ */
+export function getMaintenanceConfig(source = process.env) {
+  const read = (name, fallback) => {
+    const raw = source[name];
+    if (raw === undefined || raw === '') return fallback;
+    if (!/^\d+$/.test(String(raw)) || Number(raw) <= 0) {
+      throw new Error(`La variable de entorno ${name} debe ser un entero positivo (recibida: "${raw}").`);
+    }
+    return Number(raw);
+  };
+  return { warnDays: read('MAINTENANCE_WARN_DAYS', 30), warnKm: read('MAINTENANCE_WARN_KM', 1000) };
+}
+
 // Configuración perezosa: se valida al primer uso para que las pruebas unitarias de módulos
 // que no tocan la base no necesiten un .env completo.
 let cached;

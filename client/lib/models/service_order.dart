@@ -1,4 +1,5 @@
 import '../utils/status_labels.dart';
+import 'maintenance.dart';
 import 'order_work.dart';
 
 class OrderClient {
@@ -90,6 +91,9 @@ class ServiceOrder {
     this.appointment,
     this.services = const [],
     this.labor = const [],
+    this.parts = const [],
+    this.serviceMileage,
+    this.maintenance,
     this.totals = OrderTotals.zero,
     this.allowedTransitions = const [],
     this.statusHistory = const [],
@@ -120,6 +124,13 @@ class ServiceOrder {
         labor: (json['labor'] as List? ?? const [])
             .map((e) => OrderLine.fromJson(Map<String, dynamic>.from(e as Map)))
             .toList(),
+        parts: (json['parts'] as List? ?? const [])
+            .map((e) => OrderPart.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        serviceMileage: (json['serviceMileage'] as num?)?.toInt(),
+        maintenance: json['maintenance'] == null
+            ? null
+            : Maintenance.fromJson(Map<String, dynamic>.from(json['maintenance'] as Map)),
         totals: json['totals'] == null ? OrderTotals.zero : OrderTotals.fromJson(Map<String, dynamic>.from(json['totals'] as Map)),
         allowedTransitions: (json['allowedTransitions'] as List? ?? const [])
             .map((e) => OrderStatus.fromApi('$e'))
@@ -147,12 +158,22 @@ class ServiceOrder {
   final OrderAppointmentRef? appointment;
   final List<OrderLine> services;
   final List<OrderLine> labor;
+  final List<OrderPart> parts;
+
+  /// Kilometraje al terminar el servicio (se registra con la orden Terminada).
+  final int? serviceMileage;
+
+  /// Último mantenimiento programado desde esta orden, si existe.
+  final Maintenance? maintenance;
   final OrderTotals totals;
   final List<OrderStatus> allowedTransitions;
   final List<StatusChange> statusHistory;
   final DateTime? deliveredAt;
 
   bool get isDelivered => status == OrderStatus.delivered;
+
+  /// Servicio concluido (Terminada o Entregada): permite programar el próximo mantenimiento.
+  bool get isFinishedOrDelivered => status == OrderStatus.finished || status == OrderStatus.delivered;
 
   /// Aún se puede asignar o reasignar mecánico (no está terminada ni entregada).
   bool get isAssignable => status != OrderStatus.finished && status != OrderStatus.delivered;

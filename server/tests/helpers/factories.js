@@ -15,6 +15,10 @@ export async function resetDatabase() {
   if (!db.database.endsWith('_test')) {
     throw new Error(`Se canceló el reinicio: "${db.database}" no es una base de pruebas.`);
   }
+  await query('DELETE FROM inventory_movements');
+  await query('DELETE FROM order_parts');
+  await query('DELETE FROM maintenance');
+  await query('DELETE FROM parts');
   await query('DELETE FROM order_status_history');
   await query('DELETE FROM order_labor');
   await query('DELETE FROM order_services');
@@ -176,4 +180,90 @@ export async function createClientWithVehicle(vehicleOverrides = {}, clientOverr
   const client = await createClient(clientOverrides);
   const vehicle = await createVehicle(client.id, vehicleOverrides);
   return { client, vehicle };
+}
+
+let partCounter = 0;
+
+/** Refacción de prueba. Con `stock` > 0 registra el movimiento de entrada «Stock inicial» (la suma coincide). */
+export async function createPart(createdBy, overrides = {}) {
+  partCounter += 1;
+  const data = {
+    code: `REF-${String(partCounter).padStart(4, '0')}-${Date.now().toString(36).toUpperCase()}`,
+    name: `Refacción de prueba ${partCounter}`,
+    description: null,
+    unit: 'pieza',
+    stock: 10,
+    minStock: 3,
+    active: 1,
+    ...overrides,
+  };
+  const result = await query(
+    'INSERT INTO parts (code, name, description, unit, stock, min_stock, active) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [data.code, data.name, data.description, data.unit, data.stock, data.minStock, data.active],
+  );
+  if (data.stock > 0) {
+    await query(
+      "INSERT INTO inventory_movements (part_id, type, quantity, reason, created_by) VALUES (?, 'IN', ?, 'Stock inicial', ?)",
+      [result.insertId, data.stock, createdBy],
+    );
+  }
+  return { id: result.insertId, ...data };
+}
+
+/** Movimiento de inventario directo en la base (no modifica el stock de la refacción). */
+export async function createMovement(partId, createdBy, overrides = {}) {
+  const data = { type: 'IN', quantity: 1, reason: 'Movimiento de prueba', orderId: null, ...overrides };
+  const result = await query(
+    'INSERT INTO inventory_movements (part_id, type, quantity, reason, order_id, created_by) VALUES (?, ?, ?, ?, ?, ?)',
+    [partId, data.type, data.quantity, data.reason, data.orderId, createdBy],
+  );
+  return { id: result.insertId, partId, ...data };
+}
+
+/** Línea de refacción de una orden directo en la base (no genera movimiento ni cambia el stock). */
+export async function createOrderPart(orderId, partId, createdBy, quantity = 1) {
+  const result = await query('INSERT INTO order_parts (order_id, part_id, quantity, created_by) VALUES (?, ?, ?, ?)', [
+    orderId,
+    partId,
+    quantity,
+    createdBy,
+  ]);
+  return { id: result.insertId, orderId, partId, quantity };
+}
+
+/** Mantenimiento de prueba (PENDIENTE por defecto, con fecha objetivo dentro de 6 meses). */
+export async function createMaintenance(vehicleId, orderId, createdBy, overrides = {}) {
+  const data = {
+    description: 'Cambio de aceite y filtro',
+    dueDate: new Date(Date.now() + 180 * 24 * 3600 * 1000),
+    dueMileage: null,
+    status: 'PENDIENTE',
+    ...overrides,
+  };
+  const result = await query(
+    `INSERT INTO maintenance (vehicle_id, order_id, description, due_date, due_mileage, status, attended_at, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      vehicleId,
+      orderId,
+      data.description,
+      data.dueDate,
+      data.dueMileage,
+      data.status,
+      data.status === 'ATENDIDO' ? new Date() : null,
+      createdBy,
+    ],
+  );
+  return { id: result.insertId, vehicleId, orderId, ...data };
+}
+
+/**
+ * Orden TERMINADO o ENTREGADO con mecánico, un servicio y su historial de estados. Útil para el
+ * historial, el kilometraje del servicio y los mantenimientos.
+ */
+export async function createFinishedOrder(vehicleId, createdBy, mechanicId, overrides = {}) {
+  const { status = 'TERMINADO', ...rest } = overrides;
+  const order = await createOrder(vehicleId, createdBy, { mechanicId, status, diagnosis: 'Diagnóstico de prueba', ...rest });
+  await createService(order.id);
+  return order;
 }

@@ -56,6 +56,26 @@ class OrdersService {
         (await _api.post('/orders/$orderId/status', body: {'status': status.apiValue})).map,
       );
 
+  /// Registra el kilometraje del servicio (orden Terminada, no menor al de entrada).
+  Future<ServiceOrder> setServiceMileage(int orderId, int serviceMileage) async => ServiceOrder.fromJson(
+        (await _api.put('/orders/$orderId/service-mileage', body: {'serviceMileage': serviceMileage})).map,
+      );
+
+  /// Agrega una refacción a la orden (suma sobre la línea existente) y descuenta el inventario.
+  Future<void> addPart(int orderId, int partId, int quantity) async {
+    await _api.post('/orders/$orderId/parts', body: {'partId': partId, 'quantity': quantity});
+  }
+
+  /// Corrige la cantidad total de una línea de refacción.
+  Future<void> updatePart(int orderId, int lineId, int quantity) async {
+    await _api.patch('/orders/$orderId/parts/$lineId', body: {'quantity': quantity});
+  }
+
+  /// Quita la línea y devuelve su cantidad al inventario.
+  Future<void> removePart(int orderId, int lineId) async {
+    await _api.delete('/orders/$orderId/parts/$lineId');
+  }
+
   Future<OrderLineResult> addLine(int orderId, OrderLineKind kind, OrderLineInput input) async {
     final response = await _api.post('/orders/$orderId/${kind.path}', body: input.toJson());
     return _lineResult(response.map);

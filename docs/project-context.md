@@ -583,6 +583,22 @@ definitivos deben validarse durante cada sprint.
 > `order_status_history` (historial de cambios de estado de la orden) y los
 > campos `mileage_correction` y `mileage_correction_reason` en `service_orders`
 > para registrar una corrección explícita de kilometraje (RN-4).
+>
+> **Decisión del Sprint 3:** las entidades `Part`, `InventoryMovement` y `Maintenance`
+> usan los campos de la especificación del sprint, no los de la lista inicial de abajo:
+> - `Part` (`parts`): `code` único, `name`, `description`, `unit`, `stock`, `minimumStock`
+>   (`min_stock`) y `active`. No incluye categoría, marca ni precios (se difieren a los sprints
+>   de pagos y tickets). Las refacciones no se eliminan; se desactivan.
+> - `InventoryMovement` (`inventory_movements`): tabla de solo agregar; `quantity` lleva signo
+>   (entrada +, salida −, ajuste ±), con `reason`, `order_id` opcional y `created_by`. El stock
+>   de la refacción es siempre la suma de sus movimientos.
+> - `Maintenance` (`maintenance`): `vehicle_id`, `order_id` de origen, `description`, `due_date`
+>   y/o `due_mileage` (al menos uno), `status` PENDIENTE/ATENDIDO; el indicador Normal, Próximo o
+>   Vencido se **calcula** (no se almacena) y los márgenes son configurables.
+> - Tablas nuevas del sprint: `parts`, `inventory_movements`, `order_parts` (refacciones usadas por
+>   orden, una línea por refacción) y `maintenance`; además la columna
+>   `service_orders.service_mileage` (kilometraje al terminar el servicio).
+> - El historial del vehículo no es una tabla: se calcula con las órdenes Terminadas o Entregadas.
 
 ## User
 

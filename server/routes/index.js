@@ -2,8 +2,10 @@ import { Router } from 'express';
 import appointmentRoutes from './appointmentRoutes.js';
 import authRoutes from './authRoutes.js';
 import clientRoutes from './clientRoutes.js';
+import maintenanceRoutes from './maintenanceRoutes.js';
 import mechanicRoutes from './mechanicRoutes.js';
 import orderRoutes from './orderRoutes.js';
+import partRoutes from './partRoutes.js';
 import userRoutes from './userRoutes.js';
 import vehicleRoutes from './vehicleRoutes.js';
 
@@ -21,5 +23,7 @@ router.use('/users', userRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/orders', orderRoutes);
 router.use('/mechanics', mechanicRoutes);
+router.use('/maintenance', maintenanceRoutes);
+router.use('/parts', partRoutes);
 
 export default router;

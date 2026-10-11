@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/navigation_provider.dart';
+import '../models/user.dart';
 import '../providers/session_provider.dart';
+import '../providers/stock_alerts_provider.dart';
 import '../utils/tokens.dart';
+import '../widgets/stock_alerts_banner.dart';
 
 /// Pantalla de bienvenida: nombre, rol y accesos directos a las secciones permitidas.
 /// No muestra indicadores ni estadísticas (el panel de control es de otro sprint).
@@ -16,6 +19,8 @@ class HomeScreen extends StatelessWidget {
     AppSection.appointments: 'Programar y consultar la llegada de los vehículos',
     AppSection.orders: 'Crear y dar seguimiento a las órdenes de servicio',
     AppSection.myOrders: 'Consultar y trabajar las órdenes que tienes asignadas',
+    AppSection.maintenance: 'Ver los mantenimientos próximos y vencidos para avisar al cliente',
+    AppSection.inventory: 'Controlar las refacciones, su existencia y las alertas de stock bajo',
     AppSection.users: 'Administrar quién puede usar el sistema',
   };
 
@@ -38,6 +43,7 @@ class HomeScreen extends StatelessWidget {
               Text('Hola, ${user.name}', style: theme.textTheme.headlineMedium),
               const SizedBox(height: AppSpacing.xs),
               Text('Sesión iniciada como ${user.role.label}', style: theme.textTheme.bodySmall),
+              if (user.role == UserRole.admin) _StockAlertNotice(),
               const SizedBox(height: AppSpacing.xl),
               Text('Accesos directos', style: theme.textTheme.titleMedium),
               const SizedBox(height: AppSpacing.md),
@@ -63,6 +69,40 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Aviso de stock bajo en el inicio del administrador: aparece solo si hay refacciones en alerta y lleva a Inventario.
+class _StockAlertNotice extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final alerts = context.watch<StockAlertsProvider>();
+    if (!alerts.loaded || alerts.count == 0) return const SizedBox.shrink();
+    final color = alerts.outOfStock > 0 ? AppColors.danger : AppColors.warning;
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xl),
+      child: InkWell(
+        key: const ValueKey('aviso-stock-bajo'),
+        borderRadius: BorderRadius.circular(AppRadius.panel),
+        onTap: () => context.read<NavigationProvider>().goTo(AppSection.inventory),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(AppRadius.panel),
+            border: Border.all(color: color.withValues(alpha: 0.4)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.warning_amber_outlined, color: color, size: 20),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(child: Text(stockAlertsSummary(alerts.count, alerts.outOfStock))),
+              const Icon(Icons.chevron_right, color: AppColors.textSecondary),
             ],
           ),
         ),

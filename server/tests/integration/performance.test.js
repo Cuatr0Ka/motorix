@@ -183,3 +183,122 @@ describe(`rendimiento de citas y órdenes con ${TOTAL} registros (SC-010)`, () =
     expect(ms).toBeLessThan(LIMITE_MS);
   });
 });
+
+describe(`rendimiento de historial, inventario y mantenimientos con ${TOTAL} registros (SC-012)`, () => {
+  let admin;
+  let vehiculoConHistorial;
+
+  beforeAll(async () => {
+    admin = await createUserWithToken('ADMIN');
+
+    // 1 000 refacciones (con mínimos repartidos para tener las tres condiciones de stock) y 1 000 movimientos
+    // adicionales sobre una de ellas.
+    const partes = Array.from({ length: TOTAL }, (_, i) => [`PERF-${String(i).padStart(4, '0')}`, `Refacción de carga ${i}`, 'pieza', (i % 3) * 5, 5]);
+    await query(
+      `INSERT INTO parts (code, name, unit, stock, min_stock) VALUES ${partes.map(() => '(?, ?, ?, ?, ?)').join(', ')}`,
+      partes.flat(),
+    );
+    const ids = (await query('SELECT id FROM parts ORDER BY id')).map((p) => p.id);
+    const entradas = Array.from({ length: TOTAL }, () => [ids[0], 'IN', 1, 'Entrada de carga', admin.id]);
+    await query(
+      `INSERT INTO inventory_movements (part_id, type, quantity, reason, created_by) VALUES ${entradas.map(() => "(?, ?, ?, ?, ?)").join(', ')}`,
+      entradas.flat(),
+    );
+    await query('UPDATE parts SET stock = stock + ? WHERE id = ?', [TOTAL, ids[0]]);
+
+    // 1 000 mantenimientos pendientes (uno por vehículo, con indicadores variados).
+    const ordenes = await query('SELECT o.id, o.vehicle_id FROM service_orders o ORDER BY o.id LIMIT ?', [TOTAL].map(String));
+    await query('UPDATE vehicles SET current_mileage = 5000');
+    const mantenimientos = ordenes.map((o, i) => [
+      o.vehicle_id,
+      o.id,
+      `Mantenimiento de carga ${i}`,
+      i % 4 === 0 ? null : new Date(Date.now() + ((i % 5) * 30 - 40) * 24 * 3600 * 1000),
+      i % 4 === 0 || i % 2 ? 5000 + (i % 7) * 600 : null,
+      admin.id,
+    ]);
+    await query(
+      `INSERT INTO maintenance (vehicle_id, order_id, description, due_date, due_mileage, created_by) VALUES ${mantenimientos.map(() => '(?, ?, ?, ?, ?, ?)').join(', ')}`,
+      mantenimientos.flat(),
+    );
+
+    // Un vehículo con 1 000 servicios entregados para el historial.
+    [{ id: vehiculoConHistorial }] = await query("SELECT id FROM vehicles WHERE license_plate = 'CAR-0001-X'");
+    const [{ client_id: clienteId }] = await query('SELECT client_id FROM vehicles WHERE id = ?', [vehiculoConHistorial]);
+    const historicas = Array.from({ length: TOTAL }, (_, i) => [clienteId, vehiculoConHistorial, mecanico.id, `Servicio histórico ${i}`, 1000 + i, admin.id]);
+    await query(
+      `INSERT INTO service_orders (client_id, vehicle_id, mechanic_id, status, reported_problem, entry_mileage, created_by) VALUES ${historicas.map(() => "(?, ?, ?, 'ENTREGADO', ?, ?, ?)").join(', ')}`,
+      historicas.flat(),
+    );
+    const idsHistoricas = (await query("SELECT id FROM service_orders WHERE reported_problem LIKE 'Servicio histórico %'")).map((o) => o.id);
+    const servicios = idsHistoricas.map((id) => [id, 'Servicio de carga', '100.00']);
+    await query(
+      `INSERT INTO order_services (order_id, description, amount) VALUES ${servicios.map(() => '(?, ?, ?)').join(', ')}`,
+      servicios.flat(),
+    );
+  }, 120000);
+
+  /** Mide una petición como administrador. */
+  async function medirAdmin(url) {
+    const inicio = performance.now();
+    const res = await request(app).get(url).set(auth(admin.token));
+    return { res, ms: performance.now() - inicio };
+  }
+
+  it('test_el_listado_y_los_filtros_de_refacciones_responden_en_menos_de_2_segundos', async () => {
+    for (const url of [
+      '/api/parts',
+      '/api/parts?search=carga%20500',
+      '/api/parts?search=PERF-05',
+      '/api/parts?stockStatus=AGOTADO',
+      '/api/parts?stockStatus=BAJO',
+      '/api/parts?stockStatus=SUFICIENTE&active=true',
+      '/api/parts?page=50&pageSize=20',
+    ]) {
+      const { res, ms } = await medirAdmin(url);
+
+      expect(res.status).toBe(200);
+      expect(ms).toBeLessThan(LIMITE_MS);
+      if (url === '/api/parts') expect(res.body.meta.total).toBe(TOTAL);
+    }
+  });
+
+  it('test_las_alertas_y_los_movimientos_responden_en_menos_de_2_segundos', async () => {
+    const [{ id }] = await query("SELECT id FROM parts WHERE code = 'PERF-0000'");
+    for (const url of ['/api/parts/alerts', `/api/parts/${id}`, `/api/parts/${id}/movements?page=50&pageSize=20`]) {
+      const { res, ms } = await medirAdmin(url);
+
+      expect(res.status).toBe(200);
+      expect(ms).toBeLessThan(LIMITE_MS);
+    }
+  });
+
+  it('test_la_lista_de_mantenimientos_y_sus_filtros_responden_en_menos_de_2_segundos', async () => {
+    for (const url of [
+      '/api/maintenance',
+      '/api/maintenance?indicator=VENCIDO',
+      '/api/maintenance?indicator=PROXIMO',
+      '/api/maintenance?indicator=NORMAL',
+      '/api/maintenance?search=n%C3%BAmero%20500',
+      '/api/maintenance?search=CAR-05',
+      '/api/maintenance?page=50&pageSize=20',
+    ]) {
+      const { res, ms } = await medirAdmin(url);
+
+      expect(res.status).toBe(200);
+      expect(ms).toBeLessThan(LIMITE_MS);
+      if (url === '/api/maintenance') expect(res.body.meta.total).toBe(TOTAL);
+    }
+  });
+
+  it('test_el_historial_de_un_vehiculo_con_mil_servicios_responde_en_menos_de_2_segundos', async () => {
+    for (const url of [`/api/vehicles/${vehiculoConHistorial}/history`, `/api/vehicles/${vehiculoConHistorial}/history?page=50&pageSize=20`]) {
+      const { res, ms } = await medirAdmin(url);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.entries).toHaveLength(20);
+      expect(res.body.meta.total).toBeGreaterThanOrEqual(TOTAL);
+      expect(ms).toBeLessThan(LIMITE_MS);
+    }
+  });
+});

@@ -1,10 +1,13 @@
 import { withTransaction } from '../config/db.js';
 import * as appointmentModel from '../models/appointmentModel.js';
+import * as maintenanceModel from '../models/maintenanceModel.js';
 import * as orderModel from '../models/orderModel.js';
+import * as orderPartModel from '../models/orderPartModel.js';
 import * as orderWorkModel from '../models/orderWorkModel.js';
 import * as userModel from '../models/userModel.js';
 import * as vehicleModel from '../models/vehicleModel.js';
 import { AppError } from '../utils/AppError.js';
+import { presentMaintenance } from './maintenancePresenter.js';
 import { assertEntryMileage } from './mileageRule.js';
 import { ORDER_STATUS_LABELS, allowedFor, assertTransition, canActorTransition } from './orderTransitions.js';
 
@@ -57,11 +60,13 @@ export function toSummary(order) {
 
 /** Detalle de la orden: resumen + trabajo, totales, historial y transiciones que puede ejecutar quien consulta. */
 export async function buildDetail(order, actor, connection) {
-  const [services, labor, totals, statusHistory] = await Promise.all([
+  const [services, labor, totals, statusHistory, scheduled, parts] = await Promise.all([
     orderWorkModel.listServices(order.id, connection),
     orderWorkModel.listLabor(order.id, connection),
     orderWorkModel.totals(order.id, connection),
     orderWorkModel.listHistory(order.id, connection),
+    maintenanceModel.findLatestByOrder(order.id, connection),
+    orderPartModel.listByOrder(order.id, connection),
   ]);
   // Una orden sin mecánico no puede salir de RECIBIDO: no se ofrece ninguna transición.
   const unassigned = order.mechanicId == null && order.status === 'RECIBIDO';
@@ -71,11 +76,14 @@ export async function buildDetail(order, actor, connection) {
     diagnosis: order.diagnosis,
     observations: order.observations,
     recommendations: order.recommendations,
+    serviceMileage: order.serviceMileage,
+    maintenance: scheduled ? presentMaintenance(scheduled, scheduled.currentMileage) : null,
     mileageCorrection: order.mileageCorrection,
     mileageCorrectionReason: order.mileageCorrectionReason,
     appointment: order.appointment,
     services,
     labor,
+    parts,
     totals,
     allowedTransitions,
     statusHistory,

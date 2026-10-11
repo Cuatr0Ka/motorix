@@ -22,11 +22,14 @@ if (-not $Forzar) {
 
 $conexion = Get-ConexionMySql -Base $Base
 
-Invoke-MySql -Conexion $conexion -Sql @"
-SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS vehicles, clients, users, schema_migrations;
-SET FOREIGN_KEY_CHECKS = 1;
-"@
+# Se eliminan TODAS las tablas de la base (no una lista fija), de modo que las tablas que agregue cada
+# sprint tampoco impidan recrear el esquema desde cero.
+$tablas = @(Invoke-MySql -Conexion $conexion -Sql 'SHOW TABLES;' -Silencioso | Where-Object { $_ })
+if ($tablas.Count -gt 0) {
+  $comilla = [char]96
+  $lista = ($tablas | ForEach-Object { "$comilla$($_.Trim())$comilla" }) -join ', '
+  Invoke-MySql -Conexion $conexion -Sql "SET FOREIGN_KEY_CHECKS = 0; DROP TABLE IF EXISTS $lista; SET FOREIGN_KEY_CHECKS = 1;"
+}
 
 & (Join-Path $PSScriptRoot 'aplicar-migraciones.ps1') -Base $Base
 if (-not $SinSeeds) { & (Join-Path $PSScriptRoot 'aplicar-seeds.ps1') -Base $Base }

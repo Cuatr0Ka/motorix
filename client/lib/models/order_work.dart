@@ -57,3 +57,32 @@ enum OrderLineKind {
 
   final String path;
 }
+
+/// Refacción utilizada en una orden (una línea por refacción). `available` es la existencia actual,
+/// para mostrar cuánto más se puede agregar.
+class OrderPart {
+  const OrderPart({
+    required this.id,
+    required this.partId,
+    required this.code,
+    required this.name,
+    required this.unit,
+    required this.quantity,
+  });
+
+  factory OrderPart.fromJson(Map<String, dynamic> json) => OrderPart(
+        id: (json['id'] as num).toInt(),
+        partId: (json['partId'] as num).toInt(),
+        code: '${json['code']}',
+        name: '${json['name']}',
+        unit: '${json['unit']}',
+        quantity: (json['quantity'] as num).toInt(),
+      );
+
+  final int id;
+  final int partId;
+  final String code;
+  final String name;
+  final String unit;
+  final int quantity;
+}

@@ -6,12 +6,16 @@ import '../models/service_order.dart';
 import '../models/user.dart';
 import '../providers/order_detail_provider.dart';
 import '../providers/session_provider.dart';
+import '../services/maintenance_service.dart';
 import '../services/orders_service.dart';
 import '../utils/formatters.dart';
 import '../utils/status_labels.dart';
 import '../utils/tokens.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/mechanic_selector.dart';
+import '../widgets/order_maintenance_section.dart';
+import '../widgets/order_parts_section.dart';
+import '../widgets/part_selector.dart';
 import '../widgets/page_header.dart';
 import '../widgets/state_views.dart';
 import '../widgets/status_chip.dart';
@@ -27,7 +31,11 @@ class OrderDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<OrderDetailProvider>(
-      create: (context) => OrderDetailProvider(context.read<OrdersService>(), orderId)..load(),
+      create: (context) => OrderDetailProvider(
+        context.read<OrdersService>(),
+        orderId,
+        maintenanceService: context.read<MaintenanceService>(),
+      )..load(),
       child: const _OrderDetailView(),
     );
   }
@@ -101,6 +109,56 @@ class _OrderDetailView extends StatelessWidget {
     _report(context, failure, 'Línea quitada correctamente.');
   }
 
+  OrderPartsActions _partsActions(BuildContext context) {
+    final provider = context.read<OrderDetailProvider>();
+    return OrderPartsActions(
+      onAdd: () async {
+        final added = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => AddPartDialog(onSubmit: (part, quantity) => provider.addPart(part.id, quantity)),
+        );
+        if (added == true && context.mounted) showSuccess(context, 'Refacción agregada correctamente.');
+      },
+      onUpdate: (line, quantity) async {
+        final failure = await provider.updatePart(line.id, quantity);
+        if (failure == null && context.mounted) showSuccess(context, 'Cantidad actualizada correctamente.');
+        return failure;
+      },
+      onRemove: (line) async {
+        final failure = await provider.removePart(line.id);
+        if (!context.mounted) return;
+        _report(context, failure, 'Refacción quitada; la cantidad regresó al inventario.');
+      },
+    );
+  }
+
+  OrderMaintenanceActions _maintenanceActions(BuildContext context) {
+    final provider = context.read<OrderDetailProvider>();
+    return OrderMaintenanceActions(
+      onSetServiceMileage: (mileage) async {
+        final failure = await provider.setServiceMileage(mileage);
+        if (!context.mounted) return;
+        _report(context, failure, 'Kilometraje del servicio guardado correctamente.');
+      },
+      onSchedule: (input) async {
+        final failure = await provider.scheduleMaintenance(input);
+        if (!context.mounted) return;
+        _report(context, failure, 'Próximo mantenimiento programado correctamente.');
+      },
+      onUpdate: (maintenance, input) async {
+        final failure = await provider.updateMaintenance(maintenance.id, input);
+        if (!context.mounted) return;
+        _report(context, failure, 'Mantenimiento actualizado correctamente.');
+      },
+      onAttend: (maintenance) async {
+        final failure = await provider.attendMaintenance(maintenance.id);
+        if (!context.mounted) return;
+        _report(context, failure, 'Mantenimiento marcado como atendido.');
+      },
+    );
+  }
+
   /// Cambia el estado. La entrega pide confirmación; el servidor valida la secuencia, el rol y la pertenencia.
   Future<void> _changeStatus(BuildContext context, ServiceOrder order, OrderStatus status) async {
     final provider = context.read<OrderDetailProvider>();
@@ -125,6 +183,9 @@ class _OrderDetailView extends StatelessWidget {
     final role = context.watch<SessionProvider>().user?.role;
     final canAssign = (role == UserRole.admin || role == UserRole.receptionist) && (order?.isAssignable ?? false);
     final canEditWork = (role == UserRole.admin || role == UserRole.mechanic) && !(order?.isDelivered ?? true);
+    // El kilometraje del servicio y el mantenimiento los registran el mecánico asignado y el administrador;
+    // el mantenimiento también puede programarse con la orden ya entregada.
+    final canRecordMaintenance = role == UserRole.admin || role == UserRole.mechanic;
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.xl),
@@ -149,6 +210,19 @@ class _OrderDetailView extends StatelessWidget {
                               order: order,
                               busy: provider.busy,
                               onChangeStatus: (status) => _changeStatus(context, order, status),
+                              extraSections: [
+                                OrderPartsSection(
+                                  parts: order.parts,
+                                  busy: provider.busy,
+                                  actions: canEditWork ? _partsActions(context) : null,
+                                ),
+                                if (order.isFinishedOrDelivered)
+                                  OrderMaintenanceSection(
+                                    order: order,
+                                    busy: provider.busy,
+                                    actions: canRecordMaintenance ? _maintenanceActions(context) : null,
+                                  ),
+                              ],
                               assignAction: canAssign
                                   ? OutlinedButton.icon(
                                       key: const ValueKey('asignar-mecanico'),
@@ -269,9 +343,14 @@ class OrderSections extends StatelessWidget {
     this.editing,
     this.busy = false,
     this.onChangeStatus,
+    this.extraSections = const [],
   });
 
   final ServiceOrder order;
+
+  /// Secciones adicionales (refacciones, kilometraje del servicio, mantenimiento) que se muestran antes
+  /// del historial de estados.
+  final List<Widget> extraSections;
 
   /// Cambia el estado de la orden. Los botones se generan con `order.allowedTransitions`, que el servidor ya
   /// filtra por rol y pertenencia, de modo que la matriz de estados no se duplica en el cliente.
@@ -421,6 +500,7 @@ class OrderSections extends StatelessWidget {
             ],
           ),
         ),
+        ...extraSections,
         SectionCard(
           title: 'Historial de estados',
           child: Column(

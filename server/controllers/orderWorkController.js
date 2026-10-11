@@ -5,6 +5,10 @@ export async function updateWork(req, res) {
   return ok(res, await orderWorkService.updateWork(req.params.id, req.body, req.user));
 }
 
+export async function setServiceMileage(req, res) {
+  return ok(res, await orderWorkService.setServiceMileage(req.params.id, req.body.serviceMileage, req.user));
+}
+
 /** Fábrica de controladores de líneas para 'services' (servicios realizados) y 'labor' (mano de obra). */
 export function linesController(kind) {
   return {

@@ -54,3 +54,39 @@ enum OrderStatus {
   static OrderStatus fromApi(String? value) =>
       OrderStatus.values.firstWhere((s) => s.apiValue == value, orElse: () => OrderStatus.received);
 }
+
+/// Indicador de un mantenimiento pendiente (calculado por el servidor). El color nunca es la única señal.
+enum MaintenanceIndicator {
+  normal('NORMAL', 'Normal', StatusTone.success),
+  upcoming('PROXIMO', 'Próximo', StatusTone.warning),
+  overdue('VENCIDO', 'Vencido', StatusTone.danger);
+
+  const MaintenanceIndicator(this.apiValue, this.label, this.tone);
+
+  final String apiValue;
+  final String label;
+  final StatusTone tone;
+
+  static MaintenanceIndicator? fromApi(String? value) {
+    for (final item in MaintenanceIndicator.values) {
+      if (item.apiValue == value) return item;
+    }
+    return null;
+  }
+}
+
+/// Estado de stock de una refacción: Suficiente, Bajo (en o bajo el mínimo) o Agotado (cero).
+enum StockStatus {
+  sufficient('SUFICIENTE', 'Suficiente', StatusTone.success),
+  low('BAJO', 'Bajo', StatusTone.warning),
+  outOfStock('AGOTADO', 'Agotado', StatusTone.danger);
+
+  const StockStatus(this.apiValue, this.label, this.tone);
+
+  final String apiValue;
+  final String label;
+  final StatusTone tone;
+
+  static StockStatus fromApi(String? value) =>
+      StockStatus.values.firstWhere((s) => s.apiValue == value, orElse: () => StockStatus.sufficient);
+}

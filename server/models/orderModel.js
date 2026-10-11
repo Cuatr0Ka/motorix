@@ -2,7 +2,7 @@ import { query } from '../config/db.js';
 import { formatFolio, parseFolioSearch } from '../utils/orderFolio.js';
 import { likePattern, limitOffset } from '../utils/pagination.js';
 
-const SELECT = `SELECT o.id, o.status, o.reported_problem, o.entry_mileage, o.created_at, o.delivered_at,
+const SELECT = `SELECT o.id, o.status, o.reported_problem, o.entry_mileage, o.service_mileage, o.created_at, o.delivered_at,
        o.diagnosis, o.observations, o.recommendations, o.mileage_correction, o.mileage_correction_reason,
        o.mechanic_id, o.appointment_id, a.status AS appointment_status,
        c.id AS client_id, c.name AS client_name,
@@ -21,6 +21,7 @@ const toOrder = (row) => ({
   status: row.status,
   reportedProblem: row.reported_problem,
   entryMileage: row.entry_mileage,
+  serviceMileage: row.service_mileage,
   createdAt: row.created_at,
   deliveredAt: row.delivered_at,
   diagnosis: row.diagnosis,
@@ -168,4 +169,17 @@ export async function updateStatusIf(id, fromStatus, toStatus, connection) {
 export async function currentStatus(id, connection) {
   const rows = await query('SELECT status FROM service_orders WHERE id = ?', [id], connection);
   return rows[0]?.status ?? null;
+}
+
+/**
+ * Registra el kilometraje del servicio y sube el kilometraje actual del vehículo solo si es mayor
+ * (dentro de la transacción del servicio).
+ */
+export async function setServiceMileage(id, vehicleId, value, connection) {
+  await query('UPDATE service_orders SET service_mileage = ? WHERE id = ?', [value, id], connection);
+  await query(
+    'UPDATE vehicles SET current_mileage = GREATEST(COALESCE(current_mileage, 0), ?) WHERE id = ?',
+    [value, vehicleId],
+    connection,
+  );
 }

@@ -10,6 +10,8 @@ enum AppSection {
   appointments('Citas'),
   orders('Órdenes'),
   myOrders('Mis órdenes'),
+  maintenance('Mantenimientos'),
+  inventory('Inventario'),
   users('Usuarios'),
   changePassword('Cambiar contraseña');
 
@@ -32,8 +34,10 @@ class NavigationProvider extends ChangeNotifier {
         if (role == UserRole.admin || role == UserRole.receptionist) ...[
           AppSection.appointments,
           AppSection.orders,
+          AppSection.maintenance,
         ],
         if (role == UserRole.mechanic) AppSection.myOrders,
+        if (role == UserRole.admin) AppSection.inventory,
         if (role == UserRole.admin) AppSection.users,
       ];
 

@@ -129,6 +129,9 @@ Map<String, dynamic> orderDetailJson(
   String? observations,
   String? recommendations,
   Map<String, dynamic>? appointment,
+  int? serviceMileage,
+  Map<String, dynamic>? maintenance,
+  List<Map<String, dynamic>> parts = const [],
 }) {
   double sum(List<Map<String, dynamic>> lines) =>
       lines.fold(0.0, (total, line) => total + double.parse('${line['amount']}'));
@@ -144,6 +147,9 @@ Map<String, dynamic> orderDetailJson(
     'appointment': appointment,
     'services': services,
     'labor': labor,
+    'parts': parts,
+    'serviceMileage': serviceMileage,
+    'maintenance': maintenance,
     'totals': {
       'services': servicesTotal.toStringAsFixed(2),
       'labor': laborTotal.toStringAsFixed(2),

@@ -8,6 +8,7 @@ import '../services/vehicles_service.dart';
 import '../utils/tokens.dart';
 import '../widgets/page_header.dart';
 import '../widgets/state_views.dart';
+import '../widgets/vehicle_history_section.dart';
 import 'client_detail_screen.dart';
 import 'vehicle_form_screen.dart';
 
@@ -136,6 +137,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                                     ),
                                   ),
                                 ]),
+                                const SizedBox(height: AppSpacing.xl),
+                                VehicleHistorySection(vehicleId: vehicle.id),
                               ],
                             ),
                           ),

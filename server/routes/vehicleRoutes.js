@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import * as vehicleController from '../controllers/vehicleController.js';
+import * as vehicleHistoryController from '../controllers/vehicleHistoryController.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { authorize, ROLES } from '../middlewares/authorize.js';
 import { validate } from '../middlewares/validate.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { idParams } from '../validators/common.js';
+import { idParams, listQuery } from '../validators/common.js';
 import { createVehicleSchema, listVehiclesQuery, updateVehicleSchema } from '../validators/vehicleValidators.js';
 
 const router = Router();
@@ -13,6 +14,11 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', validate({ query: listVehiclesQuery }), asyncHandler(vehicleController.list));
+router.get(
+  '/:id/history',
+  validate({ params: idParams, query: listQuery.pick({ page: true, pageSize: true }) }),
+  asyncHandler(vehicleHistoryController.getHistory),
+);
 router.get('/:id', validate({ params: idParams }), asyncHandler(vehicleController.getById));
 router.post(
   '/',

@@ -2,7 +2,8 @@
 
 Sistema de Gestión para Taller Mecánico. Proyecto académico cuyo MVP se construye en cuatro
 sprints. Este repositorio contiene el **Sprint 1** (base del sistema, autenticación, usuarios,
-clientes y vehículos) y el **Sprint 2** (citas y órdenes de servicio).
+clientes y vehículos), el **Sprint 2** (citas y órdenes de servicio) y el **Sprint 3** (historial,
+mantenimiento e inventario).
 
 ## Estructura
 
@@ -38,8 +39,9 @@ flutter run -d windows --dart-define=API_BASE_URL=http://localhost:3000/api
 
 La guía completa de validación está en
 [`specs/001-base-clientes-vehiculos/quickstart.md`](specs/001-base-clientes-vehiculos/quickstart.md) (Sprint 1) y en
-[`specs/002-citas-ordenes-servicio/quickstart.md`](specs/002-citas-ordenes-servicio/quickstart.md) (Sprint 2).
-Los scripts de `database/scripts` aplican las migraciones y los seeds de ambos sprints en orden y son idempotentes.
+[`specs/002-citas-ordenes-servicio/quickstart.md`](specs/002-citas-ordenes-servicio/quickstart.md) (Sprint 2) y
+[`specs/003-historial-inventario/quickstart.md`](specs/003-historial-inventario/quickstart.md) (Sprint 3).
+Los scripts de `database/scripts` aplican las migraciones y los seeds de los tres sprints en orden y son idempotentes.
 
 ## Cuentas iniciales (solo entorno local)
 
@@ -91,3 +93,21 @@ sección 6 de [`quickstart.md`](specs/002-citas-ordenes-servicio/quickstart.md).
 
 Menú por rol: recepción y administración ven Citas y Órdenes; el mecánico ve Mis órdenes. Los permisos se
 validan siempre en el backend.
+
+## Estado del Sprint 3
+
+Implementado: historial de servicios por vehículo (calculado a partir de las órdenes Terminadas o Entregadas),
+kilometraje del servicio, programación del próximo mantenimiento por fecha, kilometraje o ambos con indicador
+Normal, Próximo o Vencido (margen de aviso configurable con `MAINTENANCE_WARN_DAYS` y `MAINTENANCE_WARN_KM`),
+catálogo de refacciones con entradas y ajustes por conteo, refacciones utilizadas en las órdenes (cada uso genera
+su salida de inventario y el stock nunca queda negativo) y alertas de stock bajo para la administración. Los seeds
+incluyen refacciones suficientes, bajas y agotadas, historial en varios vehículos y mantenimientos en todos los
+estados.
+
+Validado con 752 pruebas del backend (incluidas las de la lógica de inventario y mantenimiento y las de
+concurrencia de stock) y 206 del cliente, y con un recorrido de extremo a extremo contra la API real y MySQL
+local; el detalle está en la sección 6 de [`quickstart.md`](specs/003-historial-inventario/quickstart.md).
+
+Menú por rol: la administración ve además Mantenimientos e Inventario; recepción ve Mantenimientos; el mecánico
+consulta el historial en el detalle del vehículo, registra el kilometraje, el mantenimiento y las refacciones en
+sus órdenes. Los permisos se validan siempre en el backend.

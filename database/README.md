@@ -7,8 +7,8 @@ integrante del equipo usa su propia instancia. El backend es el único que acced
 
 | Carpeta / archivo | Propósito |
 |-------------------|-----------|
-| `migrations/` | Scripts SQL numerados e inmutables que definen el esquema (`001` Sprint 1: usuarios, clientes y vehículos; `002` Sprint 2: citas, órdenes de servicio, servicios, mano de obra e historial de estados) |
-| `seeds/` | Datos iniciales idempotentes (`001`: cuentas, clientes y vehículos de ejemplo; `002`: segundo mecánico `mecanico2`, citas y órdenes de ejemplo en todos los estados) |
+| `migrations/` | Scripts SQL numerados e inmutables que definen el esquema (`001` Sprint 1: usuarios, clientes y vehículos; `002` Sprint 2: citas, órdenes de servicio, servicios, mano de obra e historial de estados; `003` Sprint 3: refacciones, movimientos de inventario, refacciones por orden, mantenimientos y kilometraje del servicio) |
+| `seeds/` | Datos iniciales idempotentes (`001`: cuentas, clientes y vehículos de ejemplo; `002`: segundo mecánico `mecanico2`, citas y órdenes de ejemplo en todos los estados; `003`: refacciones con movimientos, órdenes históricas para el historial, refacciones usadas y mantenimientos Normal, Próximo, Vencido y Atendido) |
 | `scripts/` | Scripts de PowerShell para crear, migrar, sembrar y reiniciar la base |
 | `data/` | Directorio de datos local opcional; está en `.gitignore` y NO se versiona |
 
@@ -36,12 +36,12 @@ integrante del equipo usa su propia instancia. El backend es el único que acced
 |-----------|---------|
 | Aplicar migraciones nuevas | `database/scripts/aplicar-migraciones.ps1 -Base motorix` |
 | Repetir los seeds (no duplica nada) | `database/scripts/aplicar-seeds.ps1 -Base motorix` |
-| Recrear la base desde cero | `database/scripts/reiniciar-local.ps1 -Base motorix` |
+| Recrear la base desde cero (elimina todas las tablas) | `database/scripts/reiniciar-local.ps1 -Base motorix` |
 
 ## Reglas
 
 - La aplicación usa el usuario dedicado `motorix_app`, NUNCA `root`.
-- Los cambios de esquema se agregan como **nuevos** scripts numerados (`002_...`); no se editan los
+- Los cambios de esquema se agregan como **nuevos** scripts numerados (`003_...`); no se editan los
   scripts de sprints ya aplicados. Cada versión aplicada queda en `schema_migrations`.
 - Las pruebas de integración usan solo `motorix_test`.
 - Los seeds no contienen contraseñas en texto plano: las cuentas iniciales llevan únicamente el

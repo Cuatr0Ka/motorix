@@ -5,6 +5,7 @@ import '../models/user.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/session_provider.dart';
 import '../providers/sidebar_provider.dart';
+import '../providers/stock_alerts_provider.dart';
 import '../utils/tokens.dart';
 import 'confirm_dialog.dart';
 
@@ -25,6 +26,10 @@ IconData _iconFor(AppSection section) {
       return Icons.assignment_outlined;
     case AppSection.myOrders:
       return Icons.build_outlined;
+    case AppSection.maintenance:
+      return Icons.event_repeat_outlined;
+    case AppSection.inventory:
+      return Icons.inventory_2_outlined;
     case AppSection.users:
       return Icons.admin_panel_settings_outlined;
     case AppSection.changePassword:
@@ -46,11 +51,23 @@ IconData _selectedIconFor(AppSection section) {
       return Icons.assignment;
     case AppSection.myOrders:
       return Icons.build;
+    case AppSection.maintenance:
+      return Icons.event_repeat;
+    case AppSection.inventory:
+      return Icons.inventory_2;
     case AppSection.users:
       return Icons.admin_panel_settings;
     case AppSection.changePassword:
       return Icons.lock;
   }
+}
+
+/// Añade al ícono de Inventario una insignia con el número de refacciones en alerta (solo administración).
+Widget _withBadge(BuildContext context, AppSection section, Widget icon) {
+  if (section != AppSection.inventory) return icon;
+  final count = context.watch<StockAlertsProvider>().count;
+  if (count == 0) return icon;
+  return Badge(key: const ValueKey('insignia-alertas'), label: Text('$count'), child: icon);
 }
 
 /// Estructura general: sidebar oscuro colapsable, encabezado y contenido con navegación propia.
@@ -72,6 +89,16 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _shown = context.read<NavigationProvider>().current;
+    // Solo la administración consulta las alertas de stock bajo (el servidor rechaza a los demás roles).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final alerts = context.read<StockAlertsProvider>();
+      if (context.read<SessionProvider>().user?.role == UserRole.admin) {
+        alerts.refresh();
+      } else {
+        alerts.clear();
+      }
+    });
   }
 
   Route<void> _routeFor(AppSection section) {
@@ -201,8 +228,8 @@ class _Sidebar extends StatelessWidget {
           destinations: [
             for (final section in sections)
               NavigationRailDestination(
-                icon: Tooltip(message: section.title, child: Icon(_iconFor(section))),
-                selectedIcon: Icon(_selectedIconFor(section)),
+                icon: Tooltip(message: section.title, child: _withBadge(context, section, Icon(_iconFor(section)))),
+                selectedIcon: _withBadge(context, section, Icon(_selectedIconFor(section))),
                 label: Text(section.title),
               ),
           ],

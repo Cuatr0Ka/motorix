@@ -39,3 +39,22 @@ export function assertEntryMileage({ previous, entry, correction = false, reason
   }
   return { correctionApplied: true, reason: text };
 }
+
+/**
+ * Regla del kilometraje del servicio (Sprint 3): entero de 0 a 2 000 000 y no menor al de entrada
+ * de la orden. Función pura; devuelve el valor validado.
+ */
+export function assertServiceMileage({ entry, service }) {
+  if (!Number.isInteger(service) || service < 0 || service > MAX_MILEAGE) {
+    throw AppError.validation('Revisa los campos marcados.', [
+      { field: 'serviceMileage', message: `El kilometraje debe ser un entero de 0 a ${MAX_MILEAGE.toLocaleString('es-MX')}.` },
+    ]);
+  }
+  if (service < entry) {
+    throw AppError.unprocessable(
+      'SERVICE_MILEAGE_TOO_LOW',
+      `El kilometraje del servicio (${service} km) no puede ser menor al de entrada (${entry} km).`,
+    );
+  }
+  return service;
+}
