@@ -142,7 +142,7 @@ ticket: `200` con `{ "ticket": {…}, "created": false }` (no se crea otro). Err
 
 ### `GET /api/tickets?search=&page=&pageSize=`
 
-`search` por folio de ticket, folio de orden, cliente o placa. `200`: lista paginada con `meta`, del más
+reciente al más antiguo. Cada elemento trae los datos del ticket sin su contenido, más `client.name`, `vehicle.licensePlate` y `total` (importe total de la instantánea, o `null` si no estuviera disponible).
 reciente al más antiguo.
 
 ### `GET /api/tickets/:id` — `200` con el ticket completo; `404`.

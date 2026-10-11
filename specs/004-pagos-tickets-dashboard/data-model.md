@@ -15,7 +15,7 @@ users 1 ───< payments (created_by)      users 1 ───< tickets (genera
 
 - El panel de control **no tiene tablas**: se calcula con `service_orders`, `appointments`, `maintenance`,
   `parts`, `payments`, `order_status_history` e `inventory_movements`.
-- Todas las llaves foráneas usan `ON DELETE RESTRICT`: pagos y tickets no se eliminan de forma ordinaria.
+- Todas las llaves foráneas usan `ON DELETE RESTRICT` (y `fk_payments_order` también `ON UPDATE RESTRICT`, necesario para que MySQL acepte la columna generada `active_order_id`): pagos y tickets no se eliminan de forma ordinaria.
 
 ## Tabla `payments` (Pago)
 
