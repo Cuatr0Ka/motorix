@@ -213,19 +213,17 @@ class _Body extends StatelessWidget {
                 if (isAdmin)
                   DataCell(Row(
                     children: [
-                      IconButton(
+                      RowActionButton.edit(
                         key: ValueKey('editar-mantenimiento-${m.id}'),
                         tooltip: 'Editar',
-                        visualDensity: VisualDensity.compact,
                         onPressed: () => onEdit(m),
-                        icon: const Icon(Icons.edit_outlined, size: 18),
                       ),
-                      IconButton(
+                      RowActionButton(
                         key: ValueKey('atender-mantenimiento-${m.id}'),
+                        icon: Icons.check_circle_outline,
                         tooltip: 'Marcar como atendido',
-                        visualDensity: VisualDensity.compact,
+                        color: AppColors.success,
                         onPressed: () => onAttend(m),
-                        icon: const Icon(Icons.check_circle_outline, size: 18),
                       ),
                     ],
                   )),

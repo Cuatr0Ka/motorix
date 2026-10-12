@@ -30,6 +30,23 @@ describe('GET /api/dashboard (contrato)', () => {
       inventory: { lowStock: entero, outOfStock: entero },
       payments: { ordersAwaitingPayment: entero, pendingMercadoPago: entero },
       recentActivity: { orderChanges: [], payments: [], inventoryMovements: [] },
+      charts: {
+        ordersByStatus: [
+          { status: 'RECIBIDO', total: 0 },
+          { status: 'DIAGNOSTICO', total: 0 },
+          { status: 'EN_REPARACION', total: 0 },
+          { status: 'ESPERANDO_REFACCION', total: 0 },
+          { status: 'TERMINADO', total: 0 },
+          { status: 'ENTREGADO', total: 0 },
+        ],
+        incomeByMonth: Array.from({ length: 6 }, () => ({ month: expect.stringMatching(/^\d{4}-\d{2}$/), total: 0 })),
+        incomeByMethod: [
+          { method: 'EFECTIVO', total: 0 },
+          { method: 'TARJETA', total: 0 },
+          { method: 'TRANSFERENCIA', total: 0 },
+          { method: 'MERCADO_PAGO', total: 0 },
+        ],
+      },
     });
   });
 

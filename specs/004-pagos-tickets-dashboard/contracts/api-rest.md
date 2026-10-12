@@ -166,7 +166,11 @@ reciente al más antiguo.
     "recentActivity": {
       "orderChanges": [ { "orderId": 12, "folio": "OS-000012", "toStatus": "TERMINADO", "changedBy": "…", "changedAt": "…" } ],
       "payments": [ { "id": 7, "orderFolio": "OS-000012", "amount": "1250.00", "method": "EFECTIVO", "status": "PAGADO", "createdAt": "…" } ],
-      "inventoryMovements": [ { "id": 31, "partCode": "ACE-5W30", "type": "OUT", "quantity": -4, "createdAt": "…" } ] } } }
+      "inventoryMovements": [ { "id": 31, "partCode": "ACE-5W30", "type": "OUT", "quantity": -4, "createdAt": "…" } ] },
+    "charts": {
+      "ordersByStatus": [ { "status": "RECIBIDO", "total": 1 }, { "status": "EN_REPARACION", "total": 2 } ],
+      "incomeByMonth": [ { "month": "2026-05", "total": 0 }, { "month": "2026-10", "total": 2570 } ],
+      "incomeByMethod": [ { "method": "EFECTIVO", "total": 3900 }, { "method": "MERCADO_PAGO", "total": 2050 } ] } } }
 ```
 
 Definiciones (mismo criterio que los listados): `attendedLast30Days` = vehículos distintos con orden
@@ -176,3 +180,9 @@ Entregada en los últimos 30 días; `inRepair` = órdenes En reparación o Esper
 la lista de Mantenimientos con ese indicador; `inventory.*` = alertas de stock bajo y agotadas;
 `ordersAwaitingPayment` = órdenes Terminadas sin pago Pagado; `pendingMercadoPago` = pagos Pendientes.
 Cada lista de actividad trae como máximo 5 elementos, del más reciente al más antiguo.
+
+Datos de las gráficas (`charts`): `ordersByStatus` trae siempre los 6 estados de la orden (con 0 si no hay
+órdenes) en el orden del flujo; `incomeByMonth` trae los últimos 6 meses (`YYYY-MM`, del más antiguo al
+actual, con 0 en los meses sin cobros) con la suma de pagos Pagados según su fecha de pago;
+`incomeByMethod` trae la suma de pagos Pagados de ese mismo periodo para cada uno de los 4 métodos. Los
+importes son números (no cadenas) y se calculan al consultar, sin tablas de estadísticas.

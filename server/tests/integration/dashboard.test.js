@@ -262,3 +262,33 @@ function hoyHora(horas) {
   fecha.setMilliseconds(0);
   return fecha;
 }
+
+describe('datos de las gráficas', () => {
+  it('test_las_graficas_cuentan_ordenes_por_estado_e_ingresos_pagados_por_mes_y_metodo', async () => {
+    await ordenEn('RECIBIDO');
+    await ordenEn('EN_REPARACION');
+    await ordenEn('EN_REPARACION');
+    const { orden } = await ordenEn('TERMINADO');
+    await createPayment(orden.id, recepcion.id, { amount: '1250.00', method: 'TARJETA' });
+
+    const { charts } = (await tablero()).body.data;
+
+    const porEstado = Object.fromEntries(charts.ordersByStatus.map((e) => [e.status, e.total]));
+    expect(porEstado).toEqual({ RECIBIDO: 1, DIAGNOSTICO: 0, EN_REPARACION: 2, ESPERANDO_REFACCION: 0, TERMINADO: 1, ENTREGADO: 0 });
+    expect(charts.incomeByMonth).toHaveLength(6);
+    expect(charts.incomeByMonth.at(-1).total).toBe(1250);
+    expect(charts.incomeByMonth.slice(0, -1).every((m) => m.total === 0)).toBe(true);
+    expect(charts.incomeByMethod.find((m) => m.method === 'TARJETA').total).toBe(1250);
+    expect(charts.incomeByMethod.find((m) => m.method === 'EFECTIVO').total).toBe(0);
+  });
+
+  it('test_los_pagos_no_pagados_no_suman_en_los_ingresos', async () => {
+    const { orden } = await ordenEn('TERMINADO');
+    await createPayment(orden.id, recepcion.id, { amount: '900.00', status: 'PENDIENTE', method: 'MERCADO_PAGO' });
+
+    const { charts } = (await tablero()).body.data;
+
+    expect(charts.incomeByMonth.every((m) => m.total === 0)).toBe(true);
+    expect(charts.incomeByMethod.every((m) => m.total === 0)).toBe(true);
+  });
+});

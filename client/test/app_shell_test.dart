@@ -42,7 +42,7 @@ void main() {
 
     await tester.tap(find.widgetWithText(OutlinedButton, 'Cancelar'));
     await tester.pumpAndSettle();
-    expect(find.text('Hola, Persona de prueba'), findsOneWidget);
+    expect(find.byKey(const ValueKey('saludo')), findsOneWidget);
   });
 
   testWidgets('test_confirmar_cierra_la_sesion_y_vuelve_al_acceso', (tester) async {
@@ -55,7 +55,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.widgetWithText(TextFormField, 'Usuario o correo'), findsOneWidget);
-    expect(find.text('Hola, Persona de prueba'), findsNothing);
+    expect(find.byKey(const ValueKey('saludo')), findsNothing);
   });
 
   testWidgets('test_el_sidebar_arranca_colapsado_en_ventanas_angostas_y_se_puede_expandir', (tester) async {
@@ -79,6 +79,6 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('atajo-clients')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Hola, Persona de prueba'), findsNothing);
+    expect(find.byKey(const ValueKey('saludo')), findsNothing);
   });
 }

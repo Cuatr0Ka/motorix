@@ -33,8 +33,9 @@ void main() {
 
     await pumpAppSignedIn(tester, api);
 
-    expect(find.text('Hola, Persona de prueba'), findsOneWidget);
-    expect(find.text('Sesión iniciada como Recepcionista'), findsOneWidget);
+    expect(find.byKey(const ValueKey('saludo')), findsOneWidget);
+    expect(find.textContaining('Recepcionista ·'), findsOneWidget);
+    expect(find.textContaining(', Persona de prueba'), findsOneWidget);
     final login = api.requests.firstWhere((r) => r.path == '/auth/login');
     expect(login.body['identifier'], 'usuario');
   });
@@ -50,7 +51,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Usuario o contraseña incorrectos.'), findsOneWidget);
-    expect(find.text('Hola, Persona de prueba'), findsNothing);
+    expect(find.byKey(const ValueKey('saludo')), findsNothing);
   });
 
   testWidgets('test_muestra_el_aviso_de_cuenta_bloqueada_del_servidor', (tester) async {

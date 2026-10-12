@@ -242,7 +242,7 @@ Cerrar sesión
 
 - Mostrar solo los módulos implementados en el sprint actual.
 - Mostrar solo los módulos permitidos para el rol del usuario.
-- En el Sprint 1 el menú es: **Inicio** (bienvenida con accesos directos, sin indicadores), Clientes, Vehículos y, solo para ADMIN, Usuarios. "Inicio" se sustituye por "Dashboard" cuando exista el panel de control (Sprint 4). "Cambiar contraseña" vive en el menú de la cuenta del encabezado.
+- En el Sprint 1 el menú era: **Inicio** (bienvenida con accesos directos, sin indicadores), Clientes, Vehículos y, solo para ADMIN, Usuarios. En el Sprint 4 "Inicio" se mantiene como bienvenida ligera (saludo, rol, fecha y accesos rápidos según el rol, sin indicadores) y, para ADMIN, suma un acceso destacado al **Panel de control**, que es la pantalla de los indicadores y gráficas.
 - Ocultar un botón **no es seguridad**: los permisos se validan también en backend.
 
 ### Header

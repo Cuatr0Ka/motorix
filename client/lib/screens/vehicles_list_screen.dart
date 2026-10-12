@@ -147,7 +147,7 @@ class _Body extends StatelessWidget {
                 DataCell(Text(vehicle.model, overflow: TextOverflow.ellipsis)),
                 DataCell(Text('${vehicle.year}')),
                 DataCell(Text(vehicle.owner.name, overflow: TextOverflow.ellipsis)),
-                DataCell(TextButton(onPressed: () => onOpen(vehicle), child: const Text('Ver detalle'))),
+                DataCell(RowActionButton.view(tooltip: 'Ver detalle del vehículo', onPressed: () => onOpen(vehicle))),
               ],
             ),
         ],

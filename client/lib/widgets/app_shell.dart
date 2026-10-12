@@ -12,7 +12,8 @@ import 'confirm_dialog.dart';
 /// Construye la pantalla de una sección del menú.
 typedef SectionBuilder = Widget Function(BuildContext context, AppSection section);
 
-IconData _iconFor(AppSection section) {
+/// Ícono del menú de cada sección (contorno). También lo usa la pantalla de Inicio.
+IconData iconForSection(AppSection section) {
   switch (section) {
     case AppSection.home:
       return Icons.home_outlined;
@@ -121,9 +122,14 @@ class _AppShellState extends State<AppShell> {
         transitionDuration: duration,
         reverseTransitionDuration: duration,
         pageBuilder: (context, animation, secondaryAnimation) => widget.sectionBuilder(context, section),
+        // La pantalla anterior se desvanece en la primera mitad y la nueva aparece en la segunda,
+        // para que los títulos de ambas nunca se vean superpuestos.
         transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
-          opacity: CurvedAnimation(parent: animation, curve: AppCurves.enter),
-          child: child,
+          opacity: ReverseAnimation(CurvedAnimation(parent: secondaryAnimation, curve: const Interval(0, 0.5))),
+          child: FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: const Interval(0.5, 1, curve: Curves.easeOutCubic)),
+            child: child,
+          ),
         ),
       );
   }
@@ -236,52 +242,60 @@ class _Sidebar extends StatelessWidget {
           destinations: [
             for (final section in sections)
               NavigationRailDestination(
-                icon: Tooltip(message: section.title, child: _withBadge(context, section, Icon(_iconFor(section)))),
+                icon: Tooltip(message: section.title, child: _withBadge(context, section, Icon(iconForSection(section)))),
                 selectedIcon: _withBadge(context, section, Icon(_selectedIconFor(section))),
                 label: Text(section.title),
               ),
           ],
-          trailing: Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                child: Tooltip(
-                  message: expanded ? '' : 'Cerrar sesión',
-                  child: TextButton(
-                    onPressed: onLogout,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.logout, color: AppColors.onSidebarMuted),
-                        _RailLabel(
-                          'Cerrar sesión',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(color: AppColors.onSidebarMuted),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
         );
 
     // El propio NavigationRail anima su ancho (~200 ms) al cambiar `extended`. Con ventanas bajas y muchas secciones
     // (administración) el menú se desplaza en lugar de desbordarse.
+    // "Cerrar sesión" queda fijo al fondo, fuera del área que se desplaza.
     return ColoredBox(
       color: AppColors.sidebar,
       child: ClipRect(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: IntrinsicHeight(child: rail),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(child: IntrinsicHeight(child: rail)),
             ),
-          ),
+            AnimatedContainer(
+              duration: AppDurations.sidebar,
+              curve: AppCurves.standard,
+              width: expanded ? AppLayout.sidebarExpanded : AppLayout.sidebarCollapsed,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+              child: Tooltip(
+                message: expanded ? '' : 'Cerrar sesión',
+                child: TextButton(
+                  onPressed: onLogout,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.logout, color: AppColors.onSidebarMuted),
+                      if (expanded)
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.sm),
+                            child: Text(
+                              'Cerrar sesión',
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.clip,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(color: AppColors.onSidebarMuted),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -17,6 +17,7 @@ Map<String, dynamic> dashboardJson({
   int awaitingPayment = 1,
   int pendingMp = 1,
   bool withActivity = true,
+  bool withCharts = true,
 }) =>
     {
       'generatedAt': '2030-10-11T15:20:00.000Z',
@@ -25,6 +26,32 @@ Map<String, dynamic> dashboardJson({
       'maintenance': {'upcoming': upcoming, 'overdue': overdue},
       'inventory': {'lowStock': lowStock, 'outOfStock': outOfStock},
       'payments': {'ordersAwaitingPayment': awaitingPayment, 'pendingMercadoPago': pendingMp},
+      'charts': !withCharts
+          ? {'ordersByStatus': [], 'incomeByMonth': [], 'incomeByMethod': []}
+          : {
+        'ordersByStatus': [
+          {'status': 'RECIBIDO', 'total': 1},
+          {'status': 'DIAGNOSTICO', 'total': 0},
+          {'status': 'EN_REPARACION', 'total': 2},
+          {'status': 'ESPERANDO_REFACCION', 'total': 1},
+          {'status': 'TERMINADO', 'total': 1},
+          {'status': 'ENTREGADO', 'total': 4},
+        ],
+        'incomeByMonth': [
+          {'month': '2030-05', 'total': 0},
+          {'month': '2030-06', 'total': 1500},
+          {'month': '2030-07', 'total': 0},
+          {'month': '2030-08', 'total': 3200},
+          {'month': '2030-09', 'total': 900},
+          {'month': '2030-10', 'total': 2570},
+        ],
+        'incomeByMethod': [
+          {'method': 'EFECTIVO', 'total': 3900},
+          {'method': 'TARJETA', 'total': 0},
+          {'method': 'TRANSFERENCIA', 'total': 1200},
+          {'method': 'MERCADO_PAGO', 'total': 3070},
+        ],
+      },
       'recentActivity': {
         'orderChanges': withActivity
             ? [
@@ -84,11 +111,14 @@ void main() {
     final api = FakeApi(role: 'ADMIN', handler: dashboardHandler(() => dashboardJson()));
     await pumpAppSignedIn(tester, api);
     await openSection(tester, 'Panel de control');
-    await tester.scrollUntilVisible(find.text('Actividad reciente'), 200, scrollable: find.byType(Scrollable).last);
+    await tester.scrollUntilVisible(find.text('Cambios de orden'), 200, scrollable: find.byType(Scrollable).last);
 
-    expect(find.textContaining('OS-000012 → Terminado · Mario Mecánico'), findsOneWidget);
-    expect(find.textContaining('OS-000012 · Efectivo · Pagado'), findsOneWidget);
-    expect(find.text('ACE-5W30 · Salida'), findsOneWidget);
+    expect(find.text('OS-000012 → Terminado'), findsOneWidget);
+    expect(find.textContaining('Mario Mecánico ·'), findsOneWidget);
+    expect(find.text('OS-000012 · Pagado'), findsOneWidget);
+    expect(find.textContaining('Efectivo ·'), findsOneWidget);
+    expect(find.text('ACE-5W30'), findsOneWidget);
+    expect(find.textContaining('Salida ·'), findsOneWidget);
     expect(find.text('−4'), findsOneWidget);
   });
 
@@ -114,11 +144,13 @@ void main() {
     await pumpAppSignedIn(tester, api);
     await openSection(tester, 'Panel de control');
 
+    await tester.scrollUntilVisible(find.text('Órdenes pendientes'), 200, scrollable: find.byType(Scrollable).last);
     await tester.tap(find.text('Órdenes pendientes'));
     await tester.pumpAndSettle();
     expect(find.text('Órdenes de servicio'), findsWidgets);
 
     await openSection(tester, 'Panel de control');
+    await tester.scrollUntilVisible(find.text('Mantenimientos vencidos'), 200, scrollable: find.byType(Scrollable).last);
     await tester.tap(find.text('Mantenimientos vencidos'));
     await tester.pumpAndSettle();
     expect(find.text('Próximos y vencidos, para avisar al cliente'), findsOneWidget);
@@ -143,7 +175,7 @@ void main() {
       handler: dashboardHandler(
         () => dashboardJson(
           attended: 0, inRepair: 0, pending: 0, finished: 0, appointments: 0, upcoming: 0, overdue: 0,
-          lowStock: 0, outOfStock: 0, awaitingPayment: 0, pendingMp: 0, withActivity: false,
+          lowStock: 0, outOfStock: 0, awaitingPayment: 0, pendingMp: 0, withActivity: false, withCharts: false,
         ),
       ),
     );
@@ -151,7 +183,8 @@ void main() {
     await openSection(tester, 'Panel de control');
 
     expect(valueOf(tester, 'Vehículos atendidos'), '0');
-    expect(find.text('Sin registros'), findsWidgets);
+    expect(find.text('Todavía no hay órdenes registradas.'), findsOneWidget);
+    expect(find.text('Sin cobros en los últimos 6 meses.'), findsNWidgets(2));
     await tester.scrollUntilVisible(find.text('Sin cambios recientes.'), 200, scrollable: find.byType(Scrollable).last);
     expect(find.text('Sin cambios recientes.'), findsOneWidget);
     expect(find.text('Sin pagos recientes.'), findsOneWidget);
@@ -212,4 +245,35 @@ void main() {
       expect(api.requests.where((r) => r.path == '/dashboard'), isEmpty);
     });
   }
+
+  testWidgets('test_las_graficas_muestran_ordenes_por_estado_e_ingresos', (tester) async {
+    useDesktopWindow(tester);
+    final api = FakeApi(role: 'ADMIN', handler: dashboardHandler(() => dashboardJson()));
+    await pumpAppSignedIn(tester, api);
+    await openSection(tester, 'Panel de control');
+
+    expect(find.text('Órdenes por estado'), findsOneWidget);
+    expect(tester.widget<Text>(find.byKey(const ValueKey('total-ordenes'))).data, '9');
+    // La leyenda de la dona trae estado, cantidad y porcentaje (4 de 9 entregadas = 44 %).
+    expect(find.text('Entregado'), findsOneWidget);
+    expect(find.text('44%'), findsOneWidget);
+    expect(find.text('Ingresos por mes'), findsOneWidget);
+    expect(find.text('Oct'), findsOneWidget);
+    expect(find.text('Ingresos por método de pago'), findsOneWidget);
+    expect(find.text('Mercado Pago'), findsOneWidget);
+    expect(find.text(r'$3,070.00'), findsOneWidget);
+  });
+
+  for (final width in [760.0, 1000.0, 1400.0, 1900.0]) {
+    testWidgets('test_el_panel_se_ve_sin_desbordes_con_una_ventana_de_${width.toInt()}_px', (tester) async {
+      useDesktopWindow(tester, width: width, height: 800);
+      final api = FakeApi(role: 'ADMIN', handler: dashboardHandler(() => dashboardJson()));
+      await pumpAppSignedIn(tester, api);
+      await openSection(tester, 'Panel de control');
+      await tester.scrollUntilVisible(find.text('Movimientos de inventario'), 200, scrollable: find.byType(Scrollable).last);
+
+      expect(tester.takeException(), isNull, reason: 'sin desbordes a $width px');
+    });
+  }
+
 }

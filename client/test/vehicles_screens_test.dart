@@ -14,7 +14,7 @@ void main() {
     expect(find.text('Toyota'), findsOneWidget);
     expect(find.text('Ana Morales'), findsOneWidget);
     expect(find.text('Luis Pérez'), findsOneWidget);
-    expect(find.text('1–2 de 2'), findsOneWidget);
+    expect(find.text('1–2 de 2'), findsNothing);
   });
 
   testWidgets('test_muestra_el_estado_vacio_con_accion_para_quien_puede_registrar', (tester) async {

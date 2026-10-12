@@ -87,6 +87,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1));
 
     // Sin animación, la pantalla de inicio ya está visible tras un solo fotograma (no tras 250 ms).
-    expect(find.text('Hola, Persona de prueba'), findsOneWidget);
+    expect(find.byKey(const ValueKey('saludo')), findsOneWidget);
   });
 }

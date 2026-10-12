@@ -28,12 +28,46 @@ class AppDataTable extends StatelessWidget {
         columns: columns,
         rows: rows,
         minWidth: minWidth,
-        columnSpacing: AppSpacing.md,
+        columnSpacing: AppSpacing.xl,
         horizontalMargin: AppSpacing.lg,
-        headingRowHeight: 44,
-        dataRowHeight: 52,
+        headingRowHeight: 48,
+        dataRowHeight: 56,
         showCheckboxColumn: false,
       ),
+    );
+  }
+}
+
+/// Botón de acción por fila: ícono con tooltip, el mismo en todos los listados.
+class RowActionButton extends StatelessWidget {
+  const RowActionButton({
+    super.key,
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    this.color = AppColors.textSecondary,
+  });
+
+  /// Ver el detalle de la fila.
+  const RowActionButton.view({Key? key, required String tooltip, required VoidCallback onPressed})
+      : this(key: key, icon: Icons.visibility_outlined, tooltip: tooltip, onPressed: onPressed);
+
+  /// Editar la fila.
+  const RowActionButton.edit({Key? key, required String tooltip, required VoidCallback onPressed})
+      : this(key: key, icon: Icons.edit_outlined, tooltip: tooltip, onPressed: onPressed);
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: tooltip,
+      visualDensity: VisualDensity.compact,
+      onPressed: onPressed,
+      icon: Icon(icon, size: 20, color: color),
     );
   }
 }
@@ -100,6 +134,7 @@ class _DebouncedSearchFieldState extends State<DebouncedSearchField> {
 }
 
 /// Barra de paginación: "1–20 de 134" con botones anterior y siguiente.
+/// No se muestra cuando todo cabe en una sola página.
 class PaginationBar extends StatelessWidget {
   const PaginationBar({super.key, required this.result, required this.onPage});
 
@@ -108,6 +143,7 @@ class PaginationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (result.totalPages <= 1) return const SizedBox.shrink();
     final style = Theme.of(context).textTheme.bodySmall;
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),

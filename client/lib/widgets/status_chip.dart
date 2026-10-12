@@ -16,16 +16,18 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Texto más oscuro que el borde y relleno algo más intenso para que se lea bien sobre blanco.
+    final textColor = Color.lerp(tone.color, Colors.black, 0.3)!;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
       decoration: BoxDecoration(
-        color: tone.color.withValues(alpha: 0.12),
+        color: tone.color.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(AppRadius.panel),
-        border: Border.all(color: tone.color.withValues(alpha: 0.4)),
+        border: Border.all(color: tone.color.withValues(alpha: 0.6)),
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: tone.color, fontWeight: FontWeight.w600),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: textColor, fontWeight: FontWeight.w600),
         overflow: TextOverflow.ellipsis,
       ),
     );

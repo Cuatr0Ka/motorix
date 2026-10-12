@@ -199,11 +199,6 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen> {
   }
 }
 
-final ButtonStyle _compact = TextButton.styleFrom(
-  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-  visualDensity: VisualDensity.compact,
-);
-
 class _Body extends StatelessWidget {
   const _Body({
     required this.provider,
@@ -254,7 +249,7 @@ class _Body extends StatelessWidget {
           DataColumn2(label: Text('Vehículo'), size: ColumnSize.M),
           DataColumn2(label: Text('Motivo'), size: ColumnSize.L),
           DataColumn2(label: Text('Estado'), fixedWidth: 130),
-          DataColumn2(label: Text('Acciones'), fixedWidth: 350),
+          DataColumn2(label: Text('Acciones'), fixedWidth: 150),
         ],
         rows: [
           for (final appointment in result.items)
@@ -270,20 +265,22 @@ class _Body extends StatelessWidget {
                 DataCell(
                   Row(
                     children: [
-                      TextButton(style: _compact, onPressed: () => onOpen(appointment), child: const Text('Ver')),
+                      RowActionButton.view(tooltip: 'Ver detalle de la cita', onPressed: () => onOpen(appointment)),
                       if (appointment.status == AppointmentStatus.pending)
-                        TextButton(
-                          style: _compact,
+                        RowActionButton(
                           key: ValueKey('confirmar-cita-${appointment.id}'),
+                          icon: Icons.check_circle_outline,
+                          tooltip: 'Confirmar cita',
+                          color: AppColors.success,
                           onPressed: () => onConfirm(appointment),
-                          child: const Text('Confirmar'),
                         ),
                       if (appointment.status.isEditable)
-                        TextButton(
-                          style: _compact,
+                        RowActionButton(
                           key: ValueKey('cancelar-cita-${appointment.id}'),
+                          icon: Icons.cancel_outlined,
+                          tooltip: 'Cancelar cita',
+                          color: AppColors.danger,
                           onPressed: () => onCancel(appointment),
-                          child: const Text('Cancelar'),
                         ),
                     ],
                   ),

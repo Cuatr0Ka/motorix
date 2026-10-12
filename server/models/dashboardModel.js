@@ -85,3 +85,33 @@ export async function recentInventoryMovements(limit) {
     createdAt: row.created_at,
   }));
 }
+
+/** Órdenes agrupadas por estado (solo los estados con al menos una orden). */
+export async function ordersGroupedByStatus() {
+  const rows = await query('SELECT status, COUNT(*) AS total FROM service_orders GROUP BY status');
+  return rows.map((row) => ({ status: row.status, total: Number(row.total) }));
+}
+
+/** Suma de pagos Pagados por mes (`YYYY-MM`) desde el primer día del mes de hace `months - 1` meses. */
+export async function paidIncomeByMonth(months) {
+  const rows = await query(
+    `SELECT DATE_FORMAT(paid_at, '%Y-%m') AS month, SUM(amount) AS total
+       FROM payments
+      WHERE status = 'PAGADO' AND paid_at >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')
+      GROUP BY month`,
+    [Math.trunc(months) - 1],
+  );
+  return rows.map((row) => ({ month: row.month, total: Number(row.total) }));
+}
+
+/** Suma de pagos Pagados por método en el mismo periodo que `paidIncomeByMonth`. */
+export async function paidIncomeByMethod(months) {
+  const rows = await query(
+    `SELECT method, SUM(amount) AS total
+       FROM payments
+      WHERE status = 'PAGADO' AND paid_at >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')
+      GROUP BY method`,
+    [Math.trunc(months) - 1],
+  );
+  return rows.map((row) => ({ method: row.method, total: Number(row.total) }));
+}

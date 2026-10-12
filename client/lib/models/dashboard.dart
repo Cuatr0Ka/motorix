@@ -17,6 +17,9 @@ class Dashboard {
     required this.orderChanges,
     required this.payments,
     required this.inventoryMovements,
+    this.ordersByStatus = const [],
+    this.incomeByMonth = const [],
+    this.incomeByMethod = const [],
   });
 
   factory Dashboard.fromJson(Map<String, dynamic> json) {
@@ -30,6 +33,7 @@ class Dashboard {
     final inventory = group('inventory');
     final payments = group('payments');
     final activity = group('recentActivity');
+    final charts = json['charts'] is Map ? group('charts') : <String, dynamic>{};
     return Dashboard(
       generatedAt: DateTime.parse('${json['generatedAt']}'),
       attendedLast30Days: number(orders, 'attendedLast30Days'),
@@ -46,6 +50,9 @@ class Dashboard {
       orderChanges: items(activity, 'orderChanges', OrderChangeActivity.fromJson),
       payments: items(activity, 'payments', PaymentActivity.fromJson),
       inventoryMovements: items(activity, 'inventoryMovements', InventoryActivity.fromJson),
+      ordersByStatus: items(charts, 'ordersByStatus', OrderStatusCount.fromJson),
+      incomeByMonth: items(charts, 'incomeByMonth', MonthlyIncome.fromJson),
+      incomeByMethod: items(charts, 'incomeByMethod', MethodIncome.fromJson),
     );
   }
 
@@ -64,6 +71,11 @@ class Dashboard {
   final List<OrderChangeActivity> orderChanges;
   final List<PaymentActivity> payments;
   final List<InventoryActivity> inventoryMovements;
+
+  /// Datos de las gráficas: órdenes por estado, e ingresos pagados por mes y por método (últimos 6 meses).
+  final List<OrderStatusCount> ordersByStatus;
+  final List<MonthlyIncome> incomeByMonth;
+  final List<MethodIncome> incomeByMethod;
 
   bool get hasRecentActivity => orderChanges.isNotEmpty || payments.isNotEmpty || inventoryMovements.isNotEmpty;
 }
@@ -119,4 +131,40 @@ class InventoryActivity {
   final String type;
   final int quantity;
   final DateTime createdAt;
+}
+
+/// Cantidad de órdenes en un estado (gráfica de dona).
+class OrderStatusCount {
+  const OrderStatusCount({required this.status, required this.total});
+
+  factory OrderStatusCount.fromJson(Map<String, dynamic> json) =>
+      OrderStatusCount(status: '${json['status']}', total: (json['total'] as num?)?.toInt() ?? 0);
+
+  final String status;
+  final int total;
+}
+
+/// Ingresos pagados de un mes (`YYYY-MM`) para la gráfica de barras.
+class MonthlyIncome {
+  const MonthlyIncome({required this.month, required this.total});
+
+  factory MonthlyIncome.fromJson(Map<String, dynamic> json) =>
+      MonthlyIncome(month: '${json['month']}', total: (json['total'] as num?)?.toDouble() ?? 0);
+
+  final String month;
+  final double total;
+
+  /// Número de mes de 1 a 12.
+  int get monthNumber => int.tryParse(month.split('-').last) ?? 1;
+}
+
+/// Ingresos pagados con un método de pago.
+class MethodIncome {
+  const MethodIncome({required this.method, required this.total});
+
+  factory MethodIncome.fromJson(Map<String, dynamic> json) =>
+      MethodIncome(method: '${json['method']}', total: (json['total'] as num?)?.toDouble() ?? 0);
+
+  final String method;
+  final double total;
 }

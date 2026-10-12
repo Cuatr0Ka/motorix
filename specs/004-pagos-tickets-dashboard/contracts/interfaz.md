@@ -8,19 +8,22 @@ sustituye la validación del backend.
 
 | Opción | Pantalla | ADMIN | RECEPTIONIST | MECHANIC |
 |--------|----------|:-----:|:------------:|:--------:|
-| Panel de control | Indicadores y actividad reciente del taller | ✔ | — | — |
+| Inicio | Bienvenida con saludo, rol, fecha y accesos rápidos según el rol; para ADMIN, acceso destacado al Panel de control | ✔ | ✔ | ✔ |
+| Panel de control | Indicadores, gráficas y actividad reciente del taller | ✔ | — | — |
 | Pagos | Listado de pagos y detalle | ✔ | ✔ | — |
 | Tickets | Listado de tickets y vista del ticket | ✔ | ✔ | — |
 | Clientes, Vehículos, Citas, Órdenes, Mis órdenes, Mantenimientos, Inventario, Usuarios | (sprints 1 a 3) | según rol | según rol | según rol |
 
 El cobro de una orden vive dentro del **detalle de la orden** (sección «Cobro»). Para el administrador, el
-Panel de control es la primera opción del menú después de Inicio.
+Inicio sigue siendo la primera opción del menú y la pantalla de entrada de todos los roles, pero solo da la
+bienvenida y accesos rápidos (sin indicadores). Para el administrador incluye un acceso destacado al Panel de
+control, que es la segunda opción del menú.
 
 ## Pantallas
 
 | Pantalla | Contenido | Acciones | Estados obligatorios |
 |----------|-----------|----------|----------------------|
-| Panel de control (ADMIN) | Tarjetas numéricas agrupadas en Órdenes, Citas, Mantenimientos, Inventario y Cobros; bloque «Actividad reciente» con tres listas cortas (cambios de orden, pagos y movimientos de inventario); fecha y hora de la última actualización | Seleccionar una tarjeta para ir a su listado; «Actualizar» | Cargando, error con reintento, tarjetas en cero con estado vacío claro |
+| Panel de control (ADMIN) | A todo el ancho de la pantalla: cuatro indicadores principales (vehículos en reparación, citas próximas, mantenimientos vencidos y refacciones con stock bajo); gráfica de dona de órdenes por estado, gráfica de barras de ingresos por mes (últimos 6 meses) y barras de ingresos por método de pago; «Resumen operativo» con los demás indicadores en lista; actividad reciente con tres listas cortas (cambios de orden, pagos y movimientos de inventario); fecha y hora de la última actualización. Se adapta a 4, 2 o 1 columnas según el ancho | Seleccionar un indicador o renglón para ir a su listado; pasar el cursor por la dona o las barras para ver el detalle; «Actualizar» | Cargando, error con reintento, indicadores en cero y gráficas con mensaje de estado vacío |
 | Sección «Cobro» del detalle de la orden | Total a cobrar, estado de cobro (chip), pagos de la orden con método, importe, estado y fecha; aviso «El total cambió después del cobro» si el importe está desactualizado; botón y enlace al ticket | «Cobrar» (diálogo con método, referencia opcional y confirmación); en Mercado Pago: «Copiar enlace», «Abrir enlace» y «Actualizar estado»; «Cancelar cobro» (pendientes); «Generar ticket» / «Ver ticket» | Cargando, error, orden no cobrable (con motivo), Mercado Pago no disponible (método deshabilitado con leyenda) |
 | Listado de pagos | Tabla con fecha, folio de la orden, cliente, placa, método, importe y chip de estado; búsqueda por folio, cliente o placa; filtros de estado y método; paginación | Abrir la orden; «Actualizar estado» en pendientes de Mercado Pago | Vacío, cargando, error, sin resultados |
 | Listado de tickets | Tabla con folio, fecha, folio de la orden, cliente, placa y total; búsqueda por folio, cliente o placa; paginación | Abrir el ticket | Vacío, cargando, error, sin resultados |

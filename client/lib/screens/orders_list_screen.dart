@@ -180,7 +180,7 @@ class _Body extends StatelessWidget {
           DataColumn2(label: Text('Cliente'), size: ColumnSize.L),
           DataColumn2(label: Text('Vehículo'), size: ColumnSize.M),
           DataColumn2(label: Text('Mecánico'), size: ColumnSize.M),
-          DataColumn2(label: Text('Estado'), fixedWidth: 170),
+          DataColumn2(label: Text('Estado'), fixedWidth: 210),
           DataColumn2(label: Text('Acciones'), fixedWidth: 110),
         ],
         rows: [
@@ -195,7 +195,7 @@ class _Body extends StatelessWidget {
                 DataCell(Text(order.vehicle.licensePlate)),
                 DataCell(Text(order.mechanic?.name ?? 'Sin asignar', overflow: TextOverflow.ellipsis)),
                 DataCell(StatusChip.order(order.status)),
-                DataCell(TextButton(onPressed: () => onOpen(order), child: const Text('Ver detalle'))),
+                DataCell(RowActionButton.view(tooltip: 'Ver detalle de la orden', onPressed: () => onOpen(order))),
               ],
             ),
         ],

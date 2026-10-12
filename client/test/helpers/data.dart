@@ -66,7 +66,11 @@ FakeHandler vehiclesHandler({List<Map<String, dynamic>>? items, FakeHandler? ext
 
 /// Abre una sección del menú lateral (por ejemplo, "Clientes" o "Vehículos").
 Future<void> openSection(WidgetTester tester, String label) async {
-  await tester.tap(find.descendant(of: find.byType(NavigationRail), matching: find.text(label)));
+  final item = find.descendant(of: find.byType(NavigationRail), matching: find.text(label));
+  // En ventanas bajas el menú se desplaza: se trae la opción a la vista antes de tocarla.
+  await tester.ensureVisible(item);
+  await tester.pumpAndSettle();
+  await tester.tap(item);
   await tester.pumpAndSettle();
 }
 

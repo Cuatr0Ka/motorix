@@ -41,7 +41,7 @@ void main() {
       expect(find.text('MNO-345-E'), findsOneWidget);
       expect(find.text('Pendiente'), findsWidgets);
       expect(find.text('Confirmada'), findsWidgets);
-      expect(find.text('1–2 de 2'), findsOneWidget);
+      expect(find.text('1–2 de 2'), findsNothing);
     });
 
     testWidgets('test_muestra_el_estado_vacio_con_accion_para_registrar', (tester) async {

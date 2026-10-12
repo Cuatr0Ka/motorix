@@ -12,10 +12,11 @@ class AppColors {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color outline = Color(0xFFDDD5D4);
   static const Color textPrimary = Color(0xFF231F20);
-  static const Color textSecondary = Color(0xFF6F6566);
+  static const Color textSecondary = Color(0xFF574D4E);
   static const Color warning = Color(0xFFC9892B);
-  static const Color success = Color(0xFF4F7A5A);
+  static const Color success = Color(0xFF3F6B4A);
   static const Color danger = Color(0xFFC0392B);
+  static const Color info = Color(0xFF3A6B94);
 
   /// Texto e íconos claros sobre el sidebar oscuro.
   static const Color onSidebar = Color(0xFFF5F2F1);
@@ -47,8 +48,8 @@ class AppRadius {
 class AppFontSize {
   AppFontSize._();
 
-  static const double caption = 12;
-  static const double body = 14;
+  static const double caption = 13;
+  static const double body = 15;
   static const double section = 18;
   static const double title = 28;
 }

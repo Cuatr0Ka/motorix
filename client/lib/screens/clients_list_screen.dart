@@ -167,18 +167,14 @@ class _Body extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
+                      RowActionButton.view(
                         tooltip: 'Ver detalle de ${client.name}',
-                        visualDensity: VisualDensity.compact,
                         onPressed: () => onOpen(client),
-                        icon: const Icon(Icons.visibility_outlined, size: 18, color: AppColors.textSecondary),
                       ),
                       if (canEdit)
-                        IconButton(
+                        RowActionButton.edit(
                           tooltip: 'Editar a ${client.name}',
-                          visualDensity: VisualDensity.compact,
                           onPressed: () => onEdit(client),
-                          icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
                         ),
                     ],
                   ),

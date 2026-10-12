@@ -5,7 +5,7 @@ import 'tokens.dart';
 /// Tono visual de un estado (convención de color de `docs/design-system.md`).
 enum StatusTone {
   neutral(AppColors.textSecondary),
-  active(AppColors.primary),
+  active(AppColors.info),
   warning(AppColors.warning),
   success(AppColors.success),
   danger(AppColors.danger);

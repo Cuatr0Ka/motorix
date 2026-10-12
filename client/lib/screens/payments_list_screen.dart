@@ -176,12 +176,11 @@ class _Body extends StatelessWidget {
                 DataCell(PaymentChip(status: payment.status)),
                 DataCell(
                   payment.isPendingMercadoPago
-                      ? IconButton(
+                      ? RowActionButton(
                           key: ValueKey('actualizar-pago-${payment.id}'),
+                          icon: Icons.sync,
                           tooltip: 'Actualizar estado',
-                          visualDensity: VisualDensity.compact,
                           onPressed: () => onRefresh(payment),
-                          icon: const Icon(Icons.sync, size: 18),
                         )
                       : const SizedBox.shrink(),
                 ),
