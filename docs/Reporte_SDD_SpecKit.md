@@ -46,7 +46,8 @@ Rama única `004-pagos-tickets-dashboard`, sin squash ni force-push: el historia
 | 4. Modelo de datos | `specs/00X-*/data-model.md` | `32ee589`, `a7c440a`, `be83ef9`, `735e5be` |
 | 4. Migraciones reales | `database/migrations/001`–`004` | `32ee589` (001, 002), `a7c440a` (003), `be83ef9` (004) |
 | 5. Tareas | `specs/00X-*/tasks.md` | `32ee589`, `a7c440a`, `be83ef9` |
-| 5 y 6. Trazabilidad y pruebas | `docs/evidencias/trazabilidad.md` y salidas de pruebas | 🟡 commit nuevo |
+| 5 y 6. Trazabilidad y pruebas | `docs/evidencias/trazabilidad.md` y salidas de pruebas | `9e5988a` |
+| 5 y 6. Análisis de consistencia | `docs/evidencias/analisis-sprint4.md` (`/speckit.analyze` del sprint 4) | `afd1b89` |
 | 6. Implementación | Historial de commits de `32ee589` a `be83ef9`, más `0e4709f` y `fbf7cbd` | ver apartado 6 |
 | 6. Capturas y salida de pruebas | 🟡 `docs/evidencias/` | 🟡 commit nuevo |
 | 7. EARS | `docs/sprints/sprint-1-base-clientes-vehiculos-ears.md` y sección «Criterios de aceptación en EARS» del spec | `979966e` y `0a387c4` |
@@ -192,7 +193,7 @@ Relaciones: un cliente tiene varios vehículos; una cita y una orden pertenecen 
 - Tareas terminadas: 108 + 88 + 77 + 70 = **343**, ninguna pendiente.
 - Cada `tasks.md` cierra con «Dependencias y orden de ejecución» (en el Sprint 1: la Fase 2 bloquea todo; US1 va primero; US6 depende de US5 y US3; US4 de US3).
 - **Limitación:** la trazabilidad es por historia, no por requisito (casi ninguna tarea cita un FR).
-- **Análisis:** no se conservó evidencia de haber ejecutado `/speckit.analyze`. La consistencia se revisó con la tabla de verificación de la constitución y los checklists de calidad.
+- **Análisis:** `/speckit.analyze` se ejecutó el 17-oct-2026 sobre el sprint 4 (`docs/evidencias/analisis-sprint4.md`): 0 críticos y 2 altos (el panel y las gráficas cambiaron sin actualizar spec, plan ni tareas). Los sprints 1 a 3 no se analizaron; su consistencia se revisó con la tabla de verificación de la constitución y los checklists de calidad.
 
 **Evidencia:** `specs/00X-*/tasks.md` con casillas `[X]`. Commits `32ee589`, `a7c440a`, `be83ef9`.
 
@@ -243,7 +244,7 @@ Una captura por criterio, con el ID de la historia y del criterio. Sprint(s) ele
 - Salidas completas en `docs/evidencias/`.
 
 ### 6.5 Análisis de consistencia
-🟡 Ejecutar `/speckit.analyze` y guardar el resultado en `docs/evidencias/`; así el apartado 5 deja de depender de la tabla de verificación de la constitución.
+`/speckit.analyze` ejecutado el 2026-10-17 sobre el sprint 4; informe completo en `docs/evidencias/analisis-sprint4.md` (`afd1b89`). Resultado: 0 hallazgos críticos, 2 altos (F1: el spec pide 10 indicadores y el panel entregado tiene 4 más una gráfica; F2: `fl_chart` se agregó en `0e4709f` sin tarea ni actualización del plan), 28 de 28 requisitos construibles con tareas. Sin cambios de código; los hallazgos son documentales.
 
 ### 6.6 Lo que todavía no cumple
 - Los cuatro specs siguen en «Borrador».
@@ -297,7 +298,7 @@ Commit `979966e` (15-oct-2026): «docs(sprints): agregar insumo del sprint 1 con
 
 1. **Apartado 6** completo: commits ↔ tareas, capturas, verificación criterio por criterio, pruebas ejecutadas.
 2. ✅ `docs/evidencias/trazabilidad.md` y salidas de pruebas creadas; falta hacer commit y tomar las capturas (6.2).
-3. Ejecutar `/speckit.analyze` y guardar el resultado.
+3. ✅ `/speckit.analyze` ejecutado y guardado (sprint 4). Pendiente opcional: resolver F1, F2 y F3 en spec, plan y tareas, y analizar los sprints 1 a 3.
 4. ✅ EARS en FR-008 y FR-012 del sprint 1 (`0a387c4`). Opcional: extender EARS al resto de los requisitos del spec.
 5. Afinar el problema que resuelve Motorix (apartado 1) con `docs/project-context.md`.
 6. Con los commits nuevos, completar el índice y comprobar que los enlaces con hash abran.
