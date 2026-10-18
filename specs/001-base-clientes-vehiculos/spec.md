@@ -210,10 +210,16 @@ luego con un cliente existente (debe funcionar), y viendo el vehículo en el det
 - **FR-007**: Todo usuario con sesión iniciada DEBE poder cambiar su contraseña; el sistema DEBE
   validar la política mínima (8 caracteres, al menos una mayúscula, una minúscula y un número)
   tanto en cambios como en altas de usuarios.
-- **FR-008**: El sistema DEBE rechazar el inicio de sesión de cuentas desactivadas y mostrar,
-  ante credenciales inválidas, un mensaje que no revele cuál dato falló. Tras 5 intentos fallidos
-  consecutivos, el sistema DEBE bloquear la cuenta durante 15 minutos e informarlo con un mensaje
-  claro; un acceso correcto reinicia el contador.
+- **FR-008**: Inicio de sesión rechazado, bloqueo y reinicio del contador (EARS):
+  - **FR-008a** (no deseado): SI la cuenta está desactivada, ENTONCES el backend DEBERÁ rechazar
+    el inicio de sesión con un mensaje claro.
+  - **FR-008b** (no deseado): SI el usuario o la contraseña son incorrectos, ENTONCES el backend
+    DEBERÁ rechazar el inicio de sesión con un mensaje en español que no indique cuál de los dos
+    datos falló.
+  - **FR-008c** (evento): CUANDO una cuenta acumule 5 intentos fallidos consecutivos, el backend
+    DEBERÁ bloquearla durante 15 minutos e informarlo con un mensaje claro.
+  - **FR-008d** (evento): CUANDO una cuenta inicie sesión correctamente, el backend DEBERÁ
+    reiniciar a cero su contador de intentos fallidos.
 - **FR-009**: Recepcionistas y administradores DEBEN poder registrar, consultar y editar clientes
   con datos de contacto (nombre completo, teléfono, correo electrónico y dirección opcional). El
   correo, si se captura, DEBE ser único entre clientes; un teléfono ya registrado en otro cliente
@@ -223,8 +229,13 @@ luego con un cliente existente (debe funcionar), y viendo el vehículo en el det
 - **FR-011**: Recepcionistas y administradores DEBEN poder registrar, consultar y editar
   vehículos con placa, marca, modelo, año, color opcional y kilometraje actual opcional; la placa
   DEBE ser única.
-- **FR-012**: Todo vehículo DEBE estar asociado a un cliente existente como propietario; el
-  sistema DEBE rechazar vehículos sin propietario o con propietario inexistente.
+- **FR-012**: Propietario obligatorio del vehículo (EARS):
+  - **FR-012a** (no deseado): SI se intenta registrar un vehículo sin propietario, ENTONCES el
+    backend DEBERÁ rechazar la operación.
+  - **FR-012b** (no deseado): SI el propietario indicado no existe, ENTONCES el backend DEBERÁ
+    rechazar la operación con un mensaje de error en español.
+  - **FR-012c** (evento): CUANDO un usuario autorizado registre un vehículo con datos válidos y
+    un propietario existente, el backend DEBERÁ crear el vehículo asociado a ese cliente.
 - **FR-013**: El sistema DEBE permitir cambiar el propietario de un vehículo hacia otro cliente
   existente, solicitando confirmación previa.
 - **FR-014**: Los mecánicos DEBEN poder consultar clientes y vehículos, sin poder crearlos ni
@@ -249,6 +260,24 @@ luego con un cliente existente (debe funcionar), y viendo el vehículo en el det
 - **FR-021**: El sistema DEBE mantener fuera del alcance de este sprint: citas, órdenes de
   servicio, inventario, pagos, tickets, panel de indicadores, chatbot, recuperación de contraseña,
   registro público de usuarios y modo oscuro.
+
+### Criterios de aceptación en EARS
+
+Los requisitos FR-008 y FR-012 están redactados con la sintaxis EARS (Easy Approach to
+Requirements Syntax): un solo DEBERÁ por requisito, sujeto explícito (backend o frontend) y
+respuesta observable. El resto de los requisitos conserva la redacción con "DEBE" y se migrará
+a EARS en una revisión posterior; la versión completa en EARS está en
+`docs/sprints/sprint-1-base-clientes-vehiculos-ears.md`.
+
+| Requisito | Patrón | Escenario relacionado | Dato medible | Prueba |
+|-----------|--------|-----------------------|--------------|--------|
+| FR-008a | No deseado | Historia 1, escenario 4 | Cuenta desactivada rechazada en el 100 % de los intentos | Backend (Jest + supertest) |
+| FR-008b | No deseado | Historia 1, escenario 3 | El mensaje no incluye cuál dato falló | Backend (Jest + supertest) |
+| FR-008c | Evento | Casos límite de sesión | 5 intentos fallidos y 15 minutos de bloqueo | Backend (Jest + supertest) |
+| FR-008d | Evento | Historia 1, escenarios 1 y 2 | Contador en 0 tras un acceso correcto | Backend (Jest + supertest) |
+| FR-012a | No deseado | Historia 6, escenario 2 | Cero vehículos sin propietario creados (SC-009) | Backend (Jest + supertest) |
+| FR-012b | No deseado | Historia 6, escenario 2 | Propietario inexistente rechazado en el 100 % de los intentos | Backend (Jest + supertest) |
+| FR-012c | Evento | Historia 6, escenario 1 | Vehículo visible en el detalle del cliente | Backend (Jest + supertest) |
 
 ### Entidades clave *(incluir si la funcionalidad involucra datos)*
 
