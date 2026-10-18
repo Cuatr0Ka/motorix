@@ -43,9 +43,21 @@ Total: 343 tareas terminadas, ninguna pendiente. Los sprints 1 y 2 entraron junt
 | Historia 1: importe distinto del total rechazado con el total a cobrar | `payments.flow.test.js` → `test_rechaza_un_importe_distinto_e_informa_el_total` | Sí |
 | SC-005: cero órdenes con dos pagos vigentes, con solicitudes simultáneas | `server/tests/integration/payments.concurrency.test.js` → `test_cinco_cobros_simultaneos_con_metodos_distintos_dejan_un_solo_pago` | Sí |
 | Sin datos de tarjeta en la base | `payments.flow.test.js` → `test_la_tabla_de_pagos_no_tiene_columnas_de_tarjeta` | Sí |
-| SC-001: pago en menos de 1 minuto | Medición de uso con una persona; no hay prueba automática | 🟡 por medir |
+| SC-001: pago en menos de 1 minuto | Medición de uso con una persona; el flujo está cubierto por pruebas automáticas, pero no hay medición de tiempo | Parcial |
+
+## Capturas de la aplicación (17-oct-2026)
+
+| Criterio | Captura |
+|---|---|
+| Panel de control con indicadores y gráficas (sprint 4, historia 4) | `captura-panel-indicadores.png` |
+| Bloqueo de cuenta tras 5 intentos fallidos (sprint 1, FR-008c) | `captura-bloqueo-cuenta.png` |
+| Orden no cobrable: la sección Cobro indica que debe estar Terminada (sprint 4, FR-006) | `captura-pago-rechazado.png` |
+| Vehículo sin propietario rechazado en el formulario (sprint 1, FR-012a) | `captura-vehiculo-sin-propietario.png` |
+
+## Análisis de consistencia
+`/speckit.analyze` se ejecutó sobre el sprint 4; el informe está en `analisis-sprint4.md`.
 
 ## Lo que no se verificó
 - SC-001 del sprint 4 y otros criterios de tiempo de uso (SC-003 y SC-004 del sprint 1) dependen de pruebas con personas, no de pruebas automáticas.
-- No se ejecutó `/speckit.analyze`.
-- Las capturas de pantalla de la aplicación funcionando están pendientes en `docs/evidencias/`.
+- `/speckit.analyze` solo se ejecutó sobre el sprint 4; los sprints 1 a 3 no tienen informe propio.
+- El rechazo de un segundo pago vigente no se alcanza desde la pantalla (el botón «Cobrar» se oculta en órdenes ya cobradas); se verifica con las pruebas automáticas de pagos.
