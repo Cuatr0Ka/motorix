@@ -1,0 +1,79 @@
+
+> motorix-server@0.1.0 test
+> cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js
+
+(node:24248) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS tests/integration/passwords.test.js (13.854 s)
+PASS tests/integration/performance.test.js
+PASS tests/integration/payments.flow.test.js
+PASS tests/integration/orderParts.flow.test.js
+PASS tests/integration/maintenance.flow.test.js
+PASS tests/integration/tickets.flow.test.js
+PASS tests/integration/orders.status.test.js
+PASS tests/integration/orders.work.test.js
+PASS tests/integration/clients.edit.test.js
+PASS tests/integration/orders.mechanicScope.test.js
+PASS tests/integration/seeds.sprint4.test.js
+PASS tests/integration/maintenance.list.test.js
+PASS tests/integration/dashboard.test.js
+PASS tests/integration/seeds.sprint3.test.js
+PASS tests/integration/users.flow.test.js
+PASS tests/integration/payments.mercadoPago.test.js
+PASS tests/integration/orders.create.test.js
+PASS tests/contract/users.contract.test.js
+PASS tests/integration/serviceMileage.test.js
+PASS tests/integration/inventory.movements.test.js
+PASS tests/integration/parts.flow.test.js
+PASS tests/integration/appointments.flow.test.js
+PASS tests/integration/seeds.sprint2.test.js
+PASS tests/contract/payments.contract.test.js
+PASS tests/integration/history.test.js
+PASS tests/integration/vehicles.flow.test.js
+PASS tests/contract/orderParts.contract.test.js
+PASS tests/contract/maintenance.contract.test.js
+PASS tests/integration/payments.security.test.js
+PASS tests/integration/orderParts.concurrency.test.js
+PASS tests/integration/auth.flow.test.js
+PASS tests/integration/orders.assign.test.js
+PASS tests/contract/orders.work.contract.test.js
+PASS tests/integration/payments.permissions.test.js
+PASS tests/contract/orders.contract.test.js
+PASS tests/contract/appointments.contract.test.js
+PASS tests/contract/history.contract.test.js
+PASS tests/integration/stockAlerts.test.js
+PASS tests/integration/vehicles.owner.test.js
+PASS tests/contract/tickets.contract.test.js
+PASS tests/contract/parts.contract.test.js
+PASS tests/contract/mechanics.contract.test.js
+PASS tests/integration/clients.flow.test.js
+PASS tests/contract/orders.status.contract.test.js
+PASS tests/integration/payments.concurrency.test.js
+PASS tests/contract/vehicles.contract.test.js
+PASS tests/contract/vehicles.patch.contract.test.js
+PASS tests/contract/clients.contract.test.js
+PASS tests/contract/clients.patch.contract.test.js
+PASS tests/contract/inventory.contract.test.js
+PASS tests/contract/dashboard.contract.test.js
+PASS tests/integration/tickets.concurrency.test.js
+PASS tests/contract/auth.contract.test.js
+PASS tests/integration/seeds.test.js
+PASS tests/unit/authService.test.js
+PASS tests/unit/orderTransitions.test.js
+PASS tests/unit/orderFolio.test.js
+PASS tests/unit/mileageRule.test.js
+PASS tests/unit/paymentRules.test.js
+PASS tests/unit/ticketContent.test.js
+PASS tests/unit/authorize.test.js
+PASS tests/unit/esm.test.js
+PASS tests/unit/maintenanceStatus.test.js
+PASS tests/unit/stockRules.test.js
+PASS tests/unit/mercadoPagoAdapter.test.js
+PASS tests/unit/errorHandler.test.js
+PASS tests/unit/orderPermissions.test.js
+
+Test Suites: 67 passed, 67 total
+Tests:       1003 passed, 1003 total
+Snapshots:   0 total
+Time:        60.414 s, estimated 80 s
+Ran all test suites.

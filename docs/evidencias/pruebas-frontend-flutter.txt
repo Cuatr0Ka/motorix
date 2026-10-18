@@ -1,0 +1,1090 @@
+Resolving dependencies...
+Downloading packages...
+  archive 4.5.1 (4.5.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  cupertino_ui 1.1.2 (1.1.3 available)
+  data_table_2 2.6.0 (3.0.0 available)
+  equatable 2.1.0 (3.0.0 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  material_ui 1.6.0 (1.7.0 available)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  qr 3.0.2 (4.0.0 available)
+  record_use 0.6.0 (1.1.1 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.3 available)
+  vm_service 15.3.0 (15.4.0 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+18 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading D:/sdd/motorix/client/test/appointments_screens_test.dart
+00:00 +0: D:/sdd/motorix/client/test/app_shell_test.dart: menú lateral según el rol test_el_rol_ADMIN_ve_solo_sus_opciones
+00:00 +1: D:/sdd/motorix/client/test/app_shell_test.dart: menú lateral según el rol test_el_rol_ADMIN_ve_solo_sus_opciones
+00:00 +2: D:/sdd/motorix/client/test/app_shell_test.dart: menú lateral según el rol test_el_rol_ADMIN_ve_solo_sus_opciones
+00:01 +3: D:/sdd/motorix/client/test/appointments_screens_test.dart: listado de citas test_muestra_las_citas_con_su_cliente_vehiculo_y_estado
+00:01 +3: D:/sdd/motorix/client/test/clients_screens_test.dart: test_muestra_el_listado_de_clientes_con_sus_datos
+DataTable2 built: 2ms
+00:01 +4: D:/sdd/motorix/client/test/appointments_screens_test.dart: listado de citas test_muestra_las_citas_con_su_cliente_vehiculo_y_estado
+DataTable2 built: 1ms
+00:01 +5: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_formulario_de_edicion_llega_con_los_datos_actuales
+00:01 +6: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_formulario_de_edicion_llega_con_los_datos_actuales
+00:01 +7: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_formulario_de_edicion_llega_con_los_datos_actuales
+00:02 +8: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_formulario_de_edicion_llega_con_los_datos_actuales
+00:02 +9: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_formulario_de_edicion_llega_con_los_datos_actuales
+00:02 +10: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_formulario_de_edicion_llega_con_los_datos_actuales
+00:02 +11: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_formulario_de_edicion_llega_con_los_datos_actuales
+DataTable2 built: 2ms
+00:02 +12: D:/sdd/motorix/client/test/dashboard_test.dart: test_el_administrador_ve_las_tarjetas_con_los_valores_del_servidor
+00:02 +12: D:/sdd/motorix/client/test/clients_screens_test.dart: test_el_mecanico_ve_el_listado_pero_no_los_botones_de_alta
+DataTable2 built: 0ms
+00:02 +13: D:/sdd/motorix/client/test/dashboard_test.dart: test_el_administrador_ve_las_tarjetas_con_los_valores_del_servidor
+00:02 +14: D:/sdd/motorix/client/test/dashboard_test.dart: test_el_administrador_ve_las_tarjetas_con_los_valores_del_servidor
+00:02 +15: D:/sdd/motorix/client/test/dashboard_test.dart: test_el_administrador_ve_las_tarjetas_con_los_valores_del_servidor
+00:02 +16: D:/sdd/motorix/client/test/dashboard_test.dart: test_el_administrador_ve_las_tarjetas_con_los_valores_del_servidor
+00:02 +17: D:/sdd/motorix/client/test/dashboard_test.dart: test_el_administrador_ve_las_tarjetas_con_los_valores_del_servidor
+00:02 +18: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:02 +18: D:/sdd/motorix/client/test/appointments_screens_test.dart: listado de citas test_el_filtro_de_estado_pide_solo_las_citas_de_ese_estado
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:02 +19: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:02 +19: D:/sdd/motorix/client/test/clients_screens_test.dart: test_muestra_el_estado_de_error_y_permite_reintentar
+DataTable2 built: 0ms
+00:02 +20: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:02 +21: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +22: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +22: D:/sdd/motorix/client/test/client_edit_test.dart: test_cambiar_el_telefono_lo_envia_por_patch_y_se_ve_en_el_detalle
+DataTable2 built: 0ms
+00:03 +23: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +24: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +24: D:/sdd/motorix/client/test/clients_screens_test.dart: test_la_busqueda_envia_el_texto_al_servidor_y_muestra_sin_resultados
+DataTable2 built: 0ms
+00:03 +25: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +26: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +27: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +27: D:/sdd/motorix/client/test/appointments_screens_test.dart: listado de citas test_confirmar_una_cita_pendiente_llama_a_la_api_y_avisa
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:03 +28: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +29: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +30: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+00:03 +31: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_el_administrador_ve_el_inventario_con_el_estado_de_stock
+DataTable2 built: 2ms
+00:03 +32: D:/sdd/motorix/client/test/client_edit_test.dart: test_una_edicion_invalida_no_llama_a_la_api_y_conserva_los_datos
+00:03 +33: D:/sdd/motorix/client/test/client_edit_test.dart: test_una_edicion_invalida_no_llama_a_la_api_y_conserva_los_datos
+DataTable2 built: 0ms
+00:03 +34: D:/sdd/motorix/client/test/clients_screens_test.dart: formulario de cliente test_valida_los_campos_obligatorios_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:03 +35: D:/sdd/motorix/client/test/dashboard_test.dart: test_actualizar_vuelve_a_consultar_y_refleja_los_cambios
+00:03 +35: D:/sdd/motorix/client/test/appointments_screens_test.dart: listado de citas test_cancelar_pide_confirmacion_y_volver_no_llama_a_la_api
+DataTable2 built: 0ms
+00:03 +36: D:/sdd/motorix/client/test/dashboard_test.dart: test_actualizar_vuelve_a_consultar_y_refleja_los_cambios
+00:04 +37: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_filtra_por_estado_de_stock_y_busca_por_nombre
+00:04 +37: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_rechazo_del_servidor_se_muestra_y_no_cambia_el_detalle
+DataTable2 built: 0ms
+00:04 +38: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_filtra_por_estado_de_stock_y_busca_por_nombre
+00:04 +38: D:/sdd/motorix/client/test/clients_screens_test.dart: formulario de cliente test_guarda_el_cliente_vuelve_al_listado_y_muestra_el_aviso_de_exito
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:04 +39: D:/sdd/motorix/client/test/inventory_screens_test.dart: listado de inventario test_filtra_por_estado_de_stock_y_busca_por_nombre
+DataTable2 built: 1ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:04 +40: D:/sdd/motorix/client/test/appointments_screens_test.dart: listado de citas test_cancelar_con_motivo_envia_el_motivo_a_la_api
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:04 +41: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:04 +41: D:/sdd/motorix/client/test/appointments_screens_test.dart: listado de citas test_las_citas_canceladas_no_ofrecen_confirmar_ni_cancelar
+DataTable2 built: 0ms
+00:04 +42: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:04 +43: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:04 +43: D:/sdd/motorix/client/test/client_edit_test.dart: test_telefono_de_otro_cliente_pide_confirmacion_y_reenvia_con_confirmDuplicatePhone
+DataTable2 built: 0ms
+00:04 +44: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:05 +44: D:/sdd/motorix/client/test/clients_screens_test.dart: formulario de cliente test_telefono_duplicado_muestra_coincidencias_y_reenvia_al_confirmar
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:05 +45: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:05 +45: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_exige_cliente_vehiculo_fecha_y_motivo_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:05 +46: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:05 +47: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:05 +48: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:05 +48: D:/sdd/motorix/client/test/clients_screens_test.dart: formulario de cliente test_cancelar_la_advertencia_de_telefono_no_guarda_nada
+DataTable2 built: 0ms
+00:05 +49: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:05 +49: D:/sdd/motorix/client/test/client_edit_test.dart: test_cancelar_la_advertencia_de_telefono_no_guarda_y_sigue_en_el_formulario
+DataTable2 built: 0ms
+00:05 +50: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:05 +51: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:05 +51: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_el_vehiculo_se_filtra_por_el_cliente_elegido
+DataTable2 built: 0ms
+00:05 +52: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+00:06 +53: D:/sdd/motorix/client/test/dashboard_test.dart: test_cada_tarjeta_lleva_al_listado_correspondiente
+DataTable2 built: 2ms
+00:06 +54: D:/sdd/motorix/client/test/maintenance_list_test.dart: test_el_rol_admin_ve_los_tres_indicadores_con_cliente_y_telefono
+DataTable2 built: 2ms
+00:06 +55: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cobrar_con_mercado_pago_muestra_el_cobro_pendiente_con_su_enlace
+00:06 +55: D:/sdd/motorix/client/test/clients_screens_test.dart: formulario de cliente test_correo_duplicado_se_muestra_en_el_campo_sin_opcion_de_confirmar
+DataTable2 built: 0ms
+00:06 +56: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cobrar_con_mercado_pago_muestra_el_cobro_pendiente_con_su_enlace
+00:06 +56: D:/sdd/motorix/client/test/client_edit_test.dart: test_salir_con_cambios_pide_confirmacion_y_sin_cambios_no
+DataTable2 built: 0ms
+00:06 +57: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cobrar_con_mercado_pago_muestra_el_cobro_pendiente_con_su_enlace
+00:06 +58: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cobrar_con_mercado_pago_muestra_el_cobro_pendiente_con_su_enlace
+00:06 +58: D:/sdd/motorix/client/test/maintenance_list_test.dart: test_el_rol_receptionist_ve_los_tres_indicadores_con_cliente_y_telefono
+DataTable2 built: 0ms
+00:06 +59: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cobrar_con_mercado_pago_muestra_el_cobro_pendiente_con_su_enlace
+00:06 +59: D:/sdd/motorix/client/test/inventory_screens_test.dart: alta y edición test_registra_una_refaccion_con_stock_inicial
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:06 +60: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cobrar_con_mercado_pago_muestra_el_cobro_pendiente_con_su_enlace
+00:06 +60: D:/sdd/motorix/client/test/my_orders_test.dart: test_la_lista_muestra_las_ordenes_asignadas_sin_boton_de_alta_ni_filtro_de_mecanico
+DataTable2 built: 2ms
+00:06 +61: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cobrar_con_mercado_pago_muestra_el_cobro_pendiente_con_su_enlace
+00:06 +61: D:/sdd/motorix/client/test/clients_screens_test.dart: formulario de cliente test_salir_con_cambios_pide_confirmacion
+DataTable2 built: 0ms
+00:06 +62: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cobrar_con_mercado_pago_muestra_el_cobro_pendiente_con_su_enlace
+DataTable2 built: 2ms
+00:06 +63: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_registra_la_cita_con_fecha_hora_y_motivo_y_avisa
+00:06 +63: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_listado_ofrece_editar_y_actualiza_la_fila_tras_guardar
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:06 +64: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_registra_la_cita_con_fecha_hora_y_motivo_y_avisa
+00:06 +65: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_registra_la_cita_con_fecha_hora_y_motivo_y_avisa
+00:06 +66: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_registra_la_cita_con_fecha_hora_y_motivo_y_avisa
+00:06 +66: D:/sdd/motorix/client/test/clients_screens_test.dart: formulario de cliente test_salir_sin_cambios_no_pide_confirmacion
+DataTable2 built: 0ms
+00:06 +67: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_registra_la_cita_con_fecha_hora_y_motivo_y_avisa
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:07 +68: D:/sdd/motorix/client/test/maintenance_list_test.dart: test_filtra_por_indicador_y_limpia_el_filtro
+00:07 +68: D:/sdd/motorix/client/test/client_edit_test.dart: test_el_mecanico_no_ve_acciones_de_edicion_ni_en_el_listado_ni_en_el_detalle
+DataTable2 built: 0ms
+00:07 +69: D:/sdd/motorix/client/test/maintenance_list_test.dart: test_filtra_por_indicador_y_limpia_el_filtro
+00:07 +69: D:/sdd/motorix/client/test/inventory_screens_test.dart: alta y edición test_valida_los_campos_obligatorios_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:07 +70: D:/sdd/motorix/client/test/maintenance_list_test.dart: test_filtra_por_indicador_y_limpia_el_filtro
+DataTable2 built: 4ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:07 +71: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_copia_el_enlace_al_portapapeles_y_lo_abre_en_el_navegador
+00:07 +72: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_copia_el_enlace_al_portapapeles_y_lo_abre_en_el_navegador
+00:07 +72: D:/sdd/motorix/client/test/clients_screens_test.dart: detalle de cliente test_muestra_los_datos_y_la_lista_de_vehiculos
+DataTable2 built: 0ms
+00:07 +73: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_copia_el_enlace_al_portapapeles_y_lo_abre_en_el_navegador
+00:07 +74: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_copia_el_enlace_al_portapapeles_y_lo_abre_en_el_navegador
+00:07 +74: D:/sdd/motorix/client/test/my_orders_test.dart: test_el_filtro_entregado_pide_esas_ordenes_al_servidor
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:07 +75: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_copia_el_enlace_al_portapapeles_y_lo_abre_en_el_navegador
+00:07 +76: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_copia_el_enlace_al_portapapeles_y_lo_abre_en_el_navegador
+00:07 +76: D:/sdd/motorix/client/test/clients_screens_test.dart: detalle de cliente test_muestra_un_mensaje_si_el_cliente_no_tiene_vehiculos
+DataTable2 built: 0ms
+00:07 +77: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_copia_el_enlace_al_portapapeles_y_lo_abre_en_el_navegador
+00:07 +77: D:/sdd/motorix/client/test/maintenance_list_test.dart: test_busca_por_cliente_o_placa
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:07 +78: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_copia_el_enlace_al_portapapeles_y_lo_abre_en_el_navegador
+DataTable2 built: 0ms
+00:07 +79: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_muestra_el_error_de_horario_ocupado_en_el_campo_de_fecha
+00:07 +79: D:/sdd/motorix/client/test/inventory_screens_test.dart: alta y edición test_un_codigo_duplicado_se_muestra_en_el_campo
+DataTable2 built: 0ms
+00:07 +80: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_muestra_el_error_de_horario_ocupado_en_el_campo_de_fecha
+00:07 +81: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_muestra_el_error_de_horario_ocupado_en_el_campo_de_fecha
+00:07 +81: D:/sdd/motorix/client/test/clients_screens_test.dart: detalle de cliente test_el_mecanico_no_ve_el_boton_editar
+DataTable2 built: 0ms
+00:07 +82: D:/sdd/motorix/client/test/appointments_screens_test.dart: formulario de cita test_muestra_el_error_de_horario_ocupado_en_el_campo_de_fecha
+DataTable2 built: 0ms
+00:07 +83: D:/sdd/motorix/client/test/my_orders_test.dart: test_abre_el_detalle_de_una_orden_propia_y_no_ofrece_asignar
+00:08 +84: D:/sdd/motorix/client/test/my_orders_test.dart: test_abre_el_detalle_de_una_orden_propia_y_no_ofrece_asignar
+DataTable2 built: 0ms
+00:08 +85: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_si_no_se_puede_abrir_el_enlace_avisa_y_sugiere_copiarlo
+00:08 +86: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_si_no_se_puede_abrir_el_enlace_avisa_y_sugiere_copiarlo
+00:08 +86: D:/sdd/motorix/client/test/dashboard_test.dart: test_el_panel_se_ve_sin_desbordes_con_una_ventana_de_760_px
+
+Warning: A call to tap() with finder "Found 1 widget with text "Panel de control" descending from widget with type "NavigationRail": [
+  Text("Panel de control", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 132.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#6d2b1 NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#ea557@Offset(0.0, 0.0), RenderSemanticsAnnotations#af6a9@Offset(0.0, 0.0), RenderMouseRegion#1af76@Offset(0.0, 0.0), RenderSemanticsAnnotations#0094c@Offset(0.0, 0.0), _RenderInkFeatures#a3ede@Offset(0.0, 0.0), RenderCustomPaint#7757c@Offset(0.0, 0.0), RenderClipPath#b0afa@Offset(0.0, 0.0), RenderStack#1e885@Offset(0.0, 0.0), RenderSemanticsAnnotations#369c3@Offset(0.0, 0.0), RenderFlex#1a8d5@Offset(0.0, 44.0), RenderPositionedBox#6d2a6@Offset(0.0, 44.0), RenderFlex#cce08@Offset(0.0, 132.0), RenderPadding#15dad@Offset(0.0, 132.0), _RenderInkFeatures#006c9@Offset(0.0, 132.0), RenderPhysicalModel#38ade@Offset(0.0, 132.0), RenderSemanticsAnnotations#b9afe@Offset(0.0, 132.0), RenderSemanticsAnnotations#a1b20@Offset(0.0, 132.0), RenderIntrinsicHeight#d089a@Offset(0.0, 132.0), _RenderSingleChildViewport#1ad96@Offset(0.0, 132.0), RenderIgnorePointer#9c3c3@Offset(0.0, 132.0), RenderSemanticsAnnotations#d88b2@Offset(0.0, 132.0), RenderPointerListener#99178@Offset(0.0, 132.0), RenderSemanticsGestureHandler#b3cba@Offset(0.0, 132.0), RenderPointerListener#b3e95@Offset(0.0, 132.0), _RenderScrollSemantics#65a7d@Offset(0.0, 132.0), RenderClipRect#762d7@Offset(0.0, 132.0), RenderFlex#db57e@Offset(0.0, 132.0), RenderClipRect#f69aa@Offset(0.0, 132.0), _RenderColoredBox#46dc1@Offset(0.0, 132.0), RenderFlex#c8502@Offset(0.0, 132.0), RenderCustomMultiChildLayoutBox#e06a7@Offset(0.0, 132.0), _RenderInkFeatures#4e274@Offset(0.0, 132.0), RenderPhysicalModel#62096@Offset(0.0, 132.0), _RenderLayoutBuilder#5723a@Offset(0.0, 132.0), RenderAnimatedOpacity#0ed1c@Offset(0.0, 132.0), RenderStack#c4ea4@Offset(0.0, 132.0), RenderSemanticsAnnotations#a0d79@Offset(0.0, 132.0), RenderRepaintBoundary#66927@Offset(0.0, 132.0), RenderIgnorePointer#aa7fe@Offset(0.0, 132.0), RenderAnimatedOpacity#59490@Offset(0.0, 132.0), RenderRepaintBoundary#b202d@Offset(0.0, 132.0), RenderSemanticsAnnotations#10ddb@Offset(0.0, 132.0), RenderOffstage#730ac@Offset(0.0, 132.0), RenderSemanticsAnnotations#dc5cd@Offset(0.0, 132.0), _RenderTheater#66519@Offset(0.0, 132.0), RenderAbsorbPointer#aa1f6@Offset(0.0, 132.0), RenderPointerListener#b158e@Offset(0.0, 132.0), RenderSemanticsAnnotations#631dc@Offset(0.0, 132.0), RenderSemanticsAnnotations#29d7f@Offset(0.0, 132.0), RenderSemanticsAnnotations#33ede@Offset(0.0, 132.0), RenderSemanticsAnnotations#b1658@Offset(0.0, 132.0), RenderTapRegionSurface#49480@Offset(0.0, 132.0), RenderSemanticsAnnotations#416e0@Offset(0.0, 132.0), RenderSemanticsAnnotations#ef1c1@Offset(0.0, 132.0), HitTestEntry<HitTestTarget>#1b731(_ReusableRenderView#36117), HitTestEntry<HitTestTarget>#770e1(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/dashboard_test.dart:272:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:08 +87: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_si_no_se_puede_abrir_el_enlace_avisa_y_sugiere_copiarlo
+00:08 +87: D:/sdd/motorix/client/test/inventory_screens_test.dart: alta y edición test_al_editar_el_codigo_esta_bloqueado_y_no_hay_stock_inicial
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:08 +88: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_si_no_se_puede_abrir_el_enlace_avisa_y_sugiere_copiarlo
+00:08 +89: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_si_no_se_puede_abrir_el_enlace_avisa_y_sugiere_copiarlo
+00:08 +90: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_si_no_se_puede_abrir_el_enlace_avisa_y_sugiere_copiarlo
+DataTable2 built: 0ms
+00:08 +91: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:08 +91: D:/sdd/motorix/client/test/appointments_screens_test.dart: detalle de cita test_muestra_los_datos_y_las_acciones_de_una_cita_pendiente
+DataTable2 built: 0ms
+00:08 +92: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:08 +93: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:08 +94: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:08 +94: D:/sdd/motorix/client/test/inventory_screens_test.dart: detalle, entradas y ajustes test_muestra_el_stock_y_los_movimientos
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:08 +95: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:08 +95: D:/sdd/motorix/client/test/appointments_screens_test.dart: detalle de cita test_una_cita_completada_no_muestra_acciones_de_edicion
+DataTable2 built: 0ms
+00:08 +96: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:09 +96: D:/sdd/motorix/client/test/maintenance_list_test.dart: test_la_recepcion_no_tiene_acciones_de_edicion
+DataTable2 built: 0ms
+00:09 +97: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:09 +98: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:09 +98: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_actualizar_el_estado_pasa_de_pendiente_a_pagado_y_aparece_la_operacion
+DataTable2 built: 0ms
+00:09 +99: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:09 +100: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+00:09 +100: D:/sdd/motorix/client/test/inventory_screens_test.dart: detalle, entradas y ajustes test_registra_una_entrada_y_el_stock_sube
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:09 +101: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_muestra_las_ordenes_con_folio_cliente_mecanico_y_estado
+DataTable2 built: 1ms
+00:09 +102: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_asigna_un_mecanico_a_una_orden_sin_asignar_y_avisa
+00:09 +102: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_si_el_proveedor_aun_no_confirma_sigue_pendiente_y_muestra_la_ultima_consulta
+DataTable2 built: 0ms
+00:09 +103: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_asigna_un_mecanico_a_una_orden_sin_asignar_y_avisa
+00:09 +103: D:/sdd/motorix/client/test/maintenance_list_test.dart: test_el_administrador_edita_y_marca_como_atendido_con_confirmacion
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:09 +104: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_asigna_un_mecanico_a_una_orden_sin_asignar_y_avisa
+00:10 +105: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_asigna_un_mecanico_a_una_orden_sin_asignar_y_avisa
+00:10 +105: D:/sdd/motorix/client/test/inventory_screens_test.dart: detalle, entradas y ajustes test_el_ajuste_pide_confirmacion_con_stock_contado_y_diferencia
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:10 +106: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_asigna_un_mecanico_a_una_orden_sin_asignar_y_avisa
+00:10 +106: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_un_cobro_rechazado_se_conserva_y_permite_cobrar_de_nuevo
+DataTable2 built: 0ms
+00:10 +107: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_asigna_un_mecanico_a_una_orden_sin_asignar_y_avisa
+00:10 +107: D:/sdd/motorix/client/test/orders_screens_test.dart: listado de órdenes test_el_filtro_de_estado_pide_solo_las_ordenes_de_ese_estado
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:10 +108: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_asigna_un_mecanico_a_una_orden_sin_asignar_y_avisa
+00:10 +108: D:/sdd/motorix/client/test/inventory_screens_test.dart: detalle, entradas y ajustes test_cancelar_la_confirmacion_del_ajuste_no_llama_a_la_api
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:10 +109: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_asigna_un_mecanico_a_una_orden_sin_asignar_y_avisa
+DataTable2 built: 3ms
+00:11 +110: D:/sdd/motorix/client/test/order_billing_test.dart: sección de cobro test_el_rol_receptionist_ve_el_total_el_estado_y_el_boton_cobrar
+DataTable2 built: 2ms
+00:11 +111: D:/sdd/motorix/client/test/order_maintenance_test.dart: kilometraje del servicio test_el_mecanico_registra_el_kilometraje_y_se_muestra
+00:11 +111: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_cancelar_el_cobro_pide_confirmacion_y_lo_deja_cancelado
+DataTable2 built: 0ms
+00:11 +112: D:/sdd/motorix/client/test/order_maintenance_test.dart: kilometraje del servicio test_el_mecanico_registra_el_kilometraje_y_se_muestra
+00:11 +112: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_exige_vehiculo_kilometraje_y_problema_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:11 +113: D:/sdd/motorix/client/test/order_maintenance_test.dart: kilometraje del servicio test_el_mecanico_registra_el_kilometraje_y_se_muestra
+00:11 +113: D:/sdd/motorix/client/test/inventory_screens_test.dart: detalle, entradas y ajustes test_desactivar_pide_confirmacion_y_la_inactiva_no_admite_entradas
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:11 +114: D:/sdd/motorix/client/test/order_maintenance_test.dart: kilometraje del servicio test_el_mecanico_registra_el_kilometraje_y_se_muestra
+00:11 +114: D:/sdd/motorix/client/test/mercado_pago_payments_test.dart: test_un_error_del_proveedor_se_muestra_en_espanol_y_no_expone_credenciales
+DataTable2 built: 0ms
+00:11 +115: D:/sdd/motorix/client/test/order_maintenance_test.dart: kilometraje del servicio test_el_mecanico_registra_el_kilometraje_y_se_muestra
+00:11 +115: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_reasigna_una_orden_ya_asignada
+DataTable2 built: 0ms
+00:11 +116: D:/sdd/motorix/client/test/order_maintenance_test.dart: kilometraje del servicio test_el_mecanico_registra_el_kilometraje_y_se_muestra
+DataTable2 built: 3ms
+00:11 +117: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_el_mecanico_agrega_una_refaccion_y_aparece_en_la_orden
+00:11 +117: D:/sdd/motorix/client/test/order_billing_test.dart: sección de cobro test_el_rol_admin_ve_el_total_el_estado_y_el_boton_cobrar
+DataTable2 built: 0ms
+00:11 +118: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_el_mecanico_agrega_una_refaccion_y_aparece_en_la_orden
+00:12 +118: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_crea_la_orden_directa_con_el_vehiculo_y_el_kilometraje
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:12 +119: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_el_mecanico_agrega_una_refaccion_y_aparece_en_la_orden
+00:12 +119: D:/sdd/motorix/client/test/order_billing_test.dart: sección de cobro test_el_mecanico_no_ve_la_seccion_de_cobro
+DataTable2 built: 0ms
+00:12 +120: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_el_mecanico_agrega_una_refaccion_y_aparece_en_la_orden
+00:12 +120: D:/sdd/motorix/client/test/order_maintenance_test.dart: kilometraje del servicio test_un_kilometraje_menor_al_de_entrada_se_rechaza_en_el_formulario_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:12 +121: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_el_mecanico_agrega_una_refaccion_y_aparece_en_la_orden
+00:12 +121: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_muestra_el_error_del_servidor_si_la_asignacion_se_rechaza
+DataTable2 built: 0ms
+00:12 +122: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_el_mecanico_agrega_una_refaccion_y_aparece_en_la_orden
+DataTable2 built: 2ms
+00:12 +123: D:/sdd/motorix/client/test/order_status_test.dart: avance de la orden test_los_botones_salen_de_las_transiciones_permitidas_por_el_servidor
+DataTable2 built: 2ms
+00:12 +124: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_un_kilometraje_menor_ofrece_la_correccion_con_motivo_y_reenvia
+00:12 +124: D:/sdd/motorix/client/test/order_billing_test.dart: sección de cobro test_una_orden_en_reparacion_explica_por_que_no_se_puede_cobrar
+DataTable2 built: 0ms
+00:12 +125: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_un_kilometraje_menor_ofrece_la_correccion_con_motivo_y_reenvia
+00:12 +125: D:/sdd/motorix/client/test/order_maintenance_test.dart: kilometraje del servicio test_la_orden_entregada_no_ofrece_registrar_kilometraje
+DataTable2 built: 0ms
+00:12 +126: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_un_kilometraje_menor_ofrece_la_correccion_con_motivo_y_reenvia
+00:13 +126: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_las_refacciones_agotadas_aparecen_deshabilitadas
+DataTable2 built: 0ms
+00:13 +127: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_un_kilometraje_menor_ofrece_la_correccion_con_motivo_y_reenvia
+00:13 +127: D:/sdd/motorix/client/test/order_status_test.dart: avance de la orden test_avanza_la_orden_y_actualiza_el_estado_los_botones_y_el_aviso
+DataTable2 built: 0ms
+00:13 +128: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_un_kilometraje_menor_ofrece_la_correccion_con_motivo_y_reenvia
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:13 +129: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:13 +129: D:/sdd/motorix/client/test/order_billing_test.dart: sección de cobro test_una_orden_sin_importes_explica_que_no_hay_nada_que_cobrar
+DataTable2 built: 0ms
+00:13 +130: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:13 +130: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_las_ordenes_terminadas_o_entregadas_no_ofrecen_asignar
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:13 +131: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:13 +131: D:/sdd/motorix/client/test/order_maintenance_test.dart: próximo mantenimiento test_exige_al_menos_fecha_o_kilometraje
+DataTable2 built: 0ms
+00:13 +132: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:13 +132: D:/sdd/motorix/client/test/order_status_test.dart: avance de la orden test_reanudar_desde_esperando_refaccion_usa_su_propio_texto
+DataTable2 built: 0ms
+00:13 +133: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:13 +133: D:/sdd/motorix/client/test/order_assign_test.dart: asignar un mecánico desde el detalle de la orden test_el_administrador_tambien_ve_la_opcion_de_asignar
+DataTable2 built: 0ms
+00:13 +134: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:13 +134: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_stock_insuficiente_conserva_lo_capturado_y_muestra_cuantas_hay
+DataTable2 built: 0ms
+00:13 +135: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:13 +135: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_cancelar_el_dialogo_de_correccion_no_crea_la_orden
+DataTable2 built: 0ms
+00:13 +136: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:14 +136: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_cobra_en_efectivo_con_confirmacion_y_queda_pagado
+DataTable2 built: 0ms
+00:14 +137: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:14 +137: D:/sdd/motorix/client/test/order_maintenance_test.dart: próximo mantenimiento test_programa_el_mantenimiento_con_kilometraje_y_lo_muestra
+DataTable2 built: 0ms
+00:14 +138: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+00:14 +138: D:/sdd/motorix/client/test/order_status_test.dart: avance de la orden test_marcar_como_terminada_no_pide_confirmacion
+DataTable2 built: 0ms
+00:14 +139: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_el_mecanico_registra_el_diagnostico_y_se_guarda_en_la_orden
+DataTable2 built: 2ms
+00:14 +140: D:/sdd/motorix/client/test/payments_list_test.dart: test_el_rol_admin_ve_los_pagos_con_los_cuatro_estados_y_metodos
+DataTable2 built: 2ms
+00:14 +141: D:/sdd/motorix/client/test/order_assign_test.dart: selector de mecánico en el formulario y filtro del listado test_la_nueva_orden_envia_el_mecanico_elegido
+00:14 +141: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_muestra_el_error_de_orden_abierta_en_el_campo_del_vehiculo
+DataTable2 built: 0ms
+00:14 +142: D:/sdd/motorix/client/test/order_assign_test.dart: selector de mecánico en el formulario y filtro del listado test_la_nueva_orden_envia_el_mecanico_elegido
+00:14 +142: D:/sdd/motorix/client/test/order_parts_test.dart: agregar refacciones test_valida_la_cantidad_y_exige_elegir_una_refaccion_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:14 +143: D:/sdd/motorix/client/test/order_assign_test.dart: selector de mecánico en el formulario y filtro del listado test_la_nueva_orden_envia_el_mecanico_elegido
+00:14 +143: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_cancelar_la_confirmacion_no_llama_a_la_api
+DataTable2 built: 0ms
+00:14 +144: D:/sdd/motorix/client/test/order_assign_test.dart: selector de mecánico en el formulario y filtro del listado test_la_nueva_orden_envia_el_mecanico_elegido
+00:14 +144: D:/sdd/motorix/client/test/order_maintenance_test.dart: próximo mantenimiento test_rechaza_una_fecha_con_formato_invalido
+DataTable2 built: 0ms
+00:14 +145: D:/sdd/motorix/client/test/order_assign_test.dart: selector de mecánico en el formulario y filtro del listado test_la_nueva_orden_envia_el_mecanico_elegido
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:14 +146: D:/sdd/motorix/client/test/order_status_test.dart: entrega test_recepcion_registra_la_entrega_solo_tras_confirmar
+DataTable2 built: 0ms
+00:14 +147: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_cancelar_el_dialogo_no_llama_a_la_api
+00:14 +147: D:/sdd/motorix/client/test/payments_list_test.dart: test_el_rol_receptionist_ve_los_pagos_con_los_cuatro_estados_y_metodos
+DataTable2 built: 0ms
+00:14 +148: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_cancelar_el_dialogo_no_llama_a_la_api
+00:15 +148: D:/sdd/motorix/client/test/orders_screens_test.dart: crear una orden test_desde_una_cita_el_vehiculo_y_el_motivo_llegan_de_la_cita
+DataTable2 built: 0ms
+00:15 +149: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_cancelar_el_dialogo_no_llama_a_la_api
+DataTable2 built: 0ms
+00:15 +150: D:/sdd/motorix/client/test/order_parts_test.dart: corregir y quitar test_corrige_la_cantidad_de_una_linea
+DataTable2 built: 0ms
+00:15 +151: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_el_dialogo_nunca_pide_datos_de_tarjeta
+DataTable2 built: 0ms
+00:15 +152: D:/sdd/motorix/client/test/order_maintenance_test.dart: próximo mantenimiento test_marcar_como_atendido_pide_confirmacion
+00:15 +152: D:/sdd/motorix/client/test/order_assign_test.dart: selector de mecánico en el formulario y filtro del listado test_el_filtro_por_mecanico_pide_solo_sus_ordenes
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:15 +153: D:/sdd/motorix/client/test/order_maintenance_test.dart: próximo mantenimiento test_marcar_como_atendido_pide_confirmacion
+00:15 +153: D:/sdd/motorix/client/test/order_status_test.dart: entrega test_el_mecanico_no_ve_el_boton_de_entrega_porque_el_servidor_no_lo_ofrece
+DataTable2 built: 0ms
+00:15 +154: D:/sdd/motorix/client/test/order_maintenance_test.dart: próximo mantenimiento test_marcar_como_atendido_pide_confirmacion
+DataTable2 built: 0ms
+00:15 +155: D:/sdd/motorix/client/test/payments_list_test.dart: test_busca_por_cliente_placa_o_folio
+00:15 +155: D:/sdd/motorix/client/test/orders_screens_test.dart: detalle de la orden (solo lectura) test_muestra_los_datos_el_trabajo_los_totales_y_el_historial
+DataTable2 built: 0ms
+00:15 +156: D:/sdd/motorix/client/test/payments_list_test.dart: test_busca_por_cliente_placa_o_folio
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:15 +157: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_vaciar_el_texto_envia_null_para_borrar_el_campo
+00:15 +157: D:/sdd/motorix/client/test/order_parts_test.dart: corregir y quitar test_corregir_por_encima_del_stock_muestra_el_error_en_el_dialogo
+DataTable2 built: 0ms
+00:15 +158: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_vaciar_el_texto_envia_null_para_borrar_el_campo
+DataTable2 built: 0ms
+00:15 +159: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_rechaza_la_referencia_con_numero_de_tarjeta_4111111111111111_sin_llamar_a_la_api
+00:15 +159: D:/sdd/motorix/client/test/order_status_test.dart: entrega test_una_orden_entregada_no_ofrece_avance
+DataTable2 built: 0ms
+00:15 +160: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_rechaza_la_referencia_con_numero_de_tarjeta_4111111111111111_sin_llamar_a_la_api
+00:15 +160: D:/sdd/motorix/client/test/order_maintenance_test.dart: próximo mantenimiento test_la_recepcion_ve_el_mantenimiento_pero_sin_acciones
+DataTable2 built: 0ms
+00:15 +161: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_rechaza_la_referencia_con_numero_de_tarjeta_4111111111111111_sin_llamar_a_la_api
+00:15 +161: D:/sdd/motorix/client/test/orders_screens_test.dart: detalle de la orden (solo lectura) test_una_orden_inexistente_muestra_el_error_con_reintento
+DataTable2 built: 0ms
+00:15 +162: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_rechaza_la_referencia_con_numero_de_tarjeta_4111111111111111_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:15 +163: D:/sdd/motorix/client/test/payments_list_test.dart: test_filtra_por_estado_y_por_metodo_y_limpia_los_filtros
+00:16 +163: D:/sdd/motorix/client/test/order_status_test.dart: sin mecánico y conflictos test_una_orden_sin_mecanico_explica_que_hay_que_asignar_uno
+DataTable2 built: 0ms
+00:16 +164: D:/sdd/motorix/client/test/payments_list_test.dart: test_filtra_por_estado_y_por_metodo_y_limpia_los_filtros
+00:16 +164: D:/sdd/motorix/client/test/order_maintenance_test.dart: próximo mantenimiento test_la_orden_entregada_permite_programar_pero_no_registrar_kilometraje
+DataTable2 built: 0ms
+00:16 +165: D:/sdd/motorix/client/test/payments_list_test.dart: test_filtra_por_estado_y_por_metodo_y_limpia_los_filtros
+00:16 +165: D:/sdd/motorix/client/test/order_parts_test.dart: corregir y quitar test_quitar_pide_confirmacion_e_informa_que_regresa_al_inventario
+DataTable2 built: 0ms
+00:16 +166: D:/sdd/motorix/client/test/payments_list_test.dart: test_filtra_por_estado_y_por_metodo_y_limpia_los_filtros
+00:16 +166: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_rechaza_la_referencia_con_numero_de_tarjeta_4111111111111111_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:16 +167: D:/sdd/motorix/client/test/payments_list_test.dart: test_filtra_por_estado_y_por_metodo_y_limpia_los_filtros
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:16 +168: D:/sdd/motorix/client/test/order_work_test.dart: diagnóstico, observaciones y recomendaciones test_registra_observaciones_y_recomendaciones_por_separado
+DataTable2 built: 0ms
+00:16 +169: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:16 +169: D:/sdd/motorix/client/test/order_status_test.dart: sin mecánico y conflictos test_un_conflicto_recarga_la_orden_y_muestra_el_estado_vigente
+DataTable2 built: 0ms
+00:16 +170: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:16 +170: D:/sdd/motorix/client/test/order_parts_test.dart: solo lectura y permisos test_la_orden_entregada_se_muestra_en_solo_lectura
+DataTable2 built: 0ms
+00:16 +171: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:16 +171: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_rechaza_la_referencia_con_numero_de_tarjeta_5555555555554444_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:16 +172: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:16 +172: D:/sdd/motorix/client/test/payments_list_test.dart: test_actualiza_el_estado_de_un_cobro_pendiente_de_mercado_pago_desde_el_listado
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:16 +173: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +173: D:/sdd/motorix/client/test/order_status_test.dart: sin mecánico y conflictos test_muestra_el_error_de_transicion_invalida_del_servidor
+DataTable2 built: 0ms
+00:17 +174: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +174: D:/sdd/motorix/client/test/ticket_printer_test.dart: test_el_documento_de_impresion_se_arma_en_memoria_con_el_contenido_del_ticket
+Helvetica-Bold has no Unicode support see https://github.com/DavBfr/dart_pdf/wiki/Fonts-Management
+Helvetica has no Unicode support see https://github.com/DavBfr/dart_pdf/wiki/Fonts-Management
+00:17 +175: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +175: D:/sdd/motorix/client/test/ticket_printer_test.dart: test_el_documento_admite_tickets_sin_refacciones_ni_mano_de_obra_y_textos_con_acentos
+Helvetica-Bold has no Unicode support see https://github.com/DavBfr/dart_pdf/wiki/Fonts-Management
+Helvetica has no Unicode support see https://github.com/DavBfr/dart_pdf/wiki/Fonts-Management
+00:17 +176: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +177: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +177: D:/sdd/motorix/client/test/order_parts_test.dart: solo lectura y permisos test_recepcion_ve_las_refacciones_pero_no_puede_modificarlas
+DataTable2 built: 0ms
+00:17 +178: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +178: D:/sdd/motorix/client/test/order_work_test.dart: servicios y mano de obra test_valida_la_descripcion_y_el_importe_antes_de_llamar_a_la_api
+DataTable2 built: 0ms
+00:17 +179: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +180: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +180: D:/sdd/motorix/client/test/order_status_test.dart: historial test_el_detalle_muestra_el_historial_con_persona_y_fecha
+DataTable2 built: 0ms
+00:17 +181: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +181: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_acepta_un_folio_de_terminal_y_lo_envia_como_referencia
+DataTable2 built: 0ms
+00:17 +182: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +183: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +183: D:/sdd/motorix/client/test/order_work_test.dart: servicios y mano de obra test_agrega_un_servicio_y_se_actualizan_las_lineas_y_los_totales
+DataTable2 built: 0ms
+00:17 +184: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +185: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:17 +185: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_mercado_pago_aparece_deshabilitado_con_su_leyenda_si_no_esta_configurado
+DataTable2 built: 0ms
+00:17 +186: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:18 +187: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:18 +187: D:/sdd/motorix/client/test/order_work_test.dart: servicios y mano de obra test_agrega_mano_de_obra_a_su_propia_seccion_y_suma_el_total
+DataTable2 built: 0ms
+00:18 +188: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:18 +188: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_un_pago_existente_se_muestra_como_error_del_servidor
+DataTable2 built: 0ms
+00:18 +189: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:18 +189: D:/sdd/motorix/client/test/order_billing_test.dart: cobrar en efectivo, tarjeta o transferencia test_muestra_el_aviso_si_el_total_cambio_despues_del_cobro
+DataTable2 built: 0ms
+00:18 +190: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:18 +190: D:/sdd/motorix/client/test/order_work_test.dart: servicios y mano de obra test_corrige_una_linea_existente
+DataTable2 built: 0ms
+00:18 +191: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:18 +191: D:/sdd/motorix/client/test/stock_alerts_test.dart: test_el_aviso_del_inicio_lleva_al_inventario
+DataTable2 built: 1ms
+00:18 +192: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+00:18 +192: D:/sdd/motorix/client/test/order_billing_test.dart: entregar una orden sin cobrar test_advierte_y_cancelar_no_cambia_el_estado
+DataTable2 built: 0ms
+00:18 +193: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_760_px
+
+Warning: A call to tap() with finder "Found 1 widget with text "Clientes" descending from widget with type "NavigationRail": [
+  Text("Clientes", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 176.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#3c960 NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#8ea2b@Offset(0.0, 0.0), RenderSemanticsAnnotations#aef67@Offset(0.0, 0.0), RenderMouseRegion#c5a60@Offset(0.0, 0.0), RenderSemanticsAnnotations#8394e@Offset(0.0, 0.0), _RenderInkFeatures#da157@Offset(0.0, 0.0), RenderCustomPaint#3d4be@Offset(0.0, 0.0), RenderClipPath#be75f@Offset(0.0, 0.0), RenderStack#9e2ef@Offset(0.0, 0.0), RenderSemanticsAnnotations#15b49@Offset(0.0, 0.0), RenderFlex#7abfa@Offset(0.0, 88.0), RenderPositionedBox#18a55@Offset(0.0, 88.0), RenderFlex#50bf1@Offset(0.0, 176.0), RenderPadding#f084c@Offset(0.0, 176.0), _RenderInkFeatures#e48b0@Offset(0.0, 176.0), RenderPhysicalModel#e0cad@Offset(0.0, 176.0), RenderSemanticsAnnotations#5711c@Offset(0.0, 176.0), RenderSemanticsAnnotations#5eac9@Offset(0.0, 176.0), RenderIntrinsicHeight#acd0b@Offset(0.0, 176.0), _RenderSingleChildViewport#6ba3f@Offset(0.0, 176.0), RenderIgnorePointer#7346d@Offset(0.0, 176.0), RenderSemanticsAnnotations#42806@Offset(0.0, 176.0), RenderPointerListener#bc870@Offset(0.0, 176.0), RenderSemanticsGestureHandler#edb99@Offset(0.0, 176.0), RenderPointerListener#3665d@Offset(0.0, 176.0), _RenderScrollSemantics#7ba8f@Offset(0.0, 176.0), RenderClipRect#8850a@Offset(0.0, 176.0), RenderFlex#25f98@Offset(0.0, 176.0), RenderClipRect#f55a9@Offset(0.0, 176.0), _RenderColoredBox#822d9@Offset(0.0, 176.0), RenderFlex#67361@Offset(0.0, 176.0), RenderCustomMultiChildLayoutBox#e85c5@Offset(0.0, 176.0), _RenderInkFeatures#4de38@Offset(0.0, 176.0), RenderPhysicalModel#d69c7@Offset(0.0, 176.0), _RenderLayoutBuilder#00261@Offset(0.0, 176.0), RenderAnimatedOpacity#f95f0@Offset(0.0, 176.0), RenderStack#6a5ec@Offset(0.0, 176.0), RenderSemanticsAnnotations#403f7@Offset(0.0, 176.0), RenderRepaintBoundary#d25f5@Offset(0.0, 176.0), RenderIgnorePointer#ad066@Offset(0.0, 176.0), RenderAnimatedOpacity#eec48@Offset(0.0, 176.0), RenderRepaintBoundary#4017b@Offset(0.0, 176.0), RenderSemanticsAnnotations#c95b4@Offset(0.0, 176.0), RenderOffstage#b562c@Offset(0.0, 176.0), RenderSemanticsAnnotations#a5d32@Offset(0.0, 176.0), _RenderTheater#c2997@Offset(0.0, 176.0), RenderAbsorbPointer#dace0@Offset(0.0, 176.0), RenderPointerListener#3697c@Offset(0.0, 176.0), RenderSemanticsAnnotations#51678@Offset(0.0, 176.0), RenderSemanticsAnnotations#90d78@Offset(0.0, 176.0), RenderSemanticsAnnotations#ae2a0@Offset(0.0, 176.0), RenderSemanticsAnnotations#4428e@Offset(0.0, 176.0), RenderTapRegionSurface#90104@Offset(0.0, 176.0), RenderSemanticsAnnotations#7d473@Offset(0.0, 176.0), RenderSemanticsAnnotations#d583d@Offset(0.0, 176.0), HitTestEntry<HitTestTarget>#13fda(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#74720(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:23:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 1ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Vehículos" descending from widget with type "NavigationRail": [
+  Text("Vehículos", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 220.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#f8dfb NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#fd6b0@Offset(0.0, 0.0), RenderSemanticsAnnotations#f807e@Offset(0.0, 0.0), RenderMouseRegion#2037f@Offset(0.0, 0.0), RenderSemanticsAnnotations#5663c@Offset(0.0, 0.0), _RenderInkFeatures#5dad2@Offset(0.0, 0.0), RenderCustomPaint#126fe@Offset(0.0, 0.0), RenderClipPath#83a3d@Offset(0.0, 0.0), RenderStack#5b9f1@Offset(0.0, 0.0), RenderSemanticsAnnotations#de3bf@Offset(0.0, 0.0), RenderFlex#7abfa@Offset(0.0, 132.0), RenderPositionedBox#18a55@Offset(0.0, 132.0), RenderFlex#50bf1@Offset(0.0, 220.0), RenderPadding#f084c@Offset(0.0, 220.0), _RenderInkFeatures#e48b0@Offset(0.0, 220.0), RenderPhysicalModel#e0cad@Offset(0.0, 220.0), RenderSemanticsAnnotations#5711c@Offset(0.0, 220.0), RenderSemanticsAnnotations#5eac9@Offset(0.0, 220.0), RenderIntrinsicHeight#acd0b@Offset(0.0, 220.0), _RenderSingleChildViewport#6ba3f@Offset(0.0, 220.0), RenderIgnorePointer#7346d@Offset(0.0, 220.0), RenderSemanticsAnnotations#42806@Offset(0.0, 220.0), RenderPointerListener#bc870@Offset(0.0, 220.0), RenderSemanticsGestureHandler#edb99@Offset(0.0, 220.0), RenderPointerListener#3665d@Offset(0.0, 220.0), _RenderScrollSemantics#7ba8f@Offset(0.0, 220.0), RenderClipRect#8850a@Offset(0.0, 220.0), RenderFlex#25f98@Offset(0.0, 220.0), RenderClipRect#f55a9@Offset(0.0, 220.0), _RenderColoredBox#822d9@Offset(0.0, 220.0), RenderFlex#67361@Offset(0.0, 220.0), RenderCustomMultiChildLayoutBox#e85c5@Offset(0.0, 220.0), _RenderInkFeatures#4de38@Offset(0.0, 220.0), RenderPhysicalModel#d69c7@Offset(0.0, 220.0), _RenderLayoutBuilder#00261@Offset(0.0, 220.0), RenderAnimatedOpacity#f95f0@Offset(0.0, 220.0), RenderStack#6a5ec@Offset(0.0, 220.0), RenderSemanticsAnnotations#403f7@Offset(0.0, 220.0), RenderRepaintBoundary#d25f5@Offset(0.0, 220.0), RenderIgnorePointer#ad066@Offset(0.0, 220.0), RenderAnimatedOpacity#eec48@Offset(0.0, 220.0), RenderRepaintBoundary#4017b@Offset(0.0, 220.0), RenderSemanticsAnnotations#c95b4@Offset(0.0, 220.0), RenderOffstage#b562c@Offset(0.0, 220.0), RenderSemanticsAnnotations#a5d32@Offset(0.0, 220.0), _RenderTheater#c2997@Offset(0.0, 220.0), RenderAbsorbPointer#dace0@Offset(0.0, 220.0), RenderPointerListener#3697c@Offset(0.0, 220.0), RenderSemanticsAnnotations#51678@Offset(0.0, 220.0), RenderSemanticsAnnotations#90d78@Offset(0.0, 220.0), RenderSemanticsAnnotations#ae2a0@Offset(0.0, 220.0), RenderSemanticsAnnotations#4428e@Offset(0.0, 220.0), RenderTapRegionSurface#90104@Offset(0.0, 220.0), RenderSemanticsAnnotations#7d473@Offset(0.0, 220.0), RenderSemanticsAnnotations#d583d@Offset(0.0, 220.0), HitTestEntry<HitTestTarget>#77d28(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#a7837(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:23:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Citas" descending from widget with type "NavigationRail": [
+  Text("Citas", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 264.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#3832f NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#0640f@Offset(0.0, 0.0), RenderSemanticsAnnotations#19564@Offset(0.0, 0.0), RenderMouseRegion#3b7a5@Offset(0.0, 0.0), RenderSemanticsAnnotations#bde15@Offset(0.0, 0.0), _RenderInkFeatures#5a044@Offset(0.0, 0.0), RenderCustomPaint#bc6df@Offset(0.0, 0.0), RenderClipPath#b5e89@Offset(0.0, 0.0), RenderStack#22259@Offset(0.0, 0.0), RenderSemanticsAnnotations#beaaa@Offset(0.0, 0.0), RenderFlex#7abfa@Offset(0.0, 176.0), RenderPositionedBox#18a55@Offset(0.0, 176.0), RenderFlex#50bf1@Offset(0.0, 264.0), RenderPadding#f084c@Offset(0.0, 264.0), _RenderInkFeatures#e48b0@Offset(0.0, 264.0), RenderPhysicalModel#e0cad@Offset(0.0, 264.0), RenderSemanticsAnnotations#5711c@Offset(0.0, 264.0), RenderSemanticsAnnotations#5eac9@Offset(0.0, 264.0), RenderIntrinsicHeight#acd0b@Offset(0.0, 264.0), _RenderSingleChildViewport#6ba3f@Offset(0.0, 264.0), RenderIgnorePointer#7346d@Offset(0.0, 264.0), RenderSemanticsAnnotations#42806@Offset(0.0, 264.0), RenderPointerListener#bc870@Offset(0.0, 264.0), RenderSemanticsGestureHandler#edb99@Offset(0.0, 264.0), RenderPointerListener#3665d@Offset(0.0, 264.0), _RenderScrollSemantics#7ba8f@Offset(0.0, 264.0), RenderClipRect#8850a@Offset(0.0, 264.0), RenderFlex#25f98@Offset(0.0, 264.0), RenderClipRect#f55a9@Offset(0.0, 264.0), _RenderColoredBox#822d9@Offset(0.0, 264.0), RenderFlex#67361@Offset(0.0, 264.0), RenderCustomMultiChildLayoutBox#e85c5@Offset(0.0, 264.0), _RenderInkFeatures#4de38@Offset(0.0, 264.0), RenderPhysicalModel#d69c7@Offset(0.0, 264.0), _RenderLayoutBuilder#00261@Offset(0.0, 264.0), RenderAnimatedOpacity#f95f0@Offset(0.0, 264.0), RenderStack#6a5ec@Offset(0.0, 264.0), RenderSemanticsAnnotations#403f7@Offset(0.0, 264.0), RenderRepaintBoundary#d25f5@Offset(0.0, 264.0), RenderIgnorePointer#ad066@Offset(0.0, 264.0), RenderAnimatedOpacity#eec48@Offset(0.0, 264.0), RenderRepaintBoundary#4017b@Offset(0.0, 264.0), RenderSemanticsAnnotations#c95b4@Offset(0.0, 264.0), RenderOffstage#b562c@Offset(0.0, 264.0), RenderSemanticsAnnotations#a5d32@Offset(0.0, 264.0), _RenderTheater#c2997@Offset(0.0, 264.0), RenderAbsorbPointer#dace0@Offset(0.0, 264.0), RenderPointerListener#3697c@Offset(0.0, 264.0), RenderSemanticsAnnotations#51678@Offset(0.0, 264.0), RenderSemanticsAnnotations#90d78@Offset(0.0, 264.0), RenderSemanticsAnnotations#ae2a0@Offset(0.0, 264.0), RenderSemanticsAnnotations#4428e@Offset(0.0, 264.0), RenderTapRegionSurface#90104@Offset(0.0, 264.0), RenderSemanticsAnnotations#7d473@Offset(0.0, 264.0), RenderSemanticsAnnotations#d583d@Offset(0.0, 264.0), HitTestEntry<HitTestTarget>#97a43(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#b1550(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:23:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Órdenes" descending from widget with type "NavigationRail": [
+  Text("Órdenes", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 308.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#4ee09 NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#9e247@Offset(0.0, 0.0), RenderSemanticsAnnotations#80716@Offset(0.0, 0.0), RenderMouseRegion#18de8@Offset(0.0, 0.0), RenderSemanticsAnnotations#0d80c@Offset(0.0, 0.0), _RenderInkFeatures#65309@Offset(0.0, 0.0), RenderCustomPaint#5594b@Offset(0.0, 0.0), RenderClipPath#be797@Offset(0.0, 0.0), RenderStack#6f190@Offset(0.0, 0.0), RenderSemanticsAnnotations#f0e52@Offset(0.0, 0.0), RenderFlex#7abfa@Offset(0.0, 220.0), RenderPositionedBox#18a55@Offset(0.0, 220.0), RenderFlex#50bf1@Offset(0.0, 308.0), RenderPadding#f084c@Offset(0.0, 308.0), _RenderInkFeatures#e48b0@Offset(0.0, 308.0), RenderPhysicalModel#e0cad@Offset(0.0, 308.0), RenderSemanticsAnnotations#5711c@Offset(0.0, 308.0), RenderSemanticsAnnotations#5eac9@Offset(0.0, 308.0), RenderIntrinsicHeight#acd0b@Offset(0.0, 308.0), _RenderSingleChildViewport#6ba3f@Offset(0.0, 308.0), RenderIgnorePointer#7346d@Offset(0.0, 308.0), RenderSemanticsAnnotations#42806@Offset(0.0, 308.0), RenderPointerListener#bc870@Offset(0.0, 308.0), RenderSemanticsGestureHandler#edb99@Offset(0.0, 308.0), RenderPointerListener#3665d@Offset(0.0, 308.0), _RenderScrollSemantics#7ba8f@Offset(0.0, 308.0), RenderClipRect#8850a@Offset(0.0, 308.0), RenderFlex#25f98@Offset(0.0, 308.0), RenderClipRect#f55a9@Offset(0.0, 308.0), _RenderColoredBox#822d9@Offset(0.0, 308.0), RenderFlex#67361@Offset(0.0, 308.0), RenderCustomMultiChildLayoutBox#e85c5@Offset(0.0, 308.0), _RenderInkFeatures#4de38@Offset(0.0, 308.0), RenderPhysicalModel#d69c7@Offset(0.0, 308.0), _RenderLayoutBuilder#00261@Offset(0.0, 308.0), RenderAnimatedOpacity#f95f0@Offset(0.0, 308.0), RenderStack#6a5ec@Offset(0.0, 308.0), RenderSemanticsAnnotations#403f7@Offset(0.0, 308.0), RenderRepaintBoundary#d25f5@Offset(0.0, 308.0), RenderIgnorePointer#ad066@Offset(0.0, 308.0), RenderAnimatedOpacity#eec48@Offset(0.0, 308.0), RenderRepaintBoundary#4017b@Offset(0.0, 308.0), RenderSemanticsAnnotations#c95b4@Offset(0.0, 308.0), RenderOffstage#b562c@Offset(0.0, 308.0), RenderSemanticsAnnotations#a5d32@Offset(0.0, 308.0), _RenderTheater#c2997@Offset(0.0, 308.0), RenderAbsorbPointer#dace0@Offset(0.0, 308.0), RenderPointerListener#3697c@Offset(0.0, 308.0), RenderSemanticsAnnotations#51678@Offset(0.0, 308.0), RenderSemanticsAnnotations#90d78@Offset(0.0, 308.0), RenderSemanticsAnnotations#ae2a0@Offset(0.0, 308.0), RenderSemanticsAnnotations#4428e@Offset(0.0, 308.0), RenderTapRegionSurface#90104@Offset(0.0, 308.0), RenderSemanticsAnnotations#7d473@Offset(0.0, 308.0), RenderSemanticsAnnotations#d583d@Offset(0.0, 308.0), HitTestEntry<HitTestTarget>#5351b(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#9516b(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:23:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Usuarios" descending from widget with type "NavigationRail": [
+  Text("Usuarios", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 528.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#f752a NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#12d33@Offset(0.0, 0.0), RenderSemanticsAnnotations#53c23@Offset(0.0, 0.0), RenderMouseRegion#30812@Offset(0.0, 0.0), RenderSemanticsAnnotations#bda49@Offset(0.0, 0.0), _RenderInkFeatures#88289@Offset(0.0, 0.0), RenderCustomPaint#940b0@Offset(0.0, 0.0), RenderClipPath#d2302@Offset(0.0, 0.0), RenderStack#eaab5@Offset(0.0, 0.0), RenderSemanticsAnnotations#e7054@Offset(0.0, 0.0), RenderFlex#7abfa@Offset(0.0, 440.0), RenderPositionedBox#18a55@Offset(0.0, 440.0), RenderFlex#50bf1@Offset(0.0, 528.0), RenderPadding#f084c@Offset(0.0, 528.0), _RenderInkFeatures#e48b0@Offset(0.0, 528.0), RenderPhysicalModel#e0cad@Offset(0.0, 528.0), RenderSemanticsAnnotations#5711c@Offset(0.0, 528.0), RenderSemanticsAnnotations#5eac9@Offset(0.0, 528.0), RenderIntrinsicHeight#acd0b@Offset(0.0, 528.0), _RenderSingleChildViewport#6ba3f@Offset(0.0, 528.0), RenderIgnorePointer#7346d@Offset(0.0, 528.0), RenderSemanticsAnnotations#42806@Offset(0.0, 528.0), RenderPointerListener#bc870@Offset(0.0, 528.0), RenderSemanticsGestureHandler#edb99@Offset(0.0, 528.0), RenderPointerListener#3665d@Offset(0.0, 528.0), _RenderScrollSemantics#7ba8f@Offset(0.0, 528.0), RenderClipRect#8850a@Offset(0.0, 528.0), RenderFlex#25f98@Offset(0.0, 528.0), RenderClipRect#f55a9@Offset(0.0, 528.0), _RenderColoredBox#822d9@Offset(0.0, 528.0), RenderFlex#67361@Offset(0.0, 528.0), RenderCustomMultiChildLayoutBox#e85c5@Offset(0.0, 528.0), _RenderInkFeatures#4de38@Offset(0.0, 528.0), RenderPhysicalModel#d69c7@Offset(0.0, 528.0), _RenderLayoutBuilder#00261@Offset(0.0, 528.0), RenderAnimatedOpacity#f95f0@Offset(0.0, 528.0), RenderStack#6a5ec@Offset(0.0, 528.0), RenderSemanticsAnnotations#403f7@Offset(0.0, 528.0), RenderRepaintBoundary#d25f5@Offset(0.0, 528.0), RenderIgnorePointer#ad066@Offset(0.0, 528.0), RenderAnimatedOpacity#eec48@Offset(0.0, 528.0), RenderRepaintBoundary#4017b@Offset(0.0, 528.0), RenderSemanticsAnnotations#c95b4@Offset(0.0, 528.0), RenderOffstage#b562c@Offset(0.0, 528.0), RenderSemanticsAnnotations#a5d32@Offset(0.0, 528.0), _RenderTheater#c2997@Offset(0.0, 528.0), RenderAbsorbPointer#dace0@Offset(0.0, 528.0), RenderPointerListener#3697c@Offset(0.0, 528.0), RenderSemanticsAnnotations#51678@Offset(0.0, 528.0), RenderSemanticsAnnotations#90d78@Offset(0.0, 528.0), RenderSemanticsAnnotations#ae2a0@Offset(0.0, 528.0), RenderSemanticsAnnotations#4428e@Offset(0.0, 528.0), RenderTapRegionSurface#90104@Offset(0.0, 528.0), RenderSemanticsAnnotations#7d473@Offset(0.0, 528.0), RenderSemanticsAnnotations#d583d@Offset(0.0, 528.0), HitTestEntry<HitTestTarget>#3efc5(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#5fd88(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:23:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Inicio" descending from widget with type "NavigationRail": [
+  Text("Inicio", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 88.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#974ab NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#757e6@Offset(0.0, 0.0), RenderSemanticsAnnotations#56971@Offset(0.0, 0.0), RenderMouseRegion#607ae@Offset(0.0, 0.0), RenderSemanticsAnnotations#36bff@Offset(0.0, 0.0), _RenderInkFeatures#81c95@Offset(0.0, 0.0), RenderCustomPaint#38dcc@Offset(0.0, 0.0), RenderClipPath#a9db1@Offset(0.0, 0.0), RenderStack#2da7c@Offset(0.0, 0.0), RenderSemanticsAnnotations#b5df1@Offset(0.0, 0.0), RenderFlex#7abfa@Offset(0.0, 0.0), RenderPositionedBox#18a55@Offset(0.0, 0.0), RenderFlex#50bf1@Offset(0.0, 88.0), RenderPadding#f084c@Offset(0.0, 88.0), _RenderInkFeatures#e48b0@Offset(0.0, 88.0), RenderPhysicalModel#e0cad@Offset(0.0, 88.0), RenderSemanticsAnnotations#5711c@Offset(0.0, 88.0), RenderSemanticsAnnotations#5eac9@Offset(0.0, 88.0), RenderIntrinsicHeight#acd0b@Offset(0.0, 88.0), _RenderSingleChildViewport#6ba3f@Offset(0.0, 88.0), RenderIgnorePointer#7346d@Offset(0.0, 88.0), RenderSemanticsAnnotations#42806@Offset(0.0, 88.0), RenderPointerListener#bc870@Offset(0.0, 88.0), RenderSemanticsGestureHandler#edb99@Offset(0.0, 88.0), RenderPointerListener#3665d@Offset(0.0, 88.0), _RenderScrollSemantics#7ba8f@Offset(0.0, 88.0), RenderClipRect#8850a@Offset(0.0, 88.0), RenderFlex#25f98@Offset(0.0, 88.0), RenderClipRect#f55a9@Offset(0.0, 88.0), _RenderColoredBox#822d9@Offset(0.0, 88.0), RenderFlex#67361@Offset(0.0, 88.0), RenderCustomMultiChildLayoutBox#e85c5@Offset(0.0, 88.0), _RenderInkFeatures#4de38@Offset(0.0, 88.0), RenderPhysicalModel#d69c7@Offset(0.0, 88.0), _RenderLayoutBuilder#00261@Offset(0.0, 88.0), RenderAnimatedOpacity#f95f0@Offset(0.0, 88.0), RenderStack#6a5ec@Offset(0.0, 88.0), RenderSemanticsAnnotations#403f7@Offset(0.0, 88.0), RenderRepaintBoundary#d25f5@Offset(0.0, 88.0), RenderIgnorePointer#ad066@Offset(0.0, 88.0), RenderAnimatedOpacity#eec48@Offset(0.0, 88.0), RenderRepaintBoundary#4017b@Offset(0.0, 88.0), RenderSemanticsAnnotations#c95b4@Offset(0.0, 88.0), RenderOffstage#b562c@Offset(0.0, 88.0), RenderSemanticsAnnotations#a5d32@Offset(0.0, 88.0), _RenderTheater#c2997@Offset(0.0, 88.0), RenderAbsorbPointer#dace0@Offset(0.0, 88.0), RenderPointerListener#3697c@Offset(0.0, 88.0), RenderSemanticsAnnotations#51678@Offset(0.0, 88.0), RenderSemanticsAnnotations#90d78@Offset(0.0, 88.0), RenderSemanticsAnnotations#ae2a0@Offset(0.0, 88.0), RenderSemanticsAnnotations#4428e@Offset(0.0, 88.0), RenderTapRegionSurface#90104@Offset(0.0, 88.0), RenderSemanticsAnnotations#7d473@Offset(0.0, 88.0), RenderSemanticsAnnotations#d583d@Offset(0.0, 88.0), HitTestEntry<HitTestTarget>#7f831(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#ce9f2(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:23:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:18 +194: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_pago_pagado_ofrece_generar_pide_confirmacion_y_abre_el_ticket_despues
+00:18 +194: D:/sdd/motorix/client/test/order_work_test.dart: servicios y mano de obra test_quitar_una_linea_pide_confirmacion_y_cancelar_no_llama_a_la_api
+DataTable2 built: 0ms
+00:18 +195: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_pago_pagado_ofrece_generar_pide_confirmacion_y_abre_el_ticket_despues
+00:18 +195: D:/sdd/motorix/client/test/order_billing_test.dart: entregar una orden sin cobrar test_con_la_advertencia_y_la_confirmacion_de_entrega_la_orden_se_entrega
+DataTable2 built: 0ms
+00:18 +196: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_pago_pagado_ofrece_generar_pide_confirmacion_y_abre_el_ticket_despues
+00:19 +196: D:/sdd/motorix/client/test/stock_alerts_test.dart: test_el_banner_muestra_el_conteo_y_la_lista_con_stock_y_minimo
+DataTable2 built: 0ms
+00:19 +197: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_pago_pagado_ofrece_generar_pide_confirmacion_y_abre_el_ticket_despues
+00:19 +197: D:/sdd/motorix/client/test/order_work_test.dart: servicios y mano de obra test_muestra_el_error_del_servidor_si_la_orden_ya_fue_entregada
+DataTable2 built: 0ms
+00:19 +198: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_pago_pagado_ofrece_generar_pide_confirmacion_y_abre_el_ticket_despues
+00:19 +198: D:/sdd/motorix/client/test/order_billing_test.dart: entregar una orden sin cobrar test_una_orden_cobrada_se_entrega_sin_la_advertencia
+DataTable2 built: 0ms
+00:19 +199: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_pago_pagado_ofrece_generar_pide_confirmacion_y_abre_el_ticket_despues
+00:19 +199: D:/sdd/motorix/client/test/stock_alerts_test.dart: test_sin_alertas_el_banner_indica_que_el_inventario_esta_en_orden
+DataTable2 built: 0ms
+00:19 +200: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_pago_pagado_ofrece_generar_pide_confirmacion_y_abre_el_ticket_despues
+00:19 +200: D:/sdd/motorix/client/test/order_work_test.dart: permisos y solo lectura test_recepcion_no_ve_las_acciones_de_edicion_del_trabajo
+DataTable2 built: 0ms
+00:19 +201: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_pago_pagado_ofrece_generar_pide_confirmacion_y_abre_el_ticket_despues
+DataTable2 built: 2ms
+00:19 +202: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_1000_px
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:19 +203: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+00:20 +203: D:/sdd/motorix/client/test/order_work_test.dart: permisos y solo lectura test_el_administrador_si_ve_las_acciones_de_edicion
+DataTable2 built: 0ms
+00:20 +204: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+00:20 +204: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_sin_pago_pagado_no_ofrece_generar_el_ticket
+DataTable2 built: 0ms
+00:20 +205: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+00:20 +205: D:/sdd/motorix/client/test/stock_alerts_test.dart: test_una_entrada_que_supera_el_minimo_quita_la_alerta
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:20 +206: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+00:20 +206: D:/sdd/motorix/client/test/order_work_test.dart: permisos y solo lectura test_una_orden_entregada_es_de_solo_lectura_y_lo_avisa
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:20 +207: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+00:20 +208: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+00:20 +208: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_con_un_cobro_de_mercado_pago_pendiente_no_ofrece_el_ticket
+DataTable2 built: 0ms
+00:20 +209: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+00:20 +210: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+00:20 +210: D:/sdd/motorix/client/test/responsive_test.dart: test_las_secciones_se_muestran_sin_desbordes_con_una_ventana_de_1400_px
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:20 +211: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_el_administrador_ve_la_tabla_con_rol_y_estado
+DataTable2 built: 1ms
+00:20 +212: D:/sdd/motorix/client/test/vehicles_screens_test.dart: test_muestra_el_listado_de_vehiculos_con_su_propietario
+DataTable2 built: 3ms
+00:21 +213: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_un_error_del_servidor_al_generar_se_muestra_en_espanol
+00:21 +214: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_un_error_del_servidor_al_generar_se_muestra_en_espanol
+00:21 +214: D:/sdd/motorix/client/test/stock_alerts_test.dart: test_un_error_al_consultar_las_alertas_se_muestra_con_reintentar
+DataTable2 built: 0ms
+00:21 +215: D:/sdd/motorix/client/test/ticket_screens_test.dart: generar el ticket desde la orden test_un_error_del_servidor_al_generar_se_muestra_en_espanol
+DataTable2 built: 0ms
+00:21 +216: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:21 +217: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:21 +218: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:21 +218: D:/sdd/motorix/client/test/vehicles_screens_test.dart: test_el_mecanico_ve_el_listado_pero_no_el_boton_de_alta
+DataTable2 built: 0ms
+00:21 +219: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:21 +219: D:/sdd/motorix/client/test/ticket_screens_test.dart: ver e imprimir el ticket test_muestra_todos_los_campos_del_ticket_y_las_refacciones_sin_importe
+DataTable2 built: 0ms
+00:21 +220: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:21 +220: D:/sdd/motorix/client/test/users_screens_test.dart: listado de usuarios test_muestra_el_error_de_carga_y_permite_reintentar
+DataTable2 built: 0ms
+00:21 +221: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:22 +221: D:/sdd/motorix/client/test/vehicles_screens_test.dart: test_muestra_el_error_de_carga_y_permite_reintentar
+DataTable2 built: 0ms
+00:22 +222: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:22 +222: D:/sdd/motorix/client/test/ticket_screens_test.dart: ver e imprimir el ticket test_imprimir_envia_el_ticket_a_la_impresora_y_avisa
+DataTable2 built: 0ms
+00:22 +223: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:22 +223: D:/sdd/motorix/client/test/responsive_test.dart: test_los_formularios_caben_en_una_ventana_angosta_y_con_poca_altura
+
+Warning: A call to tap() with finder "Found 1 widget with text "Clientes" descending from widget with type "NavigationRail": [
+  Text("Clientes", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 84.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#4b5f7 NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#12db4@Offset(0.0, 0.0), RenderSemanticsAnnotations#25126@Offset(0.0, 0.0), RenderMouseRegion#820d0@Offset(0.0, 0.0), RenderSemanticsAnnotations#bdff0@Offset(0.0, 0.0), _RenderInkFeatures#4835a@Offset(0.0, 0.0), RenderCustomPaint#bdc0b@Offset(0.0, 0.0), RenderClipPath#ecd99@Offset(0.0, 0.0), RenderStack#e98a4@Offset(0.0, 0.0), RenderSemanticsAnnotations#18263@Offset(0.0, 0.0), RenderFlex#78651@Offset(0.0, 88.0), RenderPositionedBox#d8c95@Offset(0.0, 88.0), RenderFlex#2b2b6@Offset(0.0, 176.0), RenderPadding#f6322@Offset(0.0, 176.0), _RenderInkFeatures#54c6d@Offset(0.0, 176.0), RenderPhysicalModel#63db7@Offset(0.0, 176.0), RenderSemanticsAnnotations#7f9ed@Offset(0.0, 176.0), RenderSemanticsAnnotations#72e9c@Offset(0.0, 176.0), RenderIntrinsicHeight#8a130@Offset(0.0, 176.0), _RenderSingleChildViewport#70d16@Offset(0.0, 84.0), RenderIgnorePointer#ffedc@Offset(0.0, 84.0), RenderSemanticsAnnotations#c39dc@Offset(0.0, 84.0), RenderPointerListener#2e276@Offset(0.0, 84.0), RenderSemanticsGestureHandler#aa79d@Offset(0.0, 84.0), RenderPointerListener#acd41@Offset(0.0, 84.0), _RenderScrollSemantics#91669@Offset(0.0, 84.0), RenderClipRect#db015@Offset(0.0, 84.0), RenderFlex#af383@Offset(0.0, 84.0), RenderClipRect#b770b@Offset(0.0, 84.0), _RenderColoredBox#96bc1@Offset(0.0, 84.0), RenderFlex#8520f@Offset(0.0, 84.0), RenderCustomMultiChildLayoutBox#8c56e@Offset(0.0, 84.0), _RenderInkFeatures#f0531@Offset(0.0, 84.0), RenderPhysicalModel#62682@Offset(0.0, 84.0), _RenderLayoutBuilder#79ae0@Offset(0.0, 84.0), RenderAnimatedOpacity#dc652@Offset(0.0, 84.0), RenderStack#bfc41@Offset(0.0, 84.0), RenderSemanticsAnnotations#cb761@Offset(0.0, 84.0), RenderRepaintBoundary#db8f4@Offset(0.0, 84.0), RenderIgnorePointer#bbea5@Offset(0.0, 84.0), RenderAnimatedOpacity#44b30@Offset(0.0, 84.0), RenderRepaintBoundary#3d3b8@Offset(0.0, 84.0), RenderSemanticsAnnotations#e97b2@Offset(0.0, 84.0), RenderOffstage#502f8@Offset(0.0, 84.0), RenderSemanticsAnnotations#89c63@Offset(0.0, 84.0), _RenderTheater#721b0@Offset(0.0, 84.0), RenderAbsorbPointer#ac9cd@Offset(0.0, 84.0), RenderPointerListener#40b89@Offset(0.0, 84.0), RenderSemanticsAnnotations#3d814@Offset(0.0, 84.0), RenderSemanticsAnnotations#bd93c@Offset(0.0, 84.0), RenderSemanticsAnnotations#b206d@Offset(0.0, 84.0), RenderSemanticsAnnotations#88a91@Offset(0.0, 84.0), RenderTapRegionSurface#3df75@Offset(0.0, 84.0), RenderSemanticsAnnotations#cc1a7@Offset(0.0, 84.0), RenderSemanticsAnnotations#8d353@Offset(0.0, 84.0), HitTestEntry<HitTestTarget>#8d09c(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#3d9bf(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:40:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Vehículos" descending from widget with type "NavigationRail": [
+  Text("Vehículos", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 128.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#53ba9 NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#c251a@Offset(0.0, 0.0), RenderSemanticsAnnotations#e0845@Offset(0.0, 0.0), RenderMouseRegion#5858d@Offset(0.0, 0.0), RenderSemanticsAnnotations#d2eea@Offset(0.0, 0.0), _RenderInkFeatures#8b5a9@Offset(0.0, 0.0), RenderCustomPaint#9e27a@Offset(0.0, 0.0), RenderClipPath#9b281@Offset(0.0, 0.0), RenderStack#41599@Offset(0.0, 0.0), RenderSemanticsAnnotations#a8606@Offset(0.0, 0.0), RenderFlex#78651@Offset(0.0, 132.0), RenderPositionedBox#d8c95@Offset(0.0, 132.0), RenderFlex#2b2b6@Offset(0.0, 220.0), RenderPadding#f6322@Offset(0.0, 220.0), _RenderInkFeatures#54c6d@Offset(0.0, 220.0), RenderPhysicalModel#63db7@Offset(0.0, 220.0), RenderSemanticsAnnotations#7f9ed@Offset(0.0, 220.0), RenderSemanticsAnnotations#72e9c@Offset(0.0, 220.0), RenderIntrinsicHeight#8a130@Offset(0.0, 220.0), _RenderSingleChildViewport#70d16@Offset(0.0, 128.0), RenderIgnorePointer#ffedc@Offset(0.0, 128.0), RenderSemanticsAnnotations#c39dc@Offset(0.0, 128.0), RenderPointerListener#2e276@Offset(0.0, 128.0), RenderSemanticsGestureHandler#aa79d@Offset(0.0, 128.0), RenderPointerListener#acd41@Offset(0.0, 128.0), _RenderScrollSemantics#91669@Offset(0.0, 128.0), RenderClipRect#db015@Offset(0.0, 128.0), RenderFlex#af383@Offset(0.0, 128.0), RenderClipRect#b770b@Offset(0.0, 128.0), _RenderColoredBox#96bc1@Offset(0.0, 128.0), RenderFlex#8520f@Offset(0.0, 128.0), RenderCustomMultiChildLayoutBox#8c56e@Offset(0.0, 128.0), _RenderInkFeatures#f0531@Offset(0.0, 128.0), RenderPhysicalModel#62682@Offset(0.0, 128.0), _RenderLayoutBuilder#79ae0@Offset(0.0, 128.0), RenderAnimatedOpacity#dc652@Offset(0.0, 128.0), RenderStack#bfc41@Offset(0.0, 128.0), RenderSemanticsAnnotations#cb761@Offset(0.0, 128.0), RenderRepaintBoundary#db8f4@Offset(0.0, 128.0), RenderIgnorePointer#bbea5@Offset(0.0, 128.0), RenderAnimatedOpacity#44b30@Offset(0.0, 128.0), RenderRepaintBoundary#3d3b8@Offset(0.0, 128.0), RenderSemanticsAnnotations#e97b2@Offset(0.0, 128.0), RenderOffstage#502f8@Offset(0.0, 128.0), RenderSemanticsAnnotations#89c63@Offset(0.0, 128.0), _RenderTheater#721b0@Offset(0.0, 128.0), RenderAbsorbPointer#ac9cd@Offset(0.0, 128.0), RenderPointerListener#40b89@Offset(0.0, 128.0), RenderSemanticsAnnotations#3d814@Offset(0.0, 128.0), RenderSemanticsAnnotations#bd93c@Offset(0.0, 128.0), RenderSemanticsAnnotations#b206d@Offset(0.0, 128.0), RenderSemanticsAnnotations#88a91@Offset(0.0, 128.0), RenderTapRegionSurface#3df75@Offset(0.0, 128.0), RenderSemanticsAnnotations#cc1a7@Offset(0.0, 128.0), RenderSemanticsAnnotations#8d353@Offset(0.0, 128.0), HitTestEntry<HitTestTarget>#b4994(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#03b76(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:40:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with type "OutlinedButton" that are ancestors of widget with text "Cancelar": [
+  OutlinedButton(dependencies: [IconTheme, InheritedCupertinoTheme, MediaQuery, _InheritedTheme, _LocalizationsScope-[GlobalKey#ec759]], state: _ButtonStyleState#52b93),
+]" derived an Offset (Offset(435.0, 570.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+Indeed, Offset(435.0, 570.0) is outside the bounds of the root of the render tree, Size(760.0, 560.0).
+The finder corresponds to this RenderBox: RenderSemanticsAnnotations#16d5b relayoutBoundary=up7
+The hit test result at that offset is: HitTestResult(HitTestEntry<HitTestTarget>#8ba13(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#4d950(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:44:20)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+
+Warning: A call to tap() with finder "Found 1 widget with text "Citas" descending from widget with type "NavigationRail": [
+  Text("Citas", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 172.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#4d3b6 NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#bb8fe@Offset(0.0, 0.0), RenderSemanticsAnnotations#575d6@Offset(0.0, 0.0), RenderMouseRegion#d2ef2@Offset(0.0, 0.0), RenderSemanticsAnnotations#303cb@Offset(0.0, 0.0), _RenderInkFeatures#ce83a@Offset(0.0, 0.0), RenderCustomPaint#47052@Offset(0.0, 0.0), RenderClipPath#3f0ec@Offset(0.0, 0.0), RenderStack#1f31d@Offset(0.0, 0.0), RenderSemanticsAnnotations#c84fa@Offset(0.0, 0.0), RenderFlex#78651@Offset(0.0, 176.0), RenderPositionedBox#d8c95@Offset(0.0, 176.0), RenderFlex#2b2b6@Offset(0.0, 264.0), RenderPadding#f6322@Offset(0.0, 264.0), _RenderInkFeatures#54c6d@Offset(0.0, 264.0), RenderPhysicalModel#63db7@Offset(0.0, 264.0), RenderSemanticsAnnotations#7f9ed@Offset(0.0, 264.0), RenderSemanticsAnnotations#72e9c@Offset(0.0, 264.0), RenderIntrinsicHeight#8a130@Offset(0.0, 264.0), _RenderSingleChildViewport#70d16@Offset(0.0, 172.0), RenderIgnorePointer#ffedc@Offset(0.0, 172.0), RenderSemanticsAnnotations#c39dc@Offset(0.0, 172.0), RenderPointerListener#2e276@Offset(0.0, 172.0), RenderSemanticsGestureHandler#aa79d@Offset(0.0, 172.0), RenderPointerListener#acd41@Offset(0.0, 172.0), _RenderScrollSemantics#91669@Offset(0.0, 172.0), RenderClipRect#db015@Offset(0.0, 172.0), RenderFlex#af383@Offset(0.0, 172.0), RenderClipRect#b770b@Offset(0.0, 172.0), _RenderColoredBox#96bc1@Offset(0.0, 172.0), RenderFlex#8520f@Offset(0.0, 172.0), RenderCustomMultiChildLayoutBox#8c56e@Offset(0.0, 172.0), _RenderInkFeatures#f0531@Offset(0.0, 172.0), RenderPhysicalModel#62682@Offset(0.0, 172.0), _RenderLayoutBuilder#79ae0@Offset(0.0, 172.0), RenderAnimatedOpacity#dc652@Offset(0.0, 172.0), RenderStack#bfc41@Offset(0.0, 172.0), RenderSemanticsAnnotations#cb761@Offset(0.0, 172.0), RenderRepaintBoundary#db8f4@Offset(0.0, 172.0), RenderIgnorePointer#bbea5@Offset(0.0, 172.0), RenderAnimatedOpacity#44b30@Offset(0.0, 172.0), RenderRepaintBoundary#3d3b8@Offset(0.0, 172.0), RenderSemanticsAnnotations#e97b2@Offset(0.0, 172.0), RenderOffstage#502f8@Offset(0.0, 172.0), RenderSemanticsAnnotations#89c63@Offset(0.0, 172.0), _RenderTheater#721b0@Offset(0.0, 172.0), RenderAbsorbPointer#ac9cd@Offset(0.0, 172.0), RenderPointerListener#40b89@Offset(0.0, 172.0), RenderSemanticsAnnotations#3d814@Offset(0.0, 172.0), RenderSemanticsAnnotations#bd93c@Offset(0.0, 172.0), RenderSemanticsAnnotations#b206d@Offset(0.0, 172.0), RenderSemanticsAnnotations#88a91@Offset(0.0, 172.0), RenderTapRegionSurface#3df75@Offset(0.0, 172.0), RenderSemanticsAnnotations#cc1a7@Offset(0.0, 172.0), RenderSemanticsAnnotations#8d353@Offset(0.0, 172.0), HitTestEntry<HitTestTarget>#5f8ff(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#a0535(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:40:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Órdenes" descending from widget with type "NavigationRail": [
+  Text("Órdenes", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 216.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#4b96e NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#95d80@Offset(0.0, 0.0), RenderSemanticsAnnotations#98fc6@Offset(0.0, 0.0), RenderMouseRegion#28c4a@Offset(0.0, 0.0), RenderSemanticsAnnotations#1f052@Offset(0.0, 0.0), _RenderInkFeatures#d7343@Offset(0.0, 0.0), RenderCustomPaint#f01f1@Offset(0.0, 0.0), RenderClipPath#7fc37@Offset(0.0, 0.0), RenderStack#7c95c@Offset(0.0, 0.0), RenderSemanticsAnnotations#f68ec@Offset(0.0, 0.0), RenderFlex#78651@Offset(0.0, 220.0), RenderPositionedBox#d8c95@Offset(0.0, 220.0), RenderFlex#2b2b6@Offset(0.0, 308.0), RenderPadding#f6322@Offset(0.0, 308.0), _RenderInkFeatures#54c6d@Offset(0.0, 308.0), RenderPhysicalModel#63db7@Offset(0.0, 308.0), RenderSemanticsAnnotations#7f9ed@Offset(0.0, 308.0), RenderSemanticsAnnotations#72e9c@Offset(0.0, 308.0), RenderIntrinsicHeight#8a130@Offset(0.0, 308.0), _RenderSingleChildViewport#70d16@Offset(0.0, 216.0), RenderIgnorePointer#ffedc@Offset(0.0, 216.0), RenderSemanticsAnnotations#c39dc@Offset(0.0, 216.0), RenderPointerListener#2e276@Offset(0.0, 216.0), RenderSemanticsGestureHandler#aa79d@Offset(0.0, 216.0), RenderPointerListener#acd41@Offset(0.0, 216.0), _RenderScrollSemantics#91669@Offset(0.0, 216.0), RenderClipRect#db015@Offset(0.0, 216.0), RenderFlex#af383@Offset(0.0, 216.0), RenderClipRect#b770b@Offset(0.0, 216.0), _RenderColoredBox#96bc1@Offset(0.0, 216.0), RenderFlex#8520f@Offset(0.0, 216.0), RenderCustomMultiChildLayoutBox#8c56e@Offset(0.0, 216.0), _RenderInkFeatures#f0531@Offset(0.0, 216.0), RenderPhysicalModel#62682@Offset(0.0, 216.0), _RenderLayoutBuilder#79ae0@Offset(0.0, 216.0), RenderAnimatedOpacity#dc652@Offset(0.0, 216.0), RenderStack#bfc41@Offset(0.0, 216.0), RenderSemanticsAnnotations#cb761@Offset(0.0, 216.0), RenderRepaintBoundary#db8f4@Offset(0.0, 216.0), RenderIgnorePointer#bbea5@Offset(0.0, 216.0), RenderAnimatedOpacity#44b30@Offset(0.0, 216.0), RenderRepaintBoundary#3d3b8@Offset(0.0, 216.0), RenderSemanticsAnnotations#e97b2@Offset(0.0, 216.0), RenderOffstage#502f8@Offset(0.0, 216.0), RenderSemanticsAnnotations#89c63@Offset(0.0, 216.0), _RenderTheater#721b0@Offset(0.0, 216.0), RenderAbsorbPointer#ac9cd@Offset(0.0, 216.0), RenderPointerListener#40b89@Offset(0.0, 216.0), RenderSemanticsAnnotations#3d814@Offset(0.0, 216.0), RenderSemanticsAnnotations#bd93c@Offset(0.0, 216.0), RenderSemanticsAnnotations#b206d@Offset(0.0, 216.0), RenderSemanticsAnnotations#88a91@Offset(0.0, 216.0), RenderTapRegionSurface#3df75@Offset(0.0, 216.0), RenderSemanticsAnnotations#cc1a7@Offset(0.0, 216.0), RenderSemanticsAnnotations#8d353@Offset(0.0, 216.0), HitTestEntry<HitTestTarget>#51f32(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#f8355(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:40:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Usuarios" descending from widget with type "NavigationRail": [
+  Text("Usuarios", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 436.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#17582 NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#4f1d1@Offset(0.0, 0.0), RenderSemanticsAnnotations#f1ade@Offset(0.0, 0.0), RenderMouseRegion#90001@Offset(0.0, 0.0), RenderSemanticsAnnotations#2ba9c@Offset(0.0, 0.0), _RenderInkFeatures#a98cb@Offset(0.0, 0.0), RenderCustomPaint#ff4e4@Offset(0.0, 0.0), RenderClipPath#854e2@Offset(0.0, 0.0), RenderStack#9c99e@Offset(0.0, 0.0), RenderSemanticsAnnotations#36c31@Offset(0.0, 0.0), RenderFlex#78651@Offset(0.0, 440.0), RenderPositionedBox#d8c95@Offset(0.0, 440.0), RenderFlex#2b2b6@Offset(0.0, 528.0), RenderPadding#f6322@Offset(0.0, 528.0), _RenderInkFeatures#54c6d@Offset(0.0, 528.0), RenderPhysicalModel#63db7@Offset(0.0, 528.0), RenderSemanticsAnnotations#7f9ed@Offset(0.0, 528.0), RenderSemanticsAnnotations#72e9c@Offset(0.0, 528.0), RenderIntrinsicHeight#8a130@Offset(0.0, 528.0), _RenderSingleChildViewport#70d16@Offset(0.0, 436.0), RenderIgnorePointer#ffedc@Offset(0.0, 436.0), RenderSemanticsAnnotations#c39dc@Offset(0.0, 436.0), RenderPointerListener#2e276@Offset(0.0, 436.0), RenderSemanticsGestureHandler#aa79d@Offset(0.0, 436.0), RenderPointerListener#acd41@Offset(0.0, 436.0), _RenderScrollSemantics#91669@Offset(0.0, 436.0), RenderClipRect#db015@Offset(0.0, 436.0), RenderFlex#af383@Offset(0.0, 436.0), RenderClipRect#b770b@Offset(0.0, 436.0), _RenderColoredBox#96bc1@Offset(0.0, 436.0), RenderFlex#8520f@Offset(0.0, 436.0), RenderCustomMultiChildLayoutBox#8c56e@Offset(0.0, 436.0), _RenderInkFeatures#f0531@Offset(0.0, 436.0), RenderPhysicalModel#62682@Offset(0.0, 436.0), _RenderLayoutBuilder#79ae0@Offset(0.0, 436.0), RenderAnimatedOpacity#dc652@Offset(0.0, 436.0), RenderStack#bfc41@Offset(0.0, 436.0), RenderSemanticsAnnotations#cb761@Offset(0.0, 436.0), RenderRepaintBoundary#db8f4@Offset(0.0, 436.0), RenderIgnorePointer#bbea5@Offset(0.0, 436.0), RenderAnimatedOpacity#44b30@Offset(0.0, 436.0), RenderRepaintBoundary#3d3b8@Offset(0.0, 436.0), RenderSemanticsAnnotations#e97b2@Offset(0.0, 436.0), RenderOffstage#502f8@Offset(0.0, 436.0), RenderSemanticsAnnotations#89c63@Offset(0.0, 436.0), _RenderTheater#721b0@Offset(0.0, 436.0), RenderAbsorbPointer#ac9cd@Offset(0.0, 436.0), RenderPointerListener#40b89@Offset(0.0, 436.0), RenderSemanticsAnnotations#3d814@Offset(0.0, 436.0), RenderSemanticsAnnotations#bd93c@Offset(0.0, 436.0), RenderSemanticsAnnotations#b206d@Offset(0.0, 436.0), RenderSemanticsAnnotations#88a91@Offset(0.0, 436.0), RenderTapRegionSurface#3df75@Offset(0.0, 436.0), RenderSemanticsAnnotations#cc1a7@Offset(0.0, 436.0), RenderSemanticsAnnotations#8d353@Offset(0.0, 436.0), HitTestEntry<HitTestTarget>#c3ba7(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#369a1(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:40:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+00:22 +224: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:22 +224: D:/sdd/motorix/client/test/users_screens_test.dart: desactivar y activar test_desactivar_pide_confirmacion_y_cancelar_no_envia_nada
+DataTable2 built: 0ms
+00:22 +225: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+00:22 +225: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_exige_propietario_y_datos_obligatorios_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:22 +226: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_admin_ve_el_historial_con_sus_servicios
+DataTable2 built: 2ms
+00:22 +227: D:/sdd/motorix/client/test/vehicle_owner_test.dart: registrar un vehículo desde el detalle del cliente test_el_propietario_llega_preseleccionado_y_se_guarda_con_su_clientId
+00:22 +227: D:/sdd/motorix/client/test/ticket_screens_test.dart: ver e imprimir el ticket test_si_no_se_pudo_imprimir_avisa_en_espanol
+DataTable2 built: 0ms
+00:22 +228: D:/sdd/motorix/client/test/vehicle_owner_test.dart: registrar un vehículo desde el detalle del cliente test_el_propietario_llega_preseleccionado_y_se_guarda_con_su_clientId
+00:22 +228: D:/sdd/motorix/client/test/responsive_test.dart: test_los_detalles_de_cita_y_orden_caben_en_una_ventana_angosta
+
+Warning: A call to tap() with finder "Found 1 widget with text "Citas" descending from widget with type "NavigationRail": [
+  Text("Citas", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 172.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#2c174 NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#bc9a9@Offset(0.0, 0.0), RenderSemanticsAnnotations#49466@Offset(0.0, 0.0), RenderMouseRegion#9fcc5@Offset(0.0, 0.0), RenderSemanticsAnnotations#262b1@Offset(0.0, 0.0), _RenderInkFeatures#23514@Offset(0.0, 0.0), RenderCustomPaint#6bbc7@Offset(0.0, 0.0), RenderClipPath#04ee2@Offset(0.0, 0.0), RenderStack#e8f43@Offset(0.0, 0.0), RenderSemanticsAnnotations#4eebc@Offset(0.0, 0.0), RenderFlex#6b600@Offset(0.0, 176.0), RenderPositionedBox#ad2c0@Offset(0.0, 176.0), RenderFlex#33ec1@Offset(0.0, 264.0), RenderPadding#654f4@Offset(0.0, 264.0), _RenderInkFeatures#94f64@Offset(0.0, 264.0), RenderPhysicalModel#2f077@Offset(0.0, 264.0), RenderSemanticsAnnotations#871ae@Offset(0.0, 264.0), RenderSemanticsAnnotations#a8676@Offset(0.0, 264.0), RenderIntrinsicHeight#fa341@Offset(0.0, 264.0), _RenderSingleChildViewport#a49a3@Offset(0.0, 172.0), RenderIgnorePointer#36338@Offset(0.0, 172.0), RenderSemanticsAnnotations#c0972@Offset(0.0, 172.0), RenderPointerListener#93c30@Offset(0.0, 172.0), RenderSemanticsGestureHandler#a208a@Offset(0.0, 172.0), RenderPointerListener#776fb@Offset(0.0, 172.0), _RenderScrollSemantics#3dd94@Offset(0.0, 172.0), RenderClipRect#ef29c@Offset(0.0, 172.0), RenderFlex#300a9@Offset(0.0, 172.0), RenderClipRect#4713c@Offset(0.0, 172.0), _RenderColoredBox#a789e@Offset(0.0, 172.0), RenderFlex#45303@Offset(0.0, 172.0), RenderCustomMultiChildLayoutBox#4c75b@Offset(0.0, 172.0), _RenderInkFeatures#d855b@Offset(0.0, 172.0), RenderPhysicalModel#b3c81@Offset(0.0, 172.0), _RenderLayoutBuilder#33882@Offset(0.0, 172.0), RenderAnimatedOpacity#77898@Offset(0.0, 172.0), RenderStack#acc94@Offset(0.0, 172.0), RenderSemanticsAnnotations#69527@Offset(0.0, 172.0), RenderRepaintBoundary#174a9@Offset(0.0, 172.0), RenderIgnorePointer#ec6b7@Offset(0.0, 172.0), RenderAnimatedOpacity#0b96a@Offset(0.0, 172.0), RenderRepaintBoundary#9c36b@Offset(0.0, 172.0), RenderSemanticsAnnotations#5aec1@Offset(0.0, 172.0), RenderOffstage#2b256@Offset(0.0, 172.0), RenderSemanticsAnnotations#14c53@Offset(0.0, 172.0), _RenderTheater#6de02@Offset(0.0, 172.0), RenderAbsorbPointer#f6f31@Offset(0.0, 172.0), RenderPointerListener#03df8@Offset(0.0, 172.0), RenderSemanticsAnnotations#a6259@Offset(0.0, 172.0), RenderSemanticsAnnotations#a5dca@Offset(0.0, 172.0), RenderSemanticsAnnotations#65822@Offset(0.0, 172.0), RenderSemanticsAnnotations#92cbb@Offset(0.0, 172.0), RenderTapRegionSurface#64195@Offset(0.0, 172.0), RenderSemanticsAnnotations#203e8@Offset(0.0, 172.0), RenderSemanticsAnnotations#d526c@Offset(0.0, 172.0), HitTestEntry<HitTestTarget>#2281b(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#3526e(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:53:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+
+Warning: A call to tap() with finder "Found 1 widget with text "Órdenes" descending from widget with type "NavigationRail": [
+  Text("Órdenes", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 216.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#ed5bc NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#c434d@Offset(0.0, 0.0), RenderSemanticsAnnotations#c2ac7@Offset(0.0, 0.0), RenderMouseRegion#21add@Offset(0.0, 0.0), RenderSemanticsAnnotations#6df2b@Offset(0.0, 0.0), _RenderInkFeatures#03626@Offset(0.0, 0.0), RenderCustomPaint#cc17d@Offset(0.0, 0.0), RenderClipPath#457fc@Offset(0.0, 0.0), RenderStack#8d368@Offset(0.0, 0.0), RenderSemanticsAnnotations#f5fc2@Offset(0.0, 0.0), RenderFlex#6b600@Offset(0.0, 220.0), RenderPositionedBox#ad2c0@Offset(0.0, 220.0), RenderFlex#33ec1@Offset(0.0, 308.0), RenderPadding#654f4@Offset(0.0, 308.0), _RenderInkFeatures#94f64@Offset(0.0, 308.0), RenderPhysicalModel#2f077@Offset(0.0, 308.0), RenderSemanticsAnnotations#871ae@Offset(0.0, 308.0), RenderSemanticsAnnotations#a8676@Offset(0.0, 308.0), RenderIntrinsicHeight#fa341@Offset(0.0, 308.0), _RenderSingleChildViewport#a49a3@Offset(0.0, 216.0), RenderIgnorePointer#36338@Offset(0.0, 216.0), RenderSemanticsAnnotations#c0972@Offset(0.0, 216.0), RenderPointerListener#93c30@Offset(0.0, 216.0), RenderSemanticsGestureHandler#a208a@Offset(0.0, 216.0), RenderPointerListener#776fb@Offset(0.0, 216.0), _RenderScrollSemantics#3dd94@Offset(0.0, 216.0), RenderClipRect#ef29c@Offset(0.0, 216.0), RenderFlex#300a9@Offset(0.0, 216.0), RenderClipRect#4713c@Offset(0.0, 216.0), _RenderColoredBox#a789e@Offset(0.0, 216.0), RenderFlex#45303@Offset(0.0, 216.0), RenderCustomMultiChildLayoutBox#4c75b@Offset(0.0, 216.0), _RenderInkFeatures#d855b@Offset(0.0, 216.0), RenderPhysicalModel#b3c81@Offset(0.0, 216.0), _RenderLayoutBuilder#33882@Offset(0.0, 216.0), RenderAnimatedOpacity#77898@Offset(0.0, 216.0), RenderStack#acc94@Offset(0.0, 216.0), RenderSemanticsAnnotations#69527@Offset(0.0, 216.0), RenderRepaintBoundary#174a9@Offset(0.0, 216.0), RenderIgnorePointer#ec6b7@Offset(0.0, 216.0), RenderAnimatedOpacity#0b96a@Offset(0.0, 216.0), RenderRepaintBoundary#9c36b@Offset(0.0, 216.0), RenderSemanticsAnnotations#5aec1@Offset(0.0, 216.0), RenderOffstage#2b256@Offset(0.0, 216.0), RenderSemanticsAnnotations#14c53@Offset(0.0, 216.0), _RenderTheater#6de02@Offset(0.0, 216.0), RenderAbsorbPointer#f6f31@Offset(0.0, 216.0), RenderPointerListener#03df8@Offset(0.0, 216.0), RenderSemanticsAnnotations#a6259@Offset(0.0, 216.0), RenderSemanticsAnnotations#a5dca@Offset(0.0, 216.0), RenderSemanticsAnnotations#65822@Offset(0.0, 216.0), RenderSemanticsAnnotations#92cbb@Offset(0.0, 216.0), RenderTapRegionSurface#64195@Offset(0.0, 216.0), RenderSemanticsAnnotations#203e8@Offset(0.0, 216.0), RenderSemanticsAnnotations#d526c@Offset(0.0, 216.0), HitTestEntry<HitTestTarget>#aaf62(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#f08b8(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:60:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+00:22 +229: D:/sdd/motorix/client/test/vehicle_owner_test.dart: registrar un vehículo desde el detalle del cliente test_el_propietario_llega_preseleccionado_y_se_guarda_con_su_clientId
+00:22 +229: D:/sdd/motorix/client/test/users_screens_test.dart: desactivar y activar test_confirmar_la_desactivacion_envia_active_false_y_avisa
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:22 +230: D:/sdd/motorix/client/test/vehicle_owner_test.dart: registrar un vehículo desde el detalle del cliente test_el_propietario_llega_preseleccionado_y_se_guarda_con_su_clientId
+00:22 +230: D:/sdd/motorix/client/test/ticket_screens_test.dart: ver e imprimir el ticket test_un_error_al_cargar_el_ticket_permite_reintentar
+DataTable2 built: 0ms
+00:22 +231: D:/sdd/motorix/client/test/vehicle_owner_test.dart: registrar un vehículo desde el detalle del cliente test_el_propietario_llega_preseleccionado_y_se_guarda_con_su_clientId
+00:22 +231: D:/sdd/motorix/client/test/responsive_test.dart: test_mis_ordenes_cabe_en_una_ventana_angosta
+
+Warning: A call to tap() with finder "Found 1 widget with text "Mis órdenes" descending from widget with type "NavigationRail": [
+  Text("Mis órdenes", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(0.0, 220.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#230af NEEDS-PAINT
+The hit test result at that offset is: HitTestResult(RenderPointerListener#28b38@Offset(0.0, 0.0), RenderSemanticsAnnotations#a6720@Offset(0.0, 0.0), RenderMouseRegion#21a45@Offset(0.0, 0.0), RenderSemanticsAnnotations#a1ab0@Offset(0.0, 0.0), _RenderInkFeatures#ca6ba@Offset(0.0, 0.0), RenderCustomPaint#db6aa@Offset(0.0, 0.0), RenderClipPath#ecf8e@Offset(0.0, 0.0), RenderStack#1f4a2@Offset(0.0, 0.0), RenderSemanticsAnnotations#68d0b@Offset(0.0, 0.0), RenderFlex#b787c@Offset(0.0, 132.0), RenderPositionedBox#0ffa7@Offset(0.0, 132.0), RenderFlex#2712f@Offset(0.0, 220.0), RenderPadding#bf1b9@Offset(0.0, 220.0), _RenderInkFeatures#d752a@Offset(0.0, 220.0), RenderPhysicalModel#63e9f@Offset(0.0, 220.0), RenderSemanticsAnnotations#11dae@Offset(0.0, 220.0), RenderSemanticsAnnotations#52514@Offset(0.0, 220.0), RenderIntrinsicHeight#be6ae@Offset(0.0, 220.0), _RenderSingleChildViewport#04825@Offset(0.0, 220.0), RenderIgnorePointer#d6af7@Offset(0.0, 220.0), RenderSemanticsAnnotations#b79db@Offset(0.0, 220.0), RenderPointerListener#76961@Offset(0.0, 220.0), RenderSemanticsGestureHandler#04946@Offset(0.0, 220.0), RenderPointerListener#c1a1a@Offset(0.0, 220.0), _RenderScrollSemantics#10c0a@Offset(0.0, 220.0), RenderClipRect#16747@Offset(0.0, 220.0), RenderFlex#f40be@Offset(0.0, 220.0), RenderClipRect#5cd23@Offset(0.0, 220.0), _RenderColoredBox#03124@Offset(0.0, 220.0), RenderFlex#e89eb@Offset(0.0, 220.0), RenderCustomMultiChildLayoutBox#45808@Offset(0.0, 220.0), _RenderInkFeatures#19f8e@Offset(0.0, 220.0), RenderPhysicalModel#70c89@Offset(0.0, 220.0), _RenderLayoutBuilder#bdc2d@Offset(0.0, 220.0), RenderAnimatedOpacity#b2fc4@Offset(0.0, 220.0), RenderStack#05b75@Offset(0.0, 220.0), RenderSemanticsAnnotations#4b0d7@Offset(0.0, 220.0), RenderRepaintBoundary#41c17@Offset(0.0, 220.0), RenderIgnorePointer#ce72d@Offset(0.0, 220.0), RenderAnimatedOpacity#43be8@Offset(0.0, 220.0), RenderRepaintBoundary#274c2@Offset(0.0, 220.0), RenderSemanticsAnnotations#09b8b@Offset(0.0, 220.0), RenderOffstage#c1228@Offset(0.0, 220.0), RenderSemanticsAnnotations#936bc@Offset(0.0, 220.0), _RenderTheater#d1469@Offset(0.0, 220.0), RenderAbsorbPointer#10461@Offset(0.0, 220.0), RenderPointerListener#dbbcd@Offset(0.0, 220.0), RenderSemanticsAnnotations#893ba@Offset(0.0, 220.0), RenderSemanticsAnnotations#139e9@Offset(0.0, 220.0), RenderSemanticsAnnotations#e8a88@Offset(0.0, 220.0), RenderSemanticsAnnotations#d3b6b@Offset(0.0, 220.0), RenderTapRegionSurface#738a6@Offset(0.0, 220.0), RenderSemanticsAnnotations#ffbf6@Offset(0.0, 220.0), RenderSemanticsAnnotations#3ba24@Offset(0.0, 220.0), HitTestEntry<HitTestTarget>#5a18c(_ReusableRenderView#9b848), HitTestEntry<HitTestTarget>#3ab36(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      openSection (file:///D:/sdd/motorix/client/test/helpers/data.dart:73:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///D:/sdd/motorix/client/test/responsive_test.dart:70:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+DataTable2 built: 0ms
+00:22 +232: D:/sdd/motorix/client/test/vehicle_owner_test.dart: registrar un vehículo desde el detalle del cliente test_el_propietario_llega_preseleccionado_y_se_guarda_con_su_clientId
+00:22 +232: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_receptionist_ve_el_historial_con_sus_servicios
+DataTable2 built: 0ms
+00:22 +233: D:/sdd/motorix/client/test/vehicle_owner_test.dart: registrar un vehículo desde el detalle del cliente test_el_propietario_llega_preseleccionado_y_se_guarda_con_su_clientId
+DataTable2 built: 2ms
+00:22 +234: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_valida_el_anio_y_el_vin_en_el_formulario
+DataTable2 built: 0ms
+00:22 +235: D:/sdd/motorix/client/test/users_screens_test.dart: desactivar y activar test_reactivar_no_pide_confirmacion
+00:23 +236: D:/sdd/motorix/client/test/users_screens_test.dart: desactivar y activar test_reactivar_no_pide_confirmacion
+00:23 +236: D:/sdd/motorix/client/test/ticket_screens_test.dart: listado de tickets test_el_rol_admin_ve_el_listado_y_abre_un_ticket
+DataTable2 built: 0ms
+00:23 +237: D:/sdd/motorix/client/test/users_screens_test.dart: desactivar y activar test_reactivar_no_pide_confirmacion
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:23 +238: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_el_rol_mechanic_ve_el_historial_con_sus_servicios
+DataTable2 built: 0ms
+00:23 +239: D:/sdd/motorix/client/test/vehicle_owner_test.dart: registrar un vehículo desde el detalle del cliente test_el_mecanico_no_ve_el_boton_registrar_vehiculo
+DataTable2 built: 0ms
+00:23 +240: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_busca_y_elige_al_propietario_y_guarda_el_vehiculo_con_su_clientId
+00:23 +240: D:/sdd/motorix/client/test/ticket_screens_test.dart: listado de tickets test_el_rol_receptionist_ve_el_listado_y_abre_un_ticket
+DataTable2 built: 0ms
+00:23 +241: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_busca_y_elige_al_propietario_y_guarda_el_vehiculo_con_su_clientId
+00:23 +241: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_un_vehiculo_sin_servicios_terminados_muestra_el_estado_vacio
+DataTable2 built: 0ms
+00:23 +242: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_busca_y_elige_al_propietario_y_guarda_el_vehiculo_con_su_clientId
+00:23 +242: D:/sdd/motorix/client/test/users_screens_test.dart: desactivar y activar test_el_conflicto_de_ultimo_administrador_se_muestra_al_usuario
+DataTable2 built: 0ms
+00:23 +243: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_busca_y_elige_al_propietario_y_guarda_el_vehiculo_con_su_clientId
+00:23 +244: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_busca_y_elige_al_propietario_y_guarda_el_vehiculo_con_su_clientId
+00:23 +244: D:/sdd/motorix/client/test/vehicle_owner_test.dart: detalle del vehículo y su propietario test_muestra_los_datos_y_el_propietario_con_enlace_al_cliente
+DataTable2 built: 0ms
+00:23 +245: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_busca_y_elige_al_propietario_y_guarda_el_vehiculo_con_su_clientId
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:23 +246: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_un_error_del_historial_se_muestra_y_permite_reintentar
+00:23 +247: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_un_error_del_historial_se_muestra_y_permite_reintentar
+DataTable2 built: 0ms
+00:23 +248: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar rol test_cambia_el_rol_con_el_selector_y_envia_el_valor_de_la_api
+00:23 +249: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar rol test_cambia_el_rol_con_el_selector_y_envia_el_valor_de_la_api
+00:24 +249: D:/sdd/motorix/client/test/vehicle_owner_test.dart: detalle del vehículo y su propietario test_desde_el_detalle_del_cliente_se_abre_el_vehiculo
+DataTable2 built: 0ms
+00:24 +250: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar rol test_cambia_el_rol_con_el_selector_y_envia_el_valor_de_la_api
+00:24 +250: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_el_buscador_de_propietarios_filtra_por_nombre
+DataTable2 built: 0ms
+00:24 +251: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar rol test_cambia_el_rol_con_el_selector_y_envia_el_valor_de_la_api
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:24 +252: D:/sdd/motorix/client/test/vehicle_history_test.dart: test_cargar_mas_agrega_la_siguiente_pagina
+DataTable2 built: 0ms
+00:24 +253: D:/sdd/motorix/client/test/vehicle_owner_test.dart: detalle del vehículo y su propietario test_el_mecanico_no_ve_el_boton_editar
+DataTable2 built: 0ms
+00:24 +254: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_placa_duplicada_se_muestra_en_el_campo
+00:24 +254: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar rol test_no_envia_nada_si_se_deja_el_mismo_rol
+DataTable2 built: 0ms
+00:24 +255: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_placa_duplicada_se_muestra_en_el_campo
+DataTable2 built: 0ms
+00:24 +256: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_el_formulario_de_edicion_llega_con_los_datos_actuales
+DataTable2 built: 0ms
+00:24 +257: D:/sdd/motorix/client/test/users_screens_test.dart: alta de usuario test_valida_los_campos_obligatorios_sin_llamar_a_la_api
+DataTable2 built: 0ms
+00:24 +258: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_propietario_inexistente_se_muestra_en_el_selector
+DataTable2 built: 0ms
+00:24 +259: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_cambiar_el_propietario_pide_confirmacion_y_al_confirmar_envia_el_nuevo_clientId
+DataTable2 built: 0ms
+00:25 +260: D:/sdd/motorix/client/test/users_screens_test.dart: alta de usuario test_aplica_la_politica_de_contrasena_antes_de_enviar
+DataTable2 built: 0ms
+00:25 +261: D:/sdd/motorix/client/test/vehicles_screens_test.dart: formulario de vehículo test_salir_con_cambios_pide_confirmacion
+DataTable2 built: 0ms
+00:25 +262: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_cancelar_el_cambio_de_propietario_no_envia_nada
+00:25 +262: D:/sdd/motorix/client/test/users_screens_test.dart: alta de usuario test_muestra_la_politica_de_contrasena_como_ayuda
+DataTable2 built: 0ms
+00:25 +263: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_cancelar_el_cambio_de_propietario_no_envia_nada
+DataTable2 built: 0ms
+00:25 +264: D:/sdd/motorix/client/test/users_screens_test.dart: alta de usuario test_crea_el_usuario_con_el_rol_elegido_y_vuelve_al_listado
+DataTable2 built: 0ms
+DataTable2 built: 0ms
+00:25 +265: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_un_kilometraje_menor_pide_confirmar_la_correccion_y_envia_mileageCorrection
+DataTable2 built: 0ms
+00:25 +266: D:/sdd/motorix/client/test/users_screens_test.dart: alta de usuario test_usuario_y_correo_duplicados_se_muestran_en_su_campo
+DataTable2 built: 0ms
+00:26 +267: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_cancelar_la_correccion_de_kilometraje_no_envia_nada
+DataTable2 built: 0ms
+00:26 +268: D:/sdd/motorix/client/test/users_screens_test.dart: alta de usuario test_salir_con_cambios_pide_confirmacion
+DataTable2 built: 0ms
+00:26 +269: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_un_kilometraje_mayor_se_guarda_sin_pedir_correccion
+DataTable2 built: 0ms
+00:26 +270: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar contraseña propia test_el_rol_ADMIN_puede_abrir_la_pantalla_desde_el_menu_de_la_cuenta
+00:26 +271: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_borrar_el_kilometraje_registrado_tambien_pide_confirmacion
+00:26 +272: D:/sdd/motorix/client/test/vehicle_owner_test.dart: edición de vehículo test_borrar_el_kilometraje_registrado_tambien_pide_confirmacion
+DataTable2 built: 0ms
+00:26 +273: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar contraseña propia test_el_rol_MECHANIC_puede_abrir_la_pantalla_desde_el_menu_de_la_cuenta
+00:26 +274: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar contraseña propia test_valida_confirmacion_politica_y_que_sea_distinta_sin_llamar_a_la_api
+00:27 +275: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar contraseña propia test_cambia_la_contrasena_limpia_los_campos_y_avisa
+00:27 +276: D:/sdd/motorix/client/test/users_screens_test.dart: cambiar contraseña propia test_una_contrasena_actual_incorrecta_se_muestra_en_su_campo
+00:27 +277: All tests passed!
