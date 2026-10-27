@@ -51,3 +51,6 @@ Tareas sin requisito asociado: T001 a T005 y T065 a T070 (preparación, validaci
 
 ## Conclusión
 Sin hallazgos críticos. Los dos altos son desviaciones documentales: el panel y las gráficas cambiaron en el commit `0e4709f` y el spec, el plan y las tareas no se actualizaron.
+
+## Nota sobre F1 (26-oct-2026)
+F1 se conserva como hallazgo documental: `docs/design-system.md` y `docs/project-context.md` limitan el panel a 4 indicadores, mientras que el spec pide 10. No afecta lo ya implementado: una verificación posterior encontró los 10 indicadores de FR-017 en el servidor (`server/services/dashboardService.js`) y en la pantalla (4 tarjetas y 7 filas del «Resumen operativo»), con sus pruebas aprobadas. Queda registrado en `docs/matriz-calidad.md` (RF-04, «Aprobado con observación»).
