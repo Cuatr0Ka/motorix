@@ -788,8 +788,8 @@ generatedAt
 > - `Ticket` (`tickets`): `order_id` único, `payment_id`, `content` (instantánea JSON del
 >   contenido tal como se generó), `generated_by` y `generated_at`. El folio (`TK-000012`) se
 >   deriva del identificador. No se generan archivos PDF: el ticket se visualiza e imprime.
-> - El total de cobro es **servicios más mano de obra**; las refacciones se listan con su
->   cantidad pero no suman importe (los precios de refacciones quedan fuera del MVP; el Sprint 5 los incorpora).
+> - En el Sprint 4 el total de cobro era **servicios más mano de obra** y las refacciones se listaban con
+>   su cantidad sin sumar importe. **Superado por el Sprint 5**: el total suma también las refacciones (ver abajo).
 > - Mercado Pago se usa en modo de pruebas con un enlace de cobro; el estado se confirma por
 >   consulta bajo demanda (sin avisos automáticos). El token vive solo en `MERCADOPAGO_ACCESS_TOKEN`.
 > - El panel de control es exclusivo del administrador y se calcula con datos reales, sin tablas

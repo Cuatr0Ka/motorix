@@ -3,7 +3,8 @@
 Sistema de Gestión para Taller Mecánico. Proyecto académico cuyo MVP se construye en cuatro
 sprints. Este repositorio contiene el **Sprint 1** (base del sistema, autenticación, usuarios,
 clientes y vehículos), el **Sprint 2** (citas y órdenes de servicio), el **Sprint 3** (historial,
-mantenimiento e inventario) y el **Sprint 4** (pagos, tickets y panel de control).
+mantenimiento e inventario), el **Sprint 4** (pagos, tickets y panel de control) y, ya posterior
+al MVP, el **Sprint 5** (precios de refacciones y cobro completo).
 
 ## Estructura
 
@@ -41,7 +42,7 @@ La guía completa de validación está en
 [`specs/001-base-clientes-vehiculos/quickstart.md`](specs/001-base-clientes-vehiculos/quickstart.md) (Sprint 1) y en
 [`specs/002-citas-ordenes-servicio/quickstart.md`](specs/002-citas-ordenes-servicio/quickstart.md) (Sprint 2) y
 [`specs/003-historial-inventario/quickstart.md`](specs/003-historial-inventario/quickstart.md) (Sprint 3).
-Los scripts de `database/scripts` aplican las migraciones y los seeds de los tres sprints en orden y son idempotentes.
+Los scripts de `database/scripts` aplican las migraciones y los seeds de todos los sprints en orden y son idempotentes.
 
 ## Cuentas iniciales (solo entorno local)
 
@@ -130,3 +131,22 @@ seguridad, contratos, seeds y rendimiento con 1 000 pagos y tickets) y 265 del c
 
 Menú por rol: la administración ve Panel de control, Cobros y Tickets; recepción ve Cobros y Tickets; el mecánico no
 accede a cobros. Los permisos se validan siempre en el backend.
+
+## Estado del Sprint 5
+
+Primer sprint posterior al MVP (habilitado por la enmienda 1.1.0 de la constitución): precios de refacciones y cobro
+completo. Implementado: categoría, marca y precios de compra y de venta de cada refacción (con aviso y confirmación
+si se vende bajo el costo); cada línea de refacción de una orden guarda el precio de venta vigente al agregarla, y
+el total de la orden suma servicios, mano de obra y refacciones (tope de 9 999 999.99); el pago se registra por ese
+total, Mercado Pago recibe ese importe, un pago pendiente cuyo importe ya no coincide se señala como desfasado y se
+cancela con confirmación, y una aprobación tardía muestra la diferencia por cobrar; el ticket nuevo usa el formato
+versión 2 (precio e importe por refacción y tres subtotales) y los anteriores se muestran como se emitieron; una orden
+con un pago Pagado no admite cambios de refacciones. El precio de compra solo lo ve la administración y el mecánico
+no ve ningún precio de refacciones. Los seeds agregan precios, una orden Terminada cobrable con refacciones y un pago
+pendiente desfasado, sin tocar pagos ni tickets anteriores. Las líneas de refacción anteriores al sprint quedan con
+precio 0 y no suman al total.
+
+Validado con 1215 pruebas del backend y 321 del cliente, y con un recorrido de los 10 escenarios del
+[`quickstart.md`](specs/005-precios-refacciones-cobro/quickstart.md) contra la API real y MySQL local. El registro
+de calidad del sprint (puertas, riesgos, trazabilidad, hallazgos y evidencias) está en
+[`docs/aseguramiento-calidad-sprint-5.md`](docs/aseguramiento-calidad-sprint-5.md).

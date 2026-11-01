@@ -334,7 +334,7 @@ que el precio de compra solo llega al administrador y que el mecánico no recibe
   de stock, movimientos, historial del vehículo, panel, órdenes, pagos y tickets) aparece el precio de compra.
 - **SC-007** (FR-019): Toda prueba de los sprints 1 a 4 de la línea base del 2026-10-31 (1003 de backend y 277
   de frontend) sigue pasando al cierre, salvo las que deban actualizarse por cambios declarados en esta
-  especificación (FR-021 y FR-026); cada una de esas actualizaciones se registra en el documento de
+  especificación (FR-005, FR-006, FR-007, FR-012, FR-013, FR-021 y FR-026); cada una de esas actualizaciones se registra en el documento de
   aseguramiento.
 - **SC-008** (FR-005, FR-006, FR-007, FR-023): La recepción cobra una orden con refacciones en menos de 3
   minutos, cronometrado en el entorno de demostración con datos de ejemplo, desde abrir la orden hasta ver el
