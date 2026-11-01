@@ -41,12 +41,8 @@ class PartsService {
   Future<Part> create(PartInput input) async => Part.fromJson((await _api.post('/parts', body: input.toJson())).map);
 
   /// Edita los datos de la refacción (el código y el stock no cambian por esta vía).
-  Future<Part> update(int id, PartInput input) async => Part.fromJson((await _api.patch('/parts/$id', body: {
-        'name': input.name,
-        'description': input.description,
-        'unit': input.unit,
-        'minStock': input.minStock,
-      })).map);
+  Future<Part> update(int id, PartInput input) async =>
+      Part.fromJson((await _api.patch('/parts/$id', body: input.toUpdateJson())).map);
 
   Future<Part> setActive(int id, bool active) async =>
       Part.fromJson((await _api.patch('/parts/$id', body: {'active': active})).map);

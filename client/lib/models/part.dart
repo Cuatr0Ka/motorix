@@ -2,7 +2,7 @@ import '../utils/status_labels.dart';
 import 'inventory_movement.dart';
 
 /// Refacción del catálogo. El administrador recibe todos los campos; el mecánico solo código, nombre,
-/// unidad y existencia (`minStock`, `description` y `active` llegan con valores por defecto).
+/// unidad y existencia (`minStock`, `description`, `active` y los datos de precios llegan vacíos).
 class Part {
   const Part({
     required this.id,
@@ -15,6 +15,11 @@ class Part {
     this.active = true,
     this.stockStatus = StockStatus.sufficient,
     this.movements = const [],
+    this.category,
+    this.brand,
+    this.purchasePrice,
+    this.salePrice,
+    this.priceMissing = false,
   });
 
   factory Part.fromJson(Map<String, dynamic> json) => Part(
@@ -30,6 +35,11 @@ class Part {
         movements: (json['movements'] as List? ?? const [])
             .map((e) => InventoryMovement.fromJson(Map<String, dynamic>.from(e as Map)))
             .toList(),
+        category: json['category'] as String?,
+        brand: json['brand'] as String?,
+        purchasePrice: json['purchasePrice'] == null ? null : '${json['purchasePrice']}',
+        salePrice: json['salePrice'] == null ? null : '${json['salePrice']}',
+        priceMissing: json['priceMissing'] as bool? ?? false,
       );
 
   final int id;
@@ -44,6 +54,15 @@ class Part {
 
   /// Últimos movimientos (solo en el detalle del administrador).
   final List<InventoryMovement> movements;
+
+  /// Categoría, marca y precios (cadenas con dos decimales): solo los recibe el administrador.
+  final String? category;
+  final String? brand;
+  final String? purchasePrice;
+  final String? salePrice;
+
+  /// Verdadero si todavía no tiene precio de venta: no se puede agregar a una orden.
+  final bool priceMissing;
 
   bool get isOutOfStock => stock == 0;
 
@@ -60,6 +79,11 @@ class PartInput {
     this.code,
     this.description,
     this.initialStock,
+    this.category,
+    this.brand,
+    this.purchasePrice,
+    this.salePrice,
+    this.confirmBelowCost = false,
   });
 
   final String? code;
@@ -68,7 +92,32 @@ class PartInput {
   final String unit;
   final int minStock;
   final int? initialStock;
+  final String? category;
+  final String? brand;
 
+  /// Precios capturados como texto ("120.00"); el de compra es opcional y el de venta se puede omitir al crear.
+  final String? purchasePrice;
+  final String? salePrice;
+
+  /// Confirmación explícita de una venta por debajo del costo (el servidor responde `PRICE_BELOW_COST` sin ella).
+  final bool confirmBelowCost;
+
+  /// Copia con la confirmación de venta bajo el costo.
+  PartInput confirmed() => PartInput(
+        code: code,
+        name: name,
+        description: description,
+        unit: unit,
+        minStock: minStock,
+        initialStock: initialStock,
+        category: category,
+        brand: brand,
+        purchasePrice: purchasePrice,
+        salePrice: salePrice,
+        confirmBelowCost: true,
+      );
+
+  /// Cuerpo del alta: los datos de precios se envían solo cuando tienen valor.
   Map<String, dynamic> toJson() => {
         if (code != null) 'code': code,
         'name': name,
@@ -76,6 +125,25 @@ class PartInput {
         'unit': unit,
         'minStock': minStock,
         if (initialStock != null) 'initialStock': initialStock,
+        if (category != null) 'category': category,
+        if (brand != null) 'brand': brand,
+        if (purchasePrice != null) 'purchasePrice': purchasePrice,
+        if (salePrice != null) 'salePrice': salePrice,
+        if (confirmBelowCost) 'confirmBelowCost': true,
+      };
+
+  /// Cuerpo de la edición: el precio de compra vacío se envía como `null` (borra el dato); el de venta, una vez
+  /// capturado, no se puede borrar y por eso se omite cuando está vacío.
+  Map<String, dynamic> toUpdateJson() => {
+        'name': name,
+        'description': description,
+        'unit': unit,
+        'minStock': minStock,
+        'category': category,
+        'brand': brand,
+        'purchasePrice': purchasePrice,
+        if (salePrice != null) 'salePrice': salePrice,
+        if (confirmBelowCost) 'confirmBelowCost': true,
       };
 }
 

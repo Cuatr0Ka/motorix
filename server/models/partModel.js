@@ -1,7 +1,7 @@
 import { query } from '../config/db.js';
 import { likePattern, limitOffset } from '../utils/pagination.js';
 
-const COLUMNS = 'id, code, name, description, unit, stock, min_stock, active';
+const COLUMNS = 'id, code, name, description, unit, stock, min_stock, active, category, brand, purchase_price, sale_price';
 
 /** Estado de stock: Agotada (cero), Baja (en o bajo el mínimo) o Suficiente. Con mínimo 0 solo alerta al llegar a cero. */
 export function stockStatusOf(stock, minStock) {
@@ -10,7 +10,10 @@ export function stockStatusOf(stock, minStock) {
   return 'SUFICIENTE';
 }
 
-/** Fila → refacción completa (vista del administrador). */
+/**
+ * Fila → refacción completa (vista del administrador), con categoría, marca y precios (cadenas con dos decimales o
+ * `null`). `priceMissing` es verdadero si todavía no tiene precio de venta: no se puede agregar a una orden.
+ */
 export const toPart = (row) => ({
   id: row.id,
   code: row.code,
@@ -21,7 +24,25 @@ export const toPart = (row) => ({
   minStock: row.min_stock,
   active: Boolean(row.active),
   stockStatus: stockStatusOf(row.stock, row.min_stock),
+  category: row.category ?? null,
+  brand: row.brand ?? null,
+  purchasePrice: row.purchase_price ?? null,
+  salePrice: row.sale_price ?? null,
+  priceMissing: row.sale_price == null,
 });
+
+const PRICE_FIELDS = ['category', 'brand', 'purchasePrice', 'salePrice', 'priceMissing'];
+
+/**
+ * Refacción según el rol: solo el administrador recibe categoría, marca y precios (FR-013). Se usa en las respuestas
+ * de las líneas de la orden, que también reciben recepción y el mecánico.
+ */
+export function presentPart(part, role) {
+  if (role === 'ADMIN' || !part) return part;
+  const visible = { ...part };
+  for (const field of PRICE_FIELDS) delete visible[field];
+  return visible;
+}
 
 /** Proyección reducida del mecánico: código, nombre, unidad y existencia. */
 export const toMechanicPart = (row) => ({
@@ -47,8 +68,8 @@ export async function list({ search, stockStatus, active, page, pageSize }) {
   const params = [];
   if (search) {
     const pattern = likePattern(search);
-    conditions.push('(code LIKE ? OR name LIKE ?)');
-    params.push(pattern, pattern);
+    conditions.push('(code LIKE ? OR name LIKE ? OR category LIKE ? OR brand LIKE ?)');
+    params.push(pattern, pattern, pattern, pattern);
   }
   if (stockStatus) conditions.push(`(${STOCK_CONDITIONS[stockStatus]})`);
   if (active !== undefined) {
@@ -77,17 +98,28 @@ export async function lockById(id, connection) {
   return rows[0] ?? null;
 }
 
-export async function insert({ code, name, description, unit, minStock }, connection) {
+export async function insert({ code, name, description, unit, minStock, category, brand, purchasePrice, salePrice }, connection) {
   const result = await query(
-    'INSERT INTO parts (code, name, description, unit, stock, min_stock) VALUES (?, ?, ?, ?, 0, ?)',
-    [code, name, description ?? null, unit, minStock],
+    `INSERT INTO parts (code, name, description, unit, stock, min_stock, category, brand, purchase_price, sale_price)
+     VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?)`,
+    [code, name, description ?? null, unit, minStock, category ?? null, brand ?? null, purchasePrice ?? null, salePrice ?? null],
     connection,
   );
   return result.insertId;
 }
 
 // Columnas editables (lista blanca). El código y el stock no se editan por esta vía.
-const EDITABLE = { name: 'name', description: 'description', unit: 'unit', minStock: 'min_stock', active: 'active' };
+const EDITABLE = {
+  name: 'name',
+  description: 'description',
+  unit: 'unit',
+  minStock: 'min_stock',
+  active: 'active',
+  category: 'category',
+  brand: 'brand',
+  purchasePrice: 'purchase_price',
+  salePrice: 'sale_price',
+};
 
 export async function update(id, fields, connection) {
   const assignments = [];

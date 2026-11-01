@@ -60,7 +60,7 @@ export async function add(orderId, { partId, quantity }, actor) {
     }
     return {
       item: presentOrderPart(await orderPartModel.findByOrderAndPart(orderId, partId, connection), actor.role),
-      part: updatedPart,
+      part: partModel.presentPart(updatedPart, actor.role),
     };
   });
 }
@@ -94,7 +94,10 @@ export async function updateQuantity(orderId, lineId, quantity, actor) {
     } else {
       updatedPart = partModel.toPart(await partModel.findById(line.partId, connection));
     }
-    return { item: presentOrderPart(await orderPartModel.findLine(orderId, lineId, connection), actor.role), part: updatedPart };
+    return {
+      item: presentOrderPart(await orderPartModel.findLine(orderId, lineId, connection), actor.role),
+      part: partModel.presentPart(updatedPart, actor.role),
+    };
   });
 }
 
@@ -116,6 +119,6 @@ export async function remove(orderId, lineId, actor) {
       actorId: actor.id,
     });
     await orderPartModel.deleteLine(lineId, connection);
-    return { deleted: true, part };
+    return { deleted: true, part: partModel.presentPart(part, actor.role) };
   });
 }
