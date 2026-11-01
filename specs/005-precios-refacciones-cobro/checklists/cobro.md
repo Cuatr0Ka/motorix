@@ -69,7 +69,7 @@
 ## No funcionales, dependencias y suposiciones
 
 - [x] CHK040 ¿Se define un requisito de tiempo de respuesta o de volumen para el cálculo del total y para los listados con el nuevo total, o se declara que no hay cambio respecto al Sprint 4? [Vacío, No funcional, Spec §FR-016]
-- [ ] CHK041 ¿Está resuelta o asignada a una persona la enmienda de la constitución que permita un sprint posterior al MVP, de la que depende la especificación? [Dependencia, Spec Suposiciones]
+- [x] CHK041 ¿Está resuelta o asignada a una persona la enmienda de la constitución que permita un sprint posterior al MVP, de la que depende la especificación? [Dependencia, Spec Suposiciones]
 - [x] CHK042 ¿Se define el entorno y los datos de Mercado Pago (modo de pruebas) con los que debe comprobarse el importe enviado y la cancelación del pago desfasado? [Dependencia, Spec §FR-011, §FR-012]
 
 ## Notas

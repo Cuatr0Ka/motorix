@@ -368,8 +368,7 @@ resuelven en `/speckit.clarify` y se marcan aquí como resueltas al registrarse 
 ## Suposiciones
 
 - Este sprint es posterior al MVP. La constitución (principio I) fija los sprints 1 a 4 y exige aprobación del
-  equipo para agregar alcance; la implementación espera a que esa aprobación y la enmienda de la constitución
-  estén registradas (tarea T002).
+  equipo para agregar alcance; la enmienda 1.1.0 de la constitución (2026-10-31, tarea T002) lo permite.
 - Que el precio de compra solo lo vea el administrador es una regla de este sprint (FR-013) que no sale del
   contexto maestro; se mantiene salvo que el equipo decida otra cosa.
 - Todos los importes están en pesos mexicanos (MXN) con dos decimales, igual que en el Sprint 4 y en el envío a

@@ -61,7 +61,7 @@ llaman al proveedor; cumplimiento de `docs/design-system.md`
 
 | Principio | Evaluación | Cómo se cumple |
 |-----------|------------|----------------|
-| I. Alcance, MVP y fuente de verdad | REQUIERE ENMIENDA ANTES DE IMPLEMENTAR | El principio fija los sprints 1 a 4 y exige aprobación para agregar alcance. Este sprint es posterior al MVP: la implementación no empieza hasta que el director y el equipo aprueben la enmienda de la constitución (tarea T002, hallazgo H-01 del aseguramiento); la documentación y el diseño pueden avanzar. Se leyó `docs/project-context.md` (secciones 6.7, 6.8, 6.10 y 13) y el insumo del sprint. Se actualizará la documentación para que código y planeación no se contradigan (FR-018) |
+| I. Alcance, MVP y fuente de verdad | PASA | El principio fija los sprints 1 a 4 y exige aprobación para agregar alcance. Este sprint es posterior al MVP: lo permite la enmienda 1.1.0 de la constitución (2026-10-31, tarea T002, hallazgo H-01 resuelto), que exige insumo en `docs/sprints/`, aprobación registrada y el flujo de Spec Kit. Se leyó `docs/project-context.md` (secciones 6.7, 6.8, 6.10 y 13) y el insumo del sprint. Se actualizará la documentación para que código y planeación no se contradigan (FR-018) |
 | II. Arquitectura separada | PASA | `client/`, `server/`, `database/`; la lógica vive en `services/` y en el módulo puro `orderTotals`; la integración con Mercado Pago no cambia |
 | III. Stack y base local | PASA | Mismo stack; migración numerada nueva y aditiva; InnoDB, llaves foráneas, `utf8mb4`; seeds idempotentes con datos suficientes. Sin dependencias nuevas |
 | IV. Seguridad | PASA | Rutas con `authenticate` + `authorize`; validación `zod`; el precio de compra solo se selecciona en las rutas de refacciones del administrador; las líneas de la orden se proyectan por rol en el servicio; ningún dato de tarjeta |
@@ -70,7 +70,7 @@ llaman al proveedor; cumplimiento de `docs/design-system.md`
 | VII. Pruebas | PASA | Pruebas unitarias del total y de los precios, integración y contrato contra `motorix_test`, concurrencia (pago contra cambios de refacciones, precio contra alta de línea), regresión de los sprints 1 a 4 y `flutter test`; flujo de extremo a extremo en [quickstart.md](./quickstart.md) |
 | VIII. UX/UI | PASA | Material 3 con el tema propio y tokens; confirmación al guardar un precio de venta menor al de compra y al cancelar un pago desfasado; estados vacío, cargando y error; chip «Sin precio de venta» con la convención de color ámbar |
 
-**Reevaluación tras la Fase 1**: REQUIERE ENMIENDA ANTES DE IMPLEMENTAR (misma puerta del principio I, T002). El diseño no agrega
+**Reevaluación tras la Fase 1**: PASA (la enmienda 1.1.0 habilita el sprint). El diseño no agrega
 dependencias, tablas ni capas nuevas.
 
 ## Estructura del proyecto
@@ -156,4 +156,4 @@ nuevas; el único archivo nuevo de lógica es el módulo puro `server/services/o
 
 | Violación | Por qué se necesita | Alternativa más simple descartada porque |
 |-----------|--------------------|------------------------------------------|
-| Principio I: sprint posterior al MVP | Corrige una deuda declarada del MVP (el cobro no incluye refacciones) | Posponerlo deja un cobro incompleto; se resuelve con la enmienda de la constitución (H-01), que es una puerta previa a la implementación (T002) |
+| Principio I: sprint posterior al MVP | Corrige una deuda declarada del MVP (el cobro no incluye refacciones) | Posponerlo deja un cobro incompleto; se resolvió con la enmienda 1.1.0 de la constitución (H-01, T002), aprobada el 2026-10-31 |

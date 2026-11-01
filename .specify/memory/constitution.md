@@ -9,6 +9,14 @@ Reporte de Impacto de la Sincronización
   seeds del Principio III se mueve al final de la lista (sin cambio de contenido).
 - Pendientes (TODO): ratificación por el equipo (`TODO(RATIFICATION_DATE)`); decisiones
   listadas en "Decisiones Pendientes".
+
+Enmienda 1.1.0 (2026-10-31)
+- Cambio de versión: 1.0.0 → 1.1.0 (MINOR: se amplía el principio I sin eliminarlo ni redefinirlo)
+- Principio modificado: I. Alcance, MVP y Fuente de Verdad (se permiten sprints posteriores al MVP
+  con insumo, aprobación registrada y flujo de Spec Kit)
+- Secciones añadidas: "Decisiones resueltas durante el Sprint 5"
+- Plantillas revisadas: `plan-template.md`, `spec-template.md` y `tasks-template.md` no requieren cambios
+- Pendiente (TODO): ratificación formal por el equipo (`TODO(RATIFICATION_DATE)`)
 -->
 
 # Constitución de Motorix
@@ -26,8 +34,13 @@ desarrollarlo, tanto por el equipo como por el agente de IA.
 - El agente DEBE leer `docs/project-context.md` antes de implementar cualquier sprint.
 - NO se permite agregar funcionalidades fuera del alcance sin indicarlo y obtener
   aprobación del equipo.
-- El desarrollo DEBE seguir los sprints en orden (1 → 4); NO se implementa todo el
+- El desarrollo DEBE seguir los sprints en orden (1 → 4 para el MVP); NO se implementa todo el
   sistema de una sola vez. No iniciar por Mercado Pago, dashboard o tickets.
+- Los sprints posteriores al MVP (del 5 en adelante) se permiten una vez cerrados los sprints
+  1 a 4. Cada uno DEBE tener su insumo en `docs/sprints/`, la aprobación registrada del
+  responsable del proyecto y seguir el flujo de Spec Kit (especificar, aclarar, planear, generar
+  tareas, analizar e implementar) con su documento de aseguramiento de la calidad. Se siguen en
+  el orden de `docs/sprints/propuesta-sprints-post-mvp.md`.
 - El chatbot de WhatsApp está FUERA del MVP; solo puede tratarse como integración
   externa futura.
 - DEBE mantenerse la trazabilidad: requisito de alto nivel → historia de usuario →
@@ -228,6 +241,14 @@ asumirlas como definitivas:
   `models`, `services`, `controllers`, `routes`, `middlewares`, `validators`, `utils`)
   viven directamente en `server/`.
 
+### Decisiones resueltas durante el Sprint 5
+
+- **Sprints posteriores al MVP**: se permiten a partir del Sprint 5 con insumo en
+  `docs/sprints/`, aprobación registrada del responsable del proyecto y el flujo completo de
+  Spec Kit. Enmienda MINOR aprobada el 2026-10-31 por el responsable del proyecto (autoridad
+  declarada por quien lo lleva, por tratarse de un proyecto escolar) para habilitar el Sprint 5:
+  precios de refacciones y cobro completo.
+
 ## Gobernanza
 
 - Esta constitución tiene prioridad sobre cualquier otra práctica o convención del repo.
@@ -239,4 +260,4 @@ asumirlas como definitivas:
 - El cumplimiento se revisa en cada contribución; cualquier desviación DEBE justificarse
   explícitamente o descartarse.
 
-**Versión**: 1.0.0 | **Redactada**: 2026-10-01 | **Ratificación**: TODO(RATIFICATION_DATE): pendiente de aprobación del equipo | **Última enmienda**: 2026-10-10
+**Versión**: 1.1.0 | **Redactada**: 2026-10-01 | **Ratificación**: TODO(RATIFICATION_DATE): pendiente de aprobación del equipo | **Última enmienda**: 2026-10-31
