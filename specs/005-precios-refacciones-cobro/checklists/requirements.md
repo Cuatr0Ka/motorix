@@ -33,7 +33,8 @@
 
 - **Actualizado el 2026-10-31**: tras tres rondas de `/speckit.clarify` se resolvieron las 10 decisiones (D-01
   a D-10), además del posible doble cobro; no quedan marcadores ni decisiones abiertas.
+- **Revalidada el 2026-10-31** tras la revisión de `checklists/cobro.md`: se añadieron FR-026 y FR-027 y los
+  escenarios de aceptación que los cubren (historias 2, 3 y 4); se retiraron del texto las referencias al
+  servidor. Sigue en 12/12.
 - El principio I de la constitución fija los sprints 1 a 4; el Sprint 5 es posterior al MVP y requiere
-  aprobación del equipo y enmienda de la constitución (queda registrado en las suposiciones).
-- Los escenarios con decisiones abiertas dependen de su resolución para poder probarse; se cierran en
-  `/speckit.clarify`.
+  aprobación del equipo y enmienda de la constitución (hallazgo H-01 del documento de aseguramiento, abierto).

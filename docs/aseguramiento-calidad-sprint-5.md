@@ -50,7 +50,7 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 | G-01 | Insumo del sprint revisado | Lectura contra el código y el contexto maestro | Sin contradicciones con `project-context.md`; decisiones abiertas listadas | Pendiente | | |
 | G-02 | Especificación (`/speckit.specify`) | `specs/005-*/spec.md` | Historias en formato "Como... quiero... para..." y escenarios Dado / Cuando / Entonces | Aprobado con observación | 2026-10-31 | `specs/005-precios-refacciones-cobro/spec.md` y su lista de calidad. Observación: la primera versión tenía 3 marcadores de aclaración, que se resolvieron en G-03 |
 | G-03 | Aclaraciones (`/speckit.clarify`) | Sección 4 de este documento | Cero marcadores `[NEEDS CLARIFICATION]` y 10 decisiones registradas | Aprobado | 2026-10-31 | Las 10 decisiones resueltas en tres rondas de clarify (sección 4) y sin marcadores en la especificación. Además se resolvió el posible doble cobro de piezas capturadas como servicio (FR-023) |
-| G-04 | Lista de calidad de requisitos (`/speckit.checklist`) | `specs/005-*/checklists/` | Requisitos completos, medibles, sin ambigüedad ni contradicción | Pendiente | | |
+| G-04 | Lista de calidad de requisitos (`/speckit.checklist`) | `specs/005-*/checklists/` | Requisitos completos, medibles, sin ambigüedad ni contradicción | En curso | 2026-10-31 | `specs/005-precios-refacciones-cobro/checklists/cobro.md`: 41 de 42 puntos revisados y resueltos con cambios en `spec.md` (H-02); queda CHK041, la enmienda de la constitución (H-01) |
 | G-05 | Plan (`/speckit.plan`) | `plan.md`, `data-model.md`, `contracts/` | Cumple la constitución; migración `005` aditiva; contratos de API definidos | Pendiente | | |
 | G-06 | Tareas (`/speckit.tasks`) | `tasks.md` | Tareas ordenadas, con las pruebas antes del código y cobertura de cada historia | Pendiente | | |
 | G-07 | Consistencia (`/speckit.analyze`) | Informe del análisis | Sin hallazgos críticos ni altos; todo requisito con tarea y toda tarea con requisito | Pendiente | | |
@@ -93,20 +93,20 @@ Se llena después de `/speckit.tasks` y se actualiza durante la implementación.
 
 | CA | Criterio de aceptación (resumen) | Requisito (FR) | Tarea | Prueba | Resultado | Evidencia |
 |:--:|---|---|---|---|---|---|
-| CA-1 | Refacción con categoría, marca y precios persistidos | | | | Pendiente | |
-| CA-2 | Validación de precios (negativos, no numéricos, decimales, límites) | | | | Pendiente | |
-| CA-3 | El precio vigente se guarda al agregar la refacción a una orden | | | | Pendiente | |
-| CA-4 | Total = servicios + mano de obra + refacciones, en centavos | | | | Pendiente | |
-| CA-5 | El pago se registra por el nuevo total; importe distinto se rechaza | | | | Pendiente | |
-| CA-6 | Pagos y tickets anteriores conservan importe y contenido | | | | Pendiente | |
-| CA-7 | El ticket nuevo detalla las refacciones, subtotal y total | | | | Pendiente | |
-| CA-8 | Un solo pago vigente, incluso con solicitudes simultáneas; sin datos de tarjeta | | | | Pendiente | |
-| CA-9 | Mercado Pago recibe el importe correcto; pago pendiente desfasado resuelto | | | | Pendiente | |
-| CA-10 | El precio de compra solo lo ve el administrador | | | | Pendiente | |
-| CA-11 | Dashboard y listados funcionan con el nuevo total | | | | Pendiente | |
-| CA-12 | Seeds con precios y una orden cobrable con refacciones, idempotentes | | | | Pendiente | |
-| CA-13 | Pruebas de total, instantáneas, redondeo, permisos, concurrencia y compatibilidad | | | | Pendiente | |
-| CA-14 | Documentación del proyecto actualizada | | | | Pendiente | |
+| CA-1 | Refacción con categoría, marca y precios persistidos | FR-001, FR-025 | | | Pendiente | |
+| CA-2 | Validación de precios (negativos, no numéricos, decimales, límites) | FR-002 | | | Pendiente | |
+| CA-3 | El precio vigente se guarda al agregar la refacción a una orden | FR-004, FR-024 | | | Pendiente | |
+| CA-4 | Total = servicios + mano de obra + refacciones, en centavos | FR-005, FR-022 | | | Pendiente | |
+| CA-5 | El pago se registra por el nuevo total; importe distinto se rechaza | FR-006, FR-021 | | | Pendiente | |
+| CA-6 | Pagos y tickets anteriores conservan importe y contenido | FR-008, FR-009, FR-015 | | | Pendiente | |
+| CA-7 | El ticket nuevo detalla las refacciones, subtotal y total | FR-007 | | | Pendiente | |
+| CA-8 | Un solo pago vigente, incluso con solicitudes simultáneas; sin datos de tarjeta | FR-010, FR-026 | | | Pendiente | |
+| CA-9 | Mercado Pago recibe el importe correcto; pago pendiente desfasado resuelto | FR-011, FR-012, FR-027 | | | Pendiente | |
+| CA-10 | El precio de compra solo lo ve el administrador | FR-013, FR-014 | | | Pendiente | |
+| CA-11 | Dashboard y listados funcionan con el nuevo total | FR-016 | | | Pendiente | |
+| CA-12 | Seeds con precios y una orden cobrable con refacciones, idempotentes | FR-017 | | | Pendiente | |
+| CA-13 | Pruebas de total, instantáneas, redondeo, permisos, concurrencia y compatibilidad | FR-019 y todos los demás | | | Pendiente | |
+| CA-14 | Documentación del proyecto actualizada | FR-018 | | | Pendiente | |
 
 ## 7. Hallazgos y defectos
 
@@ -114,7 +114,9 @@ Se registra todo lo que se encuentre, sea en los documentos, en el análisis o e
 
 | ID | Descripción | Severidad (crítica, alta, media, baja) | Origen (puerta o prueba) | Estado | Resolución | Evidencia |
 |:--:|---|---|---|---|---|---|
-| H-01 | | | | | | |
+| H-01 | La constitución (principio I) fija los sprints 1 a 4; el Sprint 5 es posterior al MVP y requiere aprobación del equipo y una enmienda. Es la dependencia del punto CHK041 de la lista `cobro.md` | Media | G-04 (`cobro.md`, CHK041) | Abierto | Pendiente de que el director del proyecto y el equipo aprueben la enmienda, según la sección Gobernanza de la constitución | `.specify/memory/constitution.md` |
+| H-02 | La revisión de la lista `cobro.md` revisó 41 de 42 puntos y encontró huecos y ambigüedades en la mayoría (momento del total vigente, cambios de refacciones en una orden ya pagada, aprobación tardía de Mercado Pago, precio 0 frente a «sin precio», línea existente al agregar de nuevo una refacción, entre otros) | Media | G-04 (`cobro.md`) | Resuelto | Se corrigió `spec.md`: FR-006, FR-007, FR-010, FR-012, FR-013, FR-016, FR-019, FR-020, FR-022, FR-024 y los nuevos FR-026 y FR-027, además de las suposiciones y los criterios de éxito | `specs/005-precios-refacciones-cobro/checklists/cobro.md` |
+| H-03 | FR-021 cambia la regla de «nada que cobrar» del Sprint 4: las pruebas actuales que esperan el rechazo de una orden sin servicios ni mano de obra deberán actualizarse (SC-007) | Baja | G-04 (`cobro.md`, CHK024) | Abierto | Se registrará cada prueba actualizada al implementar; el resto de la línea base debe seguir pasando | |
 
 ## 8. Línea base de regresión
 
