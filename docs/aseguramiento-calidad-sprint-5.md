@@ -10,7 +10,7 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 |---|---|
 | Sprint | 5 - Precios de refacciones y cobro completo |
 | Insumo | `docs/sprints/sprint-5-precios-refacciones-cobro.md` |
-| Rama | (por definir al ejecutar `/speckit.specify`) |
+| Rama | `005-precios-refacciones-cobro` |
 | Responsable | |
 | Fecha de inicio | |
 | Fecha de cierre | |
@@ -48,8 +48,8 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 | ID | Puerta | Cómo se verifica | Criterio de paso | Estado | Fecha | Evidencia |
 |:--:|---|---|---|---|---|---|
 | G-01 | Insumo del sprint revisado | Lectura contra el código y el contexto maestro | Sin contradicciones con `project-context.md`; decisiones abiertas listadas | Pendiente | | |
-| G-02 | Especificación (`/speckit.specify`) | `specs/005-*/spec.md` | Historias en formato "Como... quiero... para..." y escenarios Dado / Cuando / Entonces | Pendiente | | |
-| G-03 | Aclaraciones (`/speckit.clarify`) | Sección 4 de este documento | Cero marcadores `[NEEDS CLARIFICATION]` y 10 decisiones registradas | Pendiente | | |
+| G-02 | Especificación (`/speckit.specify`) | `specs/005-*/spec.md` | Historias en formato "Como... quiero... para..." y escenarios Dado / Cuando / Entonces | Aprobado con observación | 2026-10-31 | `specs/005-precios-refacciones-cobro/spec.md` y su lista de calidad. Observación: la primera versión tenía 3 marcadores de aclaración, que se resolvieron en G-03 |
+| G-03 | Aclaraciones (`/speckit.clarify`) | Sección 4 de este documento | Cero marcadores `[NEEDS CLARIFICATION]` y 10 decisiones registradas | Aprobado | 2026-10-31 | Las 10 decisiones resueltas en tres rondas de clarify (sección 4) y sin marcadores en la especificación. Además se resolvió el posible doble cobro de piezas capturadas como servicio (FR-023) |
 | G-04 | Lista de calidad de requisitos (`/speckit.checklist`) | `specs/005-*/checklists/` | Requisitos completos, medibles, sin ambigüedad ni contradicción | Pendiente | | |
 | G-05 | Plan (`/speckit.plan`) | `plan.md`, `data-model.md`, `contracts/` | Cumple la constitución; migración `005` aditiva; contratos de API definidos | Pendiente | | |
 | G-06 | Tareas (`/speckit.tasks`) | `tasks.md` | Tareas ordenadas, con las pruebas antes del código y cobertura de cada historia | Pendiente | | |
@@ -62,16 +62,16 @@ Las 10 decisiones pendientes de la sección 9 del insumo del sprint. No se asume
 
 | ID | Decisión pendiente | Resolución | Decidió | Fecha | Requisito afectado |
 |:--:|---|---|---|---|---|
-| D-01 | Refacciones existentes y líneas ya registradas sin precio: ¿se asigna 0, se exige capturar el precio o se bloquea agregarlas a una orden? | | | | |
-| D-02 | Orden con solo refacciones: hoy se rechaza con `NOTHING_TO_CHARGE`. ¿Pasa a ser cobrable? | | | | |
-| D-03 | Órdenes abiertas al desplegar: ¿qué precio toman sus refacciones ya agregadas? | | | | |
-| D-04 | Pago de Mercado Pago pendiente cuando cambia el total: ¿se cancela, se actualiza o se marca como desfasado? | | | | |
-| D-05 | Corrección del precio de una línea de una orden abierta: ¿se permite y con qué permiso o motivo? | | | | |
-| D-06 | Categoría: ¿lista cerrada administrable o texto libre? Marca: ¿texto libre? | | | | |
-| D-07 | Precio de venta menor al de compra: ¿se permite, se advierte o se rechaza? | | | | |
-| D-08 | Redondeo del importe de una línea y límites máximos de precio y de total. | | | | |
-| D-09 | Cómo se muestran los tickets anteriores (sin precio de refacciones) junto a los nuevos. | | | | |
-| D-10 | Visibilidad del precio de venta para el mecánico. | | | | |
+| D-01 | Refacciones existentes y líneas ya registradas sin precio: ¿se asigna 0, se exige capturar el precio o se bloquea agregarlas a una orden? | Se bloquea agregar a una orden una refacción sin precio de venta hasta que el administrador lo capture | Equipo (clarify) | 2026-10-31 | FR-015, FR-020 |
+| D-02 | Orden con solo refacciones: hoy se rechaza con `NOTHING_TO_CHARGE`. ¿Pasa a ser cobrable? | Sí: es cobrable si su total con refacciones es mayor a cero | Equipo (clarify) | 2026-10-31 | FR-021 |
+| D-03 | Órdenes abiertas al desplegar: ¿qué precio toman sus refacciones ya agregadas? | Cuentan con precio 0 y no suman al total; solo suman las líneas nuevas | Equipo (clarify) | 2026-10-31 | FR-015 |
+| D-04 | Pago de Mercado Pago pendiente cuando cambia el total: ¿se cancela, se actualiza o se marca como desfasado? | Se señala como desfasado y la recepción lo cancela con confirmación para generar uno nuevo; no es automático | Equipo (clarify) | 2026-10-31 | FR-012 |
+| D-05 | Corrección del precio de una línea de una orden abierta: ¿se permite y con qué permiso o motivo? | El precio de una línea no se edita; se quita la línea y se vuelve a agregar con el precio vigente | Equipo (clarify) | 2026-10-31 | FR-024 |
+| D-06 | Categoría: ¿lista cerrada administrable o texto libre? Marca: ¿texto libre? | Ambas son texto libre de hasta 60 caracteres, sin catálogo | Equipo (clarify) | 2026-10-31 | FR-001 |
+| D-07 | Precio de venta menor al de compra: ¿se permite, se advierte o se rechaza? | Se permite, con aviso y confirmación antes de guardar | Equipo (clarify) | 2026-10-31 | FR-025 |
+| D-08 | Redondeo del importe de una línea y límites máximos de precio y de total. | Precio y total de la orden hasta 9 999 999.99; el redondeo no aplica (cantidad entera por precio de dos decimales) | Equipo (clarify) | 2026-10-31 | FR-002, FR-022 |
+| D-09 | Cómo se muestran los tickets anteriores (sin precio de refacciones) junto a los nuevos. | Los anteriores se muestran e imprimen como se emitieron; solo los nuevos llevan precio e importe | Equipo (clarify) | 2026-10-31 | FR-008 |
+| D-10 | Visibilidad del precio de venta para el mecánico. | No ve ningún precio; conserva la vista reducida actual | Equipo (clarify) | 2026-10-31 | FR-014 |
 
 ## 5. Riesgos y mitigaciones
 
