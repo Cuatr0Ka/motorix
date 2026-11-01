@@ -1,4 +1,4 @@
-# Aseguramiento de la calidad - Sprint 5: Precios de refacciones y cobro completo
+`dashboard.listings.regression.test.js` | Mitigado |Revisión de `project-context.md` y `design-system.md` (CA-14) | Mitigado |`billing.parts.test.js`, `paymentRules.test.js` | Mitigado |`orderTotals.test.js`, `partPrices.test.js` | Mitigado |`prices.leak.test.js`, `orders.mechanicView.test.js` | Mitigado |`billing.parts.test.js` | Mitigado |`payments.paidOrder.test.js` y las pruebas de concurrencia de pagos | Mitigado |`emitted.compat.test.js`, `tickets.v2.test.js` | Mitigado |`orderParts.prices.test.js`, `emitted.compat.test.js` | Mitigado |# Aseguramiento de la calidad - Sprint 5: Precios de refacciones y cobro completo
 
 Este documento es el registro de calidad del Sprint 5. Se llena durante la preparación, antes de ejecutar `/speckit.implement`, y se completa al cierre del sprint. Al terminar se pasa a Word.
 
@@ -11,10 +11,10 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 | Sprint | 5 - Precios de refacciones y cobro completo |
 | Insumo | `docs/sprints/sprint-5-precios-refacciones-cobro.md` |
 | Rama | `005-precios-refacciones-cobro` |
-| Responsable | |
-| Fecha de inicio | |
-| Fecha de cierre | |
-| Estado general | Pendiente |
+| Responsable | Autoridad del proyecto (Cuatr0Ka) |
+| Fecha de inicio | 2026-10-31 |
+| Fecha de cierre | 2026-11-01 |
+| Estado general | Aprobado |
 
 ## 1. Objetivo y alcance
 
@@ -41,8 +41,8 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 - [x] Los 14 criterios de aceptación están Aprobados.
 - [x] Todas las pruebas de los sprints 1 a 4 siguen pasando.
 - [x] No hay defectos críticos ni altos abiertos (sección 7).
-- [ ] La matriz de calidad final (sección 9) está completa, con evidencia.
-- [ ] Reporte, análisis y matriz no se contradicen.
+- [x] La matriz de calidad final (sección 9) está completa, con evidencia.
+- [x] Reporte, análisis y matriz no se contradicen.
 
 ## 3. Puertas de calidad
 
@@ -155,11 +155,11 @@ Se llena al cerrar el sprint, con el mismo formato de la matriz de calidad del M
 
 | Campo | Valor |
 |---|---|
-| Criterios de salida cumplidos | 3 de 5: los 14 criterios de aceptación, la regresión de los sprints 1 a 4 y sin defectos críticos ni altos. Faltan la matriz con sus capturas y la revisión final de que reporte, análisis y matriz no se contradicen |
+| Criterios de salida cumplidos | 5 de 5: los 14 criterios de aceptación, la regresión de los sprints 1 a 4, sin defectos críticos ni altos, la matriz con sus capturas y la revisión final sin contradicciones |
 | Defectos abiertos | Ninguno crítico, alto ni medio. H-08 (pruebas del cliente escritas junto con el código) está aceptado |
-| Observaciones | Pendientes de hacer a mano: las capturas de la aplicación (E-01 a E-06) y el cronometraje de SC-001 y SC-008 con la interfaz (T060). La comprobación por API de los 10 escenarios está en E-07 |
-| Aprobado por | Pendiente |
-| Fecha | Pendiente |
+| Observaciones | Cronometraje con la interfaz (T060, entorno de demostración): SC-001 en 50 s (meta: menos de 2 min) y SC-008 en 73 s (meta: menos de 3 min), ambos cumplidos. Las capturas E-01 a E-06 están enlazadas; la comprobación por API de los 10 escenarios está en E-07. RF-05 cierra con la observación del hueco heredado del Sprint 4 |
+| Aprobado por | Autoridad del proyecto (Cuatr0Ka) |
+| Fecha | 2026-11-01 |
 
 # Anexo de evidencias
 
@@ -218,7 +218,11 @@ Comando: `npm test -- tests/integration/orderParts.prices.test.js tests/integrat
 
 Pasaron las 25 pruebas de las 2 suites.
 
-Captura pendiente: `docs/evidencias/sprint-5/captura-instantanea-precio.png`.
+Línea nueva con el precio vigente tras el cambio del inventario (FIL-ACE a $999.00 en OS-000003):
+
+![Línea nueva con el precio actualizado](evidencias/sprint-5/captura-instantanea-precio.png)
+
+La línea ya existente conserva su precio original ($140.00, OS-000015); ver la captura de E-02.
 
 Resultado: **Aprobado** (25 de 25 casos).
 
@@ -249,7 +253,7 @@ Comando: `npm test -- tests/integration/payments.paidOrder.test.js`
 
 Pasaron las 8 pruebas. En el recorrido contra la API real (E-07), el escenario 7 obtuvo `409 ORDER_ALREADY_PAID` al agregar y al quitar.
 
-Captura pendiente: `docs/evidencias/sprint-5/captura-orden-pagada.png`.
+![Orden pagada con refacciones bloqueadas](evidencias/sprint-5/captura-orden-pagada.png)
 
 Resultado: **Aprobado** (8 de 8 casos).
 
@@ -285,7 +289,7 @@ Comando: `npm test -- tests/integration/billing.parts.test.js`
 
 Pasaron las 18 pruebas de la suite. En el recorrido contra la API real (E-07), el escenario 8 mostró el total 2745.00 contra un pago pendiente de 2570.00, `outdated: true` y la cancelación con confirmación.
 
-Captura pendiente: `docs/evidencias/sprint-5/captura-pago-desfasado.png`.
+![Pago pendiente desfasado](evidencias/sprint-5/captura-pago-desfasado.png)
 
 Resultado: **Aprobado** (18 de 18 casos).
 
@@ -311,7 +315,7 @@ Comando: `npm test -- tests/integration/prices.leak.test.js tests/integration/or
 
 Pasaron las 23 pruebas de las 2 suites. En el recorrido contra la API real (E-07), el escenario 10 confirmó que el mecánico recibe el detalle sin precios y `403` en los pagos de la orden.
 
-Captura pendiente: `docs/evidencias/sprint-5/captura-fuga-de-precios.png`.
+![Mecánico sin precios de refacciones](evidencias/sprint-5/captura-fuga-de-precios.png)
 
 Resultado: **Aprobado** (23 de 23 casos).
 
@@ -344,7 +348,9 @@ Pasaron las 15 pruebas de las 2 suites. En el recorrido contra la API real (E-07
 
 Observación: el total del ticket es el importe del pago registrado. Si los servicios o la mano de obra cambian después del pago (hueco del Sprint 4 que este sprint no cierra), los subtotales reflejan las líneas actuales y pueden no sumar ese total. Una prueba fija ese comportamiento y queda documentado en las suposiciones de la especificación.
 
-Captura pendiente: `docs/evidencias/sprint-5/captura-ticket-anterior-y-nuevo.png`.
+![Ticket nuevo (versión 2)](evidencias/sprint-5/captura-ticket-nuevo.png)
+
+![Ticket anterior (sin cambios)](evidencias/sprint-5/captura-ticket-anterior.png)
 
 Resultado: **Aprobado con observación** (15 de 15 casos).
 
@@ -356,7 +362,7 @@ Comando: `npm test` en `server/`
 
 Pasaron las 80 suites y las 1215 pruebas; no hubo fallos. La línea base era de 67 suites y 1003 pruebas: hay 13 suites y 212 pruebas más. De la línea base se actualizaron las aserciones de 11 pruebas (H-04 y H-05) y se reemplazó 1 (H-07).
 
-Captura pendiente: `docs/evidencias/sprint-5/captura-regresion-backend.png`.
+![Regresión del backend](evidencias/sprint-5/captura-regresion-backend.png)
 
 Resultado: **Aprobado** (1215 de 1215 pruebas).
 
@@ -368,7 +374,7 @@ Comando: `flutter test` en `client/`
 
 Pasaron las 321 pruebas; no hubo fallos. La línea base era de 277: hay 44 más. `flutter analyze lib` no reporta problemas.
 
-Captura pendiente: `docs/evidencias/sprint-5/captura-regresion-frontend.png`.
+![Regresión del frontend](evidencias/sprint-5/captura-regresion-frontend.png)
 
 Resultado: **Aprobado** (321 de 321 pruebas).
 
