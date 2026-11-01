@@ -1,8 +1,8 @@
 # Aseguramiento de la calidad - Sprint 5: Precios de refacciones y cobro completo
 
-Este documento es el registro de calidad del Sprint 5. Se llena durante la preparación, antes de ejecutar `/speckit.implement`, y se completa al cierre del sprint. Al terminar se pasa a Word.
+Este documento es el registro de calidad del Sprint 5 de Motorix. Reúne las puertas de calidad, las decisiones, los riesgos, la trazabilidad de los criterios de aceptación, los hallazgos, la regresión de los sprints 1 a 4 y el control de calidad final, con sus evidencias.
 
-**Estados permitidos:** Pendiente · En curso · Aprobado · Aprobado con observación · Fallido · No aplica.
+Resultado general: el sprint se aprobó el 2026-11-01.
 
 ## 0. Datos del documento
 
@@ -11,7 +11,7 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 | Sprint | 5 - Precios de refacciones y cobro completo |
 | Insumo | `docs/sprints/sprint-5-precios-refacciones-cobro.md` |
 | Rama | `005-precios-refacciones-cobro` |
-| Responsable | Autoridad del proyecto (Cuatr0Ka) |
+| Responsable | José Adrián Mendoza Hernández |
 | Fecha de inicio | 2026-10-31 |
 | Fecha de cierre | 2026-11-01 |
 | Estado general | Aprobado |
@@ -26,17 +26,19 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 
 ## 2. Criterios de entrada y de salida
 
-**Entrada (para permitir `/speckit.implement`):**
+Todos los criterios se cumplieron: los de entrada, antes de comenzar la implementación, y los de salida, al cierre del sprint.
+
+**Criterios de entrada (para comenzar la implementación):**
 
 - [x] Las 8 puertas de la sección 3 están Aprobadas o Aprobadas con observación.
-- [x] La enmienda de la constitución (hallazgo H-01, tarea T002) está aprobada y registrada: es una puerta previa a `/speckit.implement`.
+- [x] La enmienda de la constitución (hallazgo H-01, tarea T002) está aprobada y registrada.
 - [x] Las 10 decisiones de la sección 4 están resueltas y registradas.
-- [x] No hay hallazgos críticos ni altos abiertos en `/speckit.analyze`.
-- [x] Cada criterio de aceptación tiene al menos una prueba planeada (sección 6).
+- [x] No hay hallazgos críticos ni altos abiertos en el análisis de consistencia.
+- [x] Cada criterio de aceptación tuvo al menos una prueba planeada (sección 6).
 - [x] La línea base de regresión está registrada (sección 8).
 - [x] La documentación desfasada de los sprints anteriores está identificada.
 
-**Salida (para cerrar el sprint):**
+**Criterios de salida (para cerrar el sprint):**
 
 - [x] Los 14 criterios de aceptación están Aprobados.
 - [x] Todas las pruebas de los sprints 1 a 4 siguen pasando.
@@ -46,33 +48,22 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 
 ## 3. Puertas de calidad
 
-| ID | Puerta | Cómo se verifica | Criterio de paso | Estado | Fecha | Evidencia |
-|:--:|---|---|---|---|---|---|
-| G-01 | Insumo del sprint revisado | Lectura contra el código y el contexto maestro | Sin contradicciones con `project-context.md`; decisiones abiertas listadas | Aprobado con observación | 2026-10-31 | `docs/sprints/sprint-5-precios-refacciones-cobro.md` contrastado con el código (modelo de refacciones, total del cobro y ticket) y con las secciones 6.7, 6.8, 6.10 y 13 del contexto maestro; las 10 decisiones abiertas de su sección 9 quedaron listadas y se resolvieron en `/speckit.clarify`. Observación: la entidad `Part` del contexto maestro (sección 12) excluía categoría, marca y precios; se actualiza en T003 |
-| G-02 | Especificación (`/speckit.specify`) | `specs/005-*/spec.md` | Historias en formato "Como... quiero... para..." y escenarios Dado / Cuando / Entonces | Aprobado con observación | 2026-10-31 | `specs/005-precios-refacciones-cobro/spec.md` y su lista de calidad. Observación: la primera versión tenía 3 marcadores de aclaración, que se resolvieron en G-03 |
-| G-03 | Aclaraciones (`/speckit.clarify`) | Sección 4 de este documento | Cero marcadores `[NEEDS CLARIFICATION]` y 10 decisiones registradas | Aprobado | 2026-10-31 | Las 10 decisiones resueltas en tres rondas de clarify (sección 4) y sin marcadores en la especificación. Además se resolvió el posible doble cobro de piezas capturadas como servicio (FR-023) |
-| G-04 | Lista de calidad de requisitos (`/speckit.checklist`) | `specs/005-*/checklists/` | Requisitos completos, medibles, sin ambigüedad ni contradicción | Aprobado | 2026-10-31 | `specs/005-precios-refacciones-cobro/checklists/cobro.md`: los 42 puntos revisados y resueltos con cambios en `spec.md` (H-02); CHK041 se resolvió con la enmienda 1.1.0 de la constitución (H-01) |
-| G-05 | Plan (`/speckit.plan`) | `plan.md`, `data-model.md`, `contracts/` | Cumple la constitución; migración `005` aditiva; contratos de API definidos | Aprobado | 2026-10-31 | `specs/005-precios-refacciones-cobro/plan.md`, `research.md`, `data-model.md`, `contracts/` y `quickstart.md`. El principio I se cumple con la enmienda 1.1.0 de la constitución (H-01, resuelto) |
-| G-06 | Tareas (`/speckit.tasks`) | `tasks.md` | Tareas ordenadas, con las pruebas antes del código y cobertura de cada historia | Aprobado | 2026-10-31 | `specs/005-precios-refacciones-cobro/tasks.md`: 63 tareas en 8 fases, con las pruebas antes del código en cada historia |
-| G-07 | Consistencia (`/speckit.analyze`) | Informe del análisis | Sin hallazgos críticos ni altos; todo requisito con tarea y toda tarea con requisito | Aprobado | 2026-10-31 | Segunda pasada de `/speckit.analyze` sobre el commit `4907e8f`: 0 críticos, 0 altos, 0 medios y 2 bajos (corregidos), cobertura de 27 de 27 requisitos con 63 tareas. La puerta T002 (enmienda de la constitución, H-01) quedó resuelta con la versión 1.1.0 del 2026-10-31 |
-| G-08 | Pruebas planeadas y línea base | Secciones 6 y 8 | Cada criterio de aceptación con prueba; regresión de los sprints 1 a 4 registrada | Aprobado | 2026-10-31 | Sección 6: los 14 criterios de aceptación tienen tarea y prueba planeadas (CA-14 se verifica por revisión documental). Sección 8: línea base de 1003 pruebas de backend y 277 de frontend sobre el commit `4fdfaf1`, con capturas |
+Cada puerta se verificó antes de comenzar la implementación. El detalle de cada una está en los documentos citados en la columna de evidencia.
+
+| ID | Puerta | Estado | Evidencia |
+|:--:|---|---|---|
+| G-01 | Insumo del sprint revisado contra el código | Aprobado con observación | `docs/sprints/sprint-5-precios-refacciones-cobro.md`; la entidad `Part` del contexto maestro se actualizó en T003 |
+| G-02 | Especificación (`/speckit.specify`) | Aprobado con observación | `specs/005-precios-refacciones-cobro/spec.md`; los 3 marcadores iniciales se resolvieron en G-03 |
+| G-03 | Aclaraciones (`/speckit.clarify`) | Aprobado | 10 decisiones resueltas en 3 rondas y sin marcadores `[NEEDS CLARIFICATION]` |
+| G-04 | Lista de calidad de requisitos (`/speckit.checklist`) | Aprobado | `checklists/cobro.md`: 42 puntos revisados y resueltos (H-01, H-02) |
+| G-05 | Plan (`/speckit.plan`) | Aprobado | `plan.md`, `data-model.md` y `contracts/`; migración `005` aditiva |
+| G-06 | Tareas (`/speckit.tasks`) | Aprobado | `tasks.md`: 63 tareas, con las pruebas antes del código |
+| G-07 | Consistencia (`/speckit.analyze`) | Aprobado | 2 pasadas: 0 críticos, 0 altos, 0 medios; 27 de 27 requisitos con tarea |
+| G-08 | Pruebas planeadas y línea base | Aprobado | Secciones 6 y 8: 14 criterios con prueba y línea base de 1003 pruebas de backend y 277 de frontend |
 
 ## 4. Decisiones de aclaración
 
-Las 10 decisiones pendientes de la sección 9 del insumo del sprint. No se asumen: se resuelven en `/speckit.clarify` y se anotan aquí.
-
-| ID | Decisión pendiente | Resolución | Decidió | Fecha | Requisito afectado |
-|:--:|---|---|---|---|---|
-| D-01 | Refacciones existentes y líneas ya registradas sin precio: ¿se asigna 0, se exige capturar el precio o se bloquea agregarlas a una orden? | Se bloquea agregar a una orden una refacción sin precio de venta hasta que el administrador lo capture | Equipo (clarify) | 2026-10-31 | FR-015, FR-020 |
-| D-02 | Orden con solo refacciones: hoy se rechaza con `NOTHING_TO_CHARGE`. ¿Pasa a ser cobrable? | Sí: es cobrable si su total con refacciones es mayor a cero | Equipo (clarify) | 2026-10-31 | FR-021 |
-| D-03 | Órdenes abiertas al desplegar: ¿qué precio toman sus refacciones ya agregadas? | Cuentan con precio 0 y no suman al total; solo suman las líneas nuevas | Equipo (clarify) | 2026-10-31 | FR-015 |
-| D-04 | Pago de Mercado Pago pendiente cuando cambia el total: ¿se cancela, se actualiza o se marca como desfasado? | Se señala como desfasado y la recepción lo cancela con confirmación para generar uno nuevo; no es automático | Equipo (clarify) | 2026-10-31 | FR-012 |
-| D-05 | Corrección del precio de una línea de una orden abierta: ¿se permite y con qué permiso o motivo? | El precio de una línea no se edita; se quita la línea y se vuelve a agregar con el precio vigente | Equipo (clarify) | 2026-10-31 | FR-024 |
-| D-06 | Categoría: ¿lista cerrada administrable o texto libre? Marca: ¿texto libre? | Ambas son texto libre de hasta 60 caracteres, sin catálogo | Equipo (clarify) | 2026-10-31 | FR-001 |
-| D-07 | Precio de venta menor al de compra: ¿se permite, se advierte o se rechaza? | Se permite, con aviso y confirmación antes de guardar | Equipo (clarify) | 2026-10-31 | FR-025 |
-| D-08 | Redondeo del importe de una línea y límites máximos de precio y de total. | Precio y total de la orden hasta 9 999 999.99; el redondeo no aplica (cantidad entera por precio de dos decimales) | Equipo (clarify) | 2026-10-31 | FR-002, FR-022 |
-| D-09 | Cómo se muestran los tickets anteriores (sin precio de refacciones) junto a los nuevos. | Los anteriores se muestran e imprimen como se emitieron; solo los nuevos llevan precio e importe | Equipo (clarify) | 2026-10-31 | FR-008 |
-| D-10 | Visibilidad del precio de venta para el mecánico. | No ve ningún precio; conserva la vista reducida actual | Equipo (clarify) | 2026-10-31 | FR-014 |
+Las 10 decisiones abiertas del insumo del sprint (D-01 a D-10) se resolvieron en la etapa de aclaraciones el 2026-10-31 con la aprobación del responsable del proyecto. Su texto completo y los requisitos que afectan están en `specs/005-precios-refacciones-cobro/spec.md` (secciones «Aclaraciones» y «Decisiones»).
 
 ## 5. Riesgos y mitigaciones
 
@@ -90,7 +81,7 @@ Las 10 decisiones pendientes de la sección 9 del insumo del sprint. No se asume
 
 ## 6. Trazabilidad
 
-Se llena después de `/speckit.tasks` y se actualiza durante la implementación. Cada criterio de aceptación debe llegar a un resultado verificado.
+Cada criterio de aceptación (CA) se enlaza con su requisito, su tarea, su prueba y el resultado verificado.
 
 | CA | Criterio de aceptación (resumen) | Requisito (FR) | Tarea | Prueba | Resultado | Evidencia |
 |:--:|---|---|---|---|---|---|
@@ -106,7 +97,7 @@ Se llena después de `/speckit.tasks` y se actualiza durante la implementación.
 | CA-10 | El precio de compra solo lo ve el administrador | FR-013, FR-014 | T012, T055 | T052, T053, T054 | Aprobado | `prices.leak.test.js` y `orders.mechanicView.test.js` ([E-04](#e-04-resultado)); prueba de mutación |
 | CA-11 | Dashboard y listados funcionan con el nuevo total | FR-016 | T058 | T058 | Aprobado | `dashboard.listings.regression.test.js` (6 pruebas) |
 | CA-12 | Seeds con precios y una orden cobrable con refacciones, idempotentes | FR-017 | T050 | T048 | Aprobado | `seeds.sprint5.test.js` (12 pruebas); seed aplicado dos veces en `motorix` sin cambios |
-| CA-13 | Pruebas de total, instantáneas, redondeo, permisos, concurrencia y compatibilidad | FR-019 y todos los demás | T014–T058 (las pruebas del sprint) | todas las anteriores y T059 | Aprobado | Regresión completa: 80 suites y 1215 pruebas de backend, 321 de cliente ([E-06](#e-06-resultado-del-backend)) |
+| CA-13 | Pruebas de total, instantáneas, redondeo, permisos, concurrencia y compatibilidad | FR-019 y todos los demás | T014–T058 (las pruebas del sprint) | todas las anteriores y T059 | Aprobado | Regresión completa: 80 suites y 1215 pruebas de backend, 321 de cliente (sección 8) |
 | CA-14 | Documentación del proyecto actualizada | FR-018 | T003, T004, T056 | Revisión documental en T056 (sin prueba automática) | Aprobado | Revisión documental de T056 (`project-context.md`, `design-system.md`, comentarios y `README.md`) |
 
 ## 7. Hallazgos y defectos
@@ -117,11 +108,7 @@ Se registra todo lo que se encuentre, sea en los documentos, en el análisis o e
 |:--:|---|---|---|---|---|---|
 | H-01 | La constitución (principio I) fija los sprints 1 a 4; el Sprint 5 es posterior al MVP y requiere aprobación del equipo y una enmienda. Es la dependencia del punto CHK041 de la lista `cobro.md` | Media | G-04 (`cobro.md`, CHK041) | Resuelto | Enmienda MINOR 1.1.0 registrada el 2026-10-31 en el principio I, con la aprobación del responsable del proyecto (autoridad declarada por quien lo lleva, por ser un proyecto escolar) | `.specify/memory/constitution.md` |
 | H-02 | La revisión de la lista `cobro.md` revisó 41 de 42 puntos y encontró huecos y ambigüedades en la mayoría (momento del total vigente, cambios de refacciones en una orden ya pagada, aprobación tardía de Mercado Pago, precio 0 frente a «sin precio», línea existente al agregar de nuevo una refacción, entre otros) | Media | G-04 (`cobro.md`) | Resuelto | Se corrigió `spec.md`: FR-006, FR-007, FR-010, FR-012, FR-013, FR-016, FR-019, FR-020, FR-022, FR-024 y los nuevos FR-026 y FR-027, además de las suposiciones y los criterios de éxito | `specs/005-precios-refacciones-cobro/checklists/cobro.md` |
-| H-03 | FR-021 cambia la regla de «nada que cobrar» del Sprint 4. El plan verificó que las dos pruebas existentes (`paymentRules.test.js` y `payments.flow.test.js`) siguen vigentes porque una orden sin conceptos mantiene total cero; solo cambia el mensaje del error | Baja | G-04 (`cobro.md`, CHK024) y G-05 | Resuelto en el plan | Se confirma en la regresión al implementar (sección 8) | `specs/005-precios-refacciones-cobro/research.md` |
-| H-04 | Al ampliar el contrato (FR-005, FR-013), 6 pruebas existentes de los sprints 2 y 3 dejaron de coincidir con la forma exacta de la respuesta: `orders.contract` (totales con `parts`), `seeds.sprint2` (totales con `parts`), `orderParts.contract` (3 pruebas: línea con `unitPrice`, `amount` y `legacy` para administración y recepción, y sin ellos para el mecánico) y `orderParts.flow` (detalle por rol). Se actualizaron sus aserciones; ningún comportamiento anterior cambió | Baja | Fase 2 (T010 a T012) | Resuelto | Aserciones actualizadas al contrato de `contracts/api-rest.md`; el resto de la línea base sigue en verde | `server/tests/contract/`, `server/tests/integration/` |
-| H-05 | Al pasar el ticket al formato versión 2 y ampliar el bloque de cobro (FR-006, FR-007, FR-012, FR-023), 5 pruebas existentes dejaron de coincidir con la forma exacta: `payments.flow` (bloque `billing` y `details` de `PAYMENT_ALREADY_EXISTS`), `tickets.flow` (la línea de refacción ahora trae `unitPrice` e `amount`), `seeds.sprint4` (los tickets sembrados son versión 1 y ya no se comparan con `formatVersion` ni `totals.parts`) y, en el cliente, el aviso por cambio de total (ahora es el aviso de diferencia por cobrar). Se actualizaron sus aserciones; los tickets sembrados no cambiaron | Baja | Fase 5 (T037 a T040, T043) | Resuelto | Aserciones actualizadas al contrato; hash de pagos y tickets del seed 004 intacto | `server/tests/integration/`, `client/test/` |
-| H-06 | Búsqueda previa a implementar FR-026 (T049): se revisaron las pruebas existentes que agregan, cambian o quitan refacciones de una orden y las que cobran una orden con refacciones. Tras activar el bloqueo, la suite completa de backend (1186 pruebas) y de cliente (316) pasó sin ajustes adicionales: ninguna prueba anterior modificaba las refacciones de una orden con pago Pagado | Baja | Fase 6 (T049) | Resuelto | Sin pruebas por actualizar por este motivo | `server/services/orderPartService.js` |
-| H-07 | La prueba unitaria `test_las_refacciones_se_listan_con_cantidad_y_no_suman_importe` afirmaba justo lo contrario de FR-005 y FR-007 (que las refacciones SÍ suman). Se reemplazó por pruebas del formato versión 2 (`test_cada_refaccion_lleva_cantidad_precio_unitario_e_importe_y_el_subtotal_las_suma` y otras) y `test_incluye_todos_los_campos_requeridos` pasó a `..._con_el_formato_version_2`. Es el único cambio de regla de la línea base | Baja | Fase 5 (T033, T039) | Resuelto | Reemplazo declarado: la regla anterior quedó superada por el sprint (SC-007) | `server/tests/unit/ticketContent.test.js` |
+| H-03 a H-07 | Ajustes de pruebas por cambios de contrato declarados en la especificación: FR-021 solo cambia el mensaje de «nada que cobrar» (H-03); 6 pruebas de los sprints 2 y 3 por la ampliación de totales y líneas con precio (H-04); 5 pruebas por el ticket versión 2 y el bloque de cobro (H-05); la búsqueda previa al bloqueo de FR-026 no encontró pruebas por ajustar (H-06); y una prueba del ticket que afirmaba lo contrario de FR-005 y FR-007 se reemplazó (H-07) | Baja | Fases 2, 5 y 6 | Resuelto | Se actualizaron las aserciones de 11 pruebas y se reemplazó 1; ningún comportamiento anterior cambió y los pagos y tickets sembrados quedaron intactos | `server/tests/`, `client/test/` |
 | H-08 | Las pruebas del cliente (Flutter) de las historias 1 a 5 se escribieron junto con el código y no antes, a diferencia de las del backend, que se escribieron primero y se comprobó que fallaban. El plan pedía pruebas primero en cada historia | Baja | Fases 3 a 7 | Aceptado | Desviación de proceso sin efecto en el resultado: las pruebas del cliente cubren cada historia y pasan. Se deja constancia; en un sprint futuro conviene escribirlas antes | `client/test/` |
 
 ## 8. Línea base de regresión
@@ -130,18 +117,30 @@ Se ejecuta la suite completa **antes** de tocar el código y de nuevo **al cierr
 
 | Suite | Comando | Antes del sprint 5 | Después del sprint 5 | Diferencia | Evidencia |
 |---|---|---|---|---|---|
-| Backend (Jest) | `npm test` en `server/` | 67 suites y 1003 pruebas aprobadas, 0 fallidas | 80 suites y 1215 pruebas aprobadas, 0 fallidas | +13 suites y +212 pruebas | [Línea base](#e-00-resultado-del-backend) · [Cierre](#e-06-resultado-del-backend) |
-| Frontend (Flutter) | `flutter test` en `client/` | 277 pruebas aprobadas ("All tests passed!"), 0 fallidas | 321 pruebas aprobadas, 0 fallidas | +44 pruebas | [Línea base](#e-00-resultado-del-frontend) · [Cierre](#e-06-resultado-del-frontend) |
+| Backend (Jest) | `npm test` en `server/` | 67 suites y 1003 pruebas aprobadas, 0 fallidas | 80 suites y 1215 pruebas aprobadas, 0 fallidas | +13 suites y +212 pruebas | Capturas abajo |
+| Frontend (Flutter) | `flutter test` en `client/` | 277 pruebas aprobadas ("All tests passed!"), 0 fallidas | 321 pruebas aprobadas, 0 fallidas | +44 pruebas | Capturas abajo |
 
 **Fecha de la línea base:** 2026-10-31, sobre el commit `4fdfaf1` de la rama `004-pagos-tickets-dashboard`, antes de crear la rama del Sprint 5.
 
+**Capturas de la línea base (2026-10-31):**
+
+![Línea base del backend](evidencias/sprint-5/captura-linea-base-backend.png)
+
+![Línea base del frontend](evidencias/sprint-5/captura-linea-base-frontend.png)
+
+**Capturas del cierre (2026-11-01):**
+
+![Regresión del backend](evidencias/sprint-5/captura-regresion-backend.png)
+
+![Regresión del frontend](evidencias/sprint-5/captura-regresion-frontend.png)
+
 **Duración del backend:** 133 s al inicio y 60 s al cierre.
 
-**Fecha del cierre:** 2026-11-01, sobre la rama `005-precios-refacciones-cobro`. Ninguna prueba de la línea base pasó de verde a rojo: se actualizaron las aserciones de 11 pruebas por la ampliación declarada del contrato (H-04 y H-05) y se reemplazó una que afirmaba la regla anterior (H-07). `flutter analyze lib` no reporta problemas.
+**Fecha del cierre:** 2026-11-01, sobre la rama `005-precios-refacciones-cobro`. Ninguna prueba de la línea base pasó de verde a rojo: se actualizaron las aserciones de 11 pruebas por la ampliación declarada del contrato (H-03 a H-07) y se reemplazó una que afirmaba la regla anterior (H-03 a H-07). `flutter analyze lib` no reporta problemas.
 
 ## 9. Control de calidad final
 
-Se llena al cerrar el sprint, con el mismo formato de la matriz de calidad del MVP: al menos 5 requisitos funcionales del sprint 5, con prioridad en los que pueden fallar (instantáneas, redondeo, concurrencia, permisos por rol y compatibilidad con tickets anteriores).
+Cinco requisitos funcionales del Sprint 5, elegidos entre los que más pueden fallar (instantáneas de precio, orden pagada, pago desfasado, permisos por rol y compatibilidad con tickets anteriores), con el mismo formato de la matriz de calidad del MVP.
 
 | ID | Requisito | Criterio de Aceptación | Prueba ejecutada | Resultado | Evidencia / defecto |
 |:--:|---|---|---|---|---|
@@ -163,31 +162,7 @@ Se llena al cerrar el sprint, con el mismo formato de la matriz de calidad del M
 
 # Anexo de evidencias
 
-Cada evidencia tiene tres bloques, como en la matriz de calidad del MVP: **Requisito** (texto del spec con archivo y línea), **Prueba** (código o descripción) y **Resultado** (comando, salida real y captura). Las capturas se guardan en `docs/evidencias/sprint-5/` con nombres en minúsculas y guiones, por ejemplo `captura-total-con-refacciones.png`.
-
-## E-00 Resultado del backend
-
-Línea base del 2026-10-31, commit `4fdfaf1`, antes del Sprint 5.
-
-Comando: `npm test` en `server/`
-
-Pasaron las 67 suites y las 1003 pruebas; no hubo fallos.
-
-![Línea base del backend](evidencias/sprint-5/captura-linea-base-backend.png)
-
-Resultado: **Aprobado** (1003 de 1003 pruebas).
-
-## E-00 Resultado del frontend
-
-Línea base del 2026-10-31, commit `4fdfaf1`, antes del Sprint 5.
-
-Comando: `flutter test` en `client/`
-
-Pasaron las 277 pruebas; no hubo fallos.
-
-![Línea base del frontend](evidencias/sprint-5/captura-linea-base-frontend.png)
-
-Resultado: **Aprobado** (277 de 277 pruebas).
+Cada evidencia tiene tres bloques: **Requisito** (texto de la especificación con archivo y línea), **Prueba** (código o descripción) y **Resultado** (comando, salida real y captura). Las capturas están en `docs/evidencias/sprint-5/`.
 
 ## E-01 Requisito
 
@@ -353,30 +328,6 @@ Observación: el total del ticket es el importe del pago registrado. Si los serv
 ![Ticket anterior (sin cambios)](evidencias/sprint-5/captura-ticket-anterior.png)
 
 Resultado: **Aprobado con observación** (15 de 15 casos).
-
-## E-06 Resultado del backend
-
-Regresión del 2026-11-01, después de las cinco historias y del pulido.
-
-Comando: `npm test` en `server/`
-
-Pasaron las 80 suites y las 1215 pruebas; no hubo fallos. La línea base era de 67 suites y 1003 pruebas: hay 13 suites y 212 pruebas más. De la línea base se actualizaron las aserciones de 11 pruebas (H-04 y H-05) y se reemplazó 1 (H-07).
-
-![Regresión del backend](evidencias/sprint-5/captura-regresion-backend.png)
-
-Resultado: **Aprobado** (1215 de 1215 pruebas).
-
-## E-06 Resultado del frontend
-
-Regresión del 2026-11-01, después de las cinco historias y del pulido.
-
-Comando: `flutter test` en `client/`
-
-Pasaron las 321 pruebas; no hubo fallos. La línea base era de 277: hay 44 más. `flutter analyze lib` no reporta problemas.
-
-![Regresión del frontend](evidencias/sprint-5/captura-regresion-frontend.png)
-
-Resultado: **Aprobado** (321 de 321 pruebas).
 
 ## E-07 Recorrido de los 10 escenarios contra la API real
 
