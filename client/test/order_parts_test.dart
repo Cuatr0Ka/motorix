@@ -512,6 +512,71 @@ void main() {
     });
   });
 
+  group('reserva de precios por rol (Sprint 5)', () {
+    /// Si el servidor enviara por error el precio de compra o de venta, la pantalla igualmente no debe mostrarlos.
+    Map<String, dynamic> conPreciosDeMas(Map<String, dynamic> json) => {...json, 'salePrice': '180.00', 'purchasePrice': '60.00'};
+
+    testWidgets('test_el_selector_de_refacciones_del_mecanico_solo_muestra_la_existencia_y_ningun_precio', (tester) async {
+      useDesktopWindow(tester);
+      final order = FakeOrderWithParts();
+      final inner = order.handler();
+      final api = FakeApi(
+        role: 'MECHANIC',
+        handler: (r) {
+          final res = inner(r);
+          if (r.method == 'GET' && r.path == '/parts') {
+            return ok([for (final id in order.stock.keys) conPreciosDeMas(mechanicPart(id, 'REF-$id', order.names[id]!, order.stock[id]!))],
+                meta: {'page': 1, 'pageSize': 50, 'total': order.stock.length});
+          }
+          return res;
+        },
+      );
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('agregar-refaccion')));
+
+      await tester.tap(find.byKey(const ValueKey('agregar-refaccion')));
+      await tester.pumpAndSettle();
+
+      final dialogo = find.byType(AlertDialog);
+      expect(find.text('Existencia: 10 pieza'), findsOneWidget);
+      expect(find.descendant(of: dialogo, matching: find.textContaining('\$')), findsNothing);
+      expect(find.descendant(of: dialogo, matching: find.textContaining('compra')), findsNothing);
+    });
+
+    for (final role in ['RECEPTIONIST', 'ADMIN']) {
+      testWidgets('test_${role.toLowerCase()}_ve_el_precio_de_venta_de_las_lineas_y_nunca_el_de_compra', (tester) async {
+        useDesktopWindow(tester);
+        final order = FakeOrderWithParts();
+        order.lines.add({
+          ...conPreciosDeMas({'id': 1, 'partId': 1, 'code': 'REF-1', 'name': 'Balatas', 'unit': 'pieza', 'quantity': 2}),
+          'unitPrice': '180.00',
+          'amount': '360.00',
+          'legacy': false,
+        });
+        final api = FakeApi(role: role, handler: order.handler());
+        await pumpAppSignedIn(tester, api);
+        await openOrder(tester, section: 'Órdenes');
+        await scrollTo(tester, find.text('REF-1 · Balatas'));
+
+        expect(find.text('× \$180.00'), findsOneWidget);
+        expect(tester.widget<Text>(find.byKey(const ValueKey('importe-orden-1'))).data, '\$360.00');
+        expect(find.text('\$60.00'), findsNothing);
+        expect(find.textContaining('compra'), findsNothing);
+      });
+    }
+
+    for (final role in ['RECEPTIONIST', 'MECHANIC']) {
+      testWidgets('test_${role.toLowerCase()}_no_ve_la_seccion_de_inventario_ni_los_precios_del_catalogo', (tester) async {
+        useDesktopWindow(tester);
+        final api = FakeApi(role: role, handler: FakeOrderWithParts().handler());
+        await pumpAppSignedIn(tester, api);
+
+        expect(find.descendant(of: find.byType(NavigationRail), matching: find.text('Inventario')), findsNothing);
+      });
+    }
+  });
+
   group('solo lectura y permisos', () {
     testWidgets('test_la_orden_entregada_se_muestra_en_solo_lectura', (tester) async {
       useDesktopWindow(tester);

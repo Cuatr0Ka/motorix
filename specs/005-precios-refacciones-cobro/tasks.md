@@ -187,13 +187,13 @@ P1: US1 (precios en la refacción), US2 (total con refacciones), US3 (pago y tic
 
 ### Pruebas de la historia 5 (escribir primero y comprobar que fallan)
 
-- [ ] T052 [P] [US5] Crear `server/tests/integration/prices.leak.test.js`: con datos que tienen precios de compra y de venta, recorrer con cada rol las rutas de refacciones (listado, detalle, alertas, movimientos), órdenes (listado y detalle), cobro, pagos, tickets, panel de control, historial del vehículo y mantenimientos, y verificar que `purchasePrice` solo aparece para el administrador y que el mecánico no recibe `purchasePrice`, `salePrice`, `unitPrice` ni `amount`
-- [ ] T053 [P] [US5] Crear `server/tests/integration/orders.mechanicView.test.js`: el detalle de una orden para el mecánico omite `unitPrice`, `amount` y `legacy` de las líneas y `totals.parts`; su `totals.total` es servicios más mano de obra; las respuestas de agregar, cambiar y quitar refacciones tampoco llevan precios; recepción recibe precios de venta pero nunca el de compra
-- [ ] T054 [P] [US5] Modificar `client/test/order_parts_test.dart` y `client/test/inventory_screens_test.dart`: con el rol de mecánico las líneas de la orden y el inventario no muestran precios ni importes; con recepción se muestran precios de venta y nunca el de compra
+- [X] T052 [P] [US5] Crear `server/tests/integration/prices.leak.test.js`: con datos que tienen precios de compra y de venta, recorrer con cada rol las rutas de refacciones (listado, detalle, alertas, movimientos), órdenes (listado y detalle), cobro, pagos, tickets, panel de control, historial del vehículo y mantenimientos, y verificar que `purchasePrice` solo aparece para el administrador y que el mecánico no recibe `purchasePrice`, `salePrice`, `unitPrice`, `priceMissing`, `legacy`, `breakdown`, `billing`, `totals.parts` ni el importe (`amount`) de una línea de refacción (los importes de sus propios servicios y mano de obra sí los recibe, como antes)
+- [X] T053 [P] [US5] Crear `server/tests/integration/orders.mechanicView.test.js`: el detalle de una orden para el mecánico omite `unitPrice`, `amount` y `legacy` de las líneas y `totals.parts`; su `totals.total` es servicios más mano de obra; las respuestas de agregar, cambiar y quitar refacciones tampoco llevan precios; recepción recibe precios de venta pero nunca el de compra
+- [X] T054 [P] [US5] Modificar `client/test/order_parts_test.dart` y `client/test/inventory_screens_test.dart`: con el rol de mecánico las líneas de la orden y el inventario no muestran precios ni importes; con recepción se muestran precios de venta y nunca el de compra
 
 ### Implementación de la historia 5
 
-- [ ] T055 [US5] Verificar con las pruebas de T052 y T053 que ninguna respuesta filtra precios; corregir en `server/services/orderService.js`, `server/services/orderPartService.js`, `server/services/paymentService.js` o `server/services/partService.js` cualquier punto donde falte `presentOrderPart` o `presentTotals`, sin duplicar lógica de proyección
+- [X] T055 [US5] Verificar con las pruebas de T052 y T053 que ninguna respuesta filtra precios; corregir en `server/services/orderService.js`, `server/services/orderPartService.js`, `server/services/paymentService.js` o `server/services/partService.js` cualquier punto donde falte `presentOrderPart` o `presentTotals`, sin duplicar lógica de proyección
 
 **Punto de control**: las cinco historias funcionan y los precios están reservados por rol
 
