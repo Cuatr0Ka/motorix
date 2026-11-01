@@ -49,7 +49,7 @@ usuarios de ejemplo.
 | 1 | Registrar precios (HU1) | Como administrador, crear una refacción con categoría, marca, compra 120 y venta 180 | Aparece en el inventario con ambos datos; recepción y mecánico no ven el precio de compra |
 | 2 | Venta bajo el costo (HU1) | Editar una refacción con venta 90 y compra 120 | Aparece el aviso; solo guarda al confirmar |
 | 3 | Refacción sin precio (HU2) | Con la refacción `BOM-AGU` (sin precio) intentar agregarla a una orden | Se rechaza con el mensaje de avisar al administrador; en el inventario muestra «Sin precio de venta» |
-| 4 | Total con refacciones (HU2) | Abrir la orden Terminada del seed con refacciones y consultar el cobro | El desglose muestra servicios, mano de obra y refacciones, y el total es su suma |
+| 4 | Total con refacciones (HU2) | Abrir la orden Terminada nueva del seed 005 («Mantenimiento con refacciones (ejemplo Sprint 5)») y consultar el cobro | El desglose muestra servicios, mano de obra y refacciones, y el total es su suma |
 | 5 | Pago y ticket (HU3) | Registrar el pago en efectivo y generar el ticket | El pago y el ticket tienen el mismo total, y el ticket detalla las refacciones con precio |
 | 6 | Instantánea (HU4) | Cambiar el precio de venta de una refacción ya cobrada | La orden, el pago y el ticket conservan sus importes |
 | 7 | Orden pagada (HU4) | En la orden cobrada, intentar agregar o quitar una refacción | Se rechaza: «La orden ya está cobrada» |

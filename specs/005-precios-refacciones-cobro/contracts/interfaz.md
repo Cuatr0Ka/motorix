@@ -35,7 +35,8 @@ corresponde.
 - **Administración y recepción**: cada línea muestra cantidad, **precio unitario** e **importe**, y debajo de la
   lista el subtotal de refacciones. Una línea anterior al sprint muestra el importe 0.00 con la indicación
   **«Anterior a los precios»**.
-- **Mecánico**: la lista es la actual (código, nombre, unidad y cantidad), sin precio ni importe.
+- **Mecánico**: la lista es la actual (código, nombre, unidad y cantidad), sin precio ni importe. Si su pantalla
+  muestra un total de la orden, lo rotula «Servicios y mano de obra», porque no incluye refacciones.
 - Al intentar agregar una refacción sin precio de venta, un `SnackBar` rojo muestra: «La refacción no tiene
   precio de venta. Avisa al administrador para que lo capture.»
 - Con un pago Pagado, los botones de agregar, quitar y cambiar cantidad se deshabilitan y la sección muestra

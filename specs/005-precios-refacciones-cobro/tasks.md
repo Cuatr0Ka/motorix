@@ -43,7 +43,7 @@ P1: US1 (precios en la refacción), US2 (total con refacciones), US3 (pago y tic
 **Propósito**: verificar la base, registrar la condición de la constitución y alinear la documentación
 
 - [ ] T001 Verificar la línea base en la rama `005-precios-refacciones-cobro`: MySQL local en ejecución, migraciones 001 a 004 aplicadas en `motorix` y `motorix_test`, `npm test` (en `server/`) con 67 suites y 1003 pruebas y `flutter test` (en `client/`) con 277 pruebas, todo en verde, antes de tocar el código
-- [ ] T002 [P] Registrar la enmienda del principio I en `.specify/memory/constitution.md` (los sprints posteriores al MVP quedan permitidos con aprobación del equipo; versión MINOR, fecha de última enmienda y reporte de impacto del encabezado). Requiere la aprobación del director del proyecto: no bloquea el desarrollo, pero sí el cierre del sprint (hallazgo H-01 de `docs/aseguramiento-calidad-sprint-5.md`)
+- [ ] T002 ⚠️ PUERTA: registrar la enmienda del principio I en `.specify/memory/constitution.md` (los sprints posteriores al MVP quedan permitidos con aprobación del equipo; versión MINOR, fecha de última enmienda y reporte de impacto del encabezado). Requiere la aprobación del director del proyecto y del equipo (hallazgo H-01 de `docs/aseguramiento-calidad-sprint-5.md`). Hasta que esté aprobada y registrada NO se ejecuta `/speckit.implement` ni se modifica código, migraciones ni seeds; solo pueden avanzar T001, T003 y T004
 - [ ] T003 [P] Actualizar `docs/project-context.md` (FR-018): §6.7 con los datos de la refacción (categoría, marca, precio de compra y de venta) y la regla de que una refacción sin precio de venta no se agrega a una orden; §6.8 y §6.10 con que el total suma servicios, mano de obra y refacciones y que el ticket nuevo detalla las refacciones; la entidad `Part` y la tabla de líneas de orden con `unit_price`; §7 y §14.1 con el Sprint 5; y §27 con las decisiones D-01 a D-10 de la sección Aclaraciones de spec.md
 - [ ] T004 [P] Actualizar `docs/design-system.md` (FR-018): corregir los indicadores del panel de control a los 10 que existen (hallazgo F1 del Sprint 4, que decía 4) y documentar los elementos nuevos: chip ámbar «Sin precio de venta», columnas de precio del inventario, aviso de importe desfasado, aviso de diferencia por cobrar, diálogo de venta bajo el costo y bloque de desglose del cobro
 
@@ -53,7 +53,7 @@ P1: US1 (precios en la refacción), US2 (total con refacciones), US3 (pago y tic
 
 **Propósito**: esquema, módulo de totales, consulta de totales, proyección por rol y datos de prueba que DEBEN existir antes de cualquier historia
 
-**⚠️ CRÍTICO**: ninguna historia puede empezar hasta terminar esta fase
+**⚠️ CRÍTICO**: esta fase no empieza hasta que la enmienda de la constitución (T002) esté aprobada, y ninguna historia puede empezar hasta terminarla
 
 ### Base de datos
 
@@ -86,14 +86,14 @@ P1: US1 (precios en la refacción), US2 (total con refacciones), US3 (pago y tic
 ### Pruebas de la historia 1 (escribir primero y comprobar que fallan)
 
 - [ ] T014 [P] [US1] Crear `server/tests/unit/partPrices.test.js`: los esquemas `createPartSchema` y `updatePartSchema` aceptan precios válidos y rechazan negativos, no numéricos, con más de dos decimales, mayores a 9999999.99 y un precio de venta igual a cero; la categoría y la marca aceptan 60 caracteres y rechazan 61; el precio de venta capturado no acepta `null`
-- [ ] T015 [P] [US1] Crear `server/tests/integration/parts.prices.test.js`: alta con precios (201 y datos persistidos), edición parcial que no altera código ni existencia, precios inválidos con `400 VALIDATION_ERROR` por campo, precio de venta menor al de compra con `422 PRICE_BELOW_COST` sin guardar y con `confirmBelowCost: true` guardado, comparación contra el valor vigente en una edición parcial, búsqueda por categoría y por marca, `priceMissing` verdadero en una refacción sin precio de venta, y `403` para recepción y mecánico al crear o editar
+- [ ] T015 [P] [US1] Crear `server/tests/integration/parts.prices.test.js`: alta con precios (201 y datos persistidos), edición parcial que no altera código ni existencia, precios inválidos con `400 VALIDATION_ERROR` por campo, precio de venta menor al de compra con `422 PRICE_BELOW_COST` sin guardar y con `confirmBelowCost: true` guardado, comparación contra el valor vigente en una edición parcial que cambia un solo precio, edición que solo cambia el nombre de una refacción que ya está bajo el costo (se guarda sin pedir confirmación), búsqueda por categoría y por marca, `priceMissing` verdadero en una refacción sin precio de venta, y `403` para recepción y mecánico al crear o editar
 - [ ] T016 [P] [US1] Modificar `server/tests/contract/parts.contract.test.js`: el listado, el detalle y las alertas del administrador incluyen `category`, `brand`, `purchasePrice`, `salePrice` y `priceMissing` con la forma de api-rest.md; el listado del mecánico conserva su forma sin ningún precio
 
 ### Implementación de la historia 1
 
 - [ ] T017 [US1] Modificar `server/validators/partValidators.js`: agregar `category` y `brand` (opcionales, hasta 60 caracteres), `purchasePrice` (opcional, no negativo) y `salePrice` (opcional, mayor a cero) con a lo sumo dos decimales y máximo 9999999.99 (número o cadena decimal), y `confirmBelowCost` (booleano opcional) a `createPartSchema` y `updatePartSchema`; ajustar el mensaje `.strict` de `updatePartSchema` y rechazar `salePrice: null`; mensajes en español
 - [ ] T018 [US1] Modificar `server/models/partModel.js`: `COLUMNS` incluye `category, brand, purchase_price, sale_price`; `toPart` agrega `category`, `brand`, `purchasePrice`, `salePrice` (cadenas con dos decimales o `null`) y `priceMissing`; `toMechanicPart` no cambia; `insert` y `EDITABLE` incluyen los campos nuevos; `list` busca también en `category` y `brand`
-- [ ] T019 [US1] Modificar `server/services/partService.js`: en `create` y `update`, calcular el precio de venta y de compra resultantes (los enviados o los vigentes) y, si la venta es menor a la compra y falta `confirmBelowCost: true`, lanzar `AppError.unprocessable('PRICE_BELOW_COST', 'El precio de venta es menor al de compra. Confirma para guardarlo.', { salePrice, purchasePrice })` sin guardar nada; el controlador y las rutas de `/api/parts` no cambian
+- [ ] T019 [US1] Modificar `server/services/partService.js`: en `create` y `update`, cuando el cuerpo trae `salePrice` o `purchasePrice`, calcular el precio de venta y de compra resultantes (los enviados o los vigentes) y, si la venta es menor a la compra y falta `confirmBelowCost: true`, lanzar `AppError.unprocessable('PRICE_BELOW_COST', 'El precio de venta es menor al de compra. Confirma para guardarlo.', { salePrice, purchasePrice })` sin guardar nada; si el cuerpo no trae ningún precio (por ejemplo, solo cambia el nombre) no se exige la confirmación aunque la refacción ya esté bajo el costo; el controlador y las rutas de `/api/parts` no cambian
 - [ ] T020 [P] [US1] Modificar `client/lib/models/part.dart`: `Part` agrega `category`, `brand`, `purchasePrice`, `salePrice` (opcionales, porque el mecánico no los recibe) y `priceMissing`; `PartInput` agrega los cuatro campos y `confirmBelowCost`, y `toJson` los envía solo cuando tienen valor
 - [ ] T021 [US1] Modificar `client/lib/services/parts_service.dart` y su proveedor en `client/lib/providers/parts_provider.dart`: enviar y leer los campos nuevos y dejar disponible el error `PRICE_BELOW_COST` con sus dos precios para que la pantalla pida confirmación, usando el mecanismo de errores de la capa de servicios existente
 - [ ] T022 [US1] Modificar `client/lib/screens/part_form_screen.dart` según contracts/interfaz.md: campos Categoría, Marca, Precio de compra y Precio de venta con sus validaciones en pantalla, diálogo «El precio de venta ($X) es menor al de compra ($Y). ¿Guardar de todos modos?» con Cancelar y Guardar de todos modos que reenvía con `confirmBelowCost`, y el precio de venta obligatorio al editar una refacción que ya lo tiene
@@ -172,7 +172,7 @@ P1: US1 (precios en la refacción), US2 (total con refacciones), US3 (pago y tic
 ### Implementación de la historia 4
 
 - [ ] T049 [US4] Modificar `server/services/orderPartService.js` (`add`, `updateQuantity` y `remove`): tras bloquear la orden y rechazar las Entregadas, buscar el pago vigente con `paymentModel.findActiveByOrder` y, si está `PAGADO`, lanzar `AppError.conflict('ORDER_ALREADY_PAID', 'La orden ya está cobrada: no se pueden modificar las refacciones.')`; con un pago `PENDIENTE` no se bloquea (FR-026)
-- [ ] T050 [US4] Crear `database/seeds/005_part_prices.sql` (idempotente, sin llamar a Mercado Pago ni incluir credenciales): asignar categoría, marca y precios de compra y de venta a las refacciones del seed 003 donde `sale_price IS NULL`, dejando `BOM-AGU` sin precio de venta; agregar líneas con precio (`unit_price` igual al `sale_price`, con su movimiento de inventario ligado a la orden) a una orden Terminada sin pago y a la orden del pago de Mercado Pago pendiente del seed 004, con clave natural `(orden, refacción)`; no modificar órdenes con pago `PAGADO`, líneas anteriores, pagos ni tickets existentes
+- [ ] T050 [US4] Crear `database/seeds/005_part_prices.sql` (idempotente, sin llamar a Mercado Pago ni incluir credenciales). Los seeds anteriores solo dejan una orden Terminada (`STU-901-G`, con un pago de Mercado Pago pendiente) y ninguna Terminada sin pago vigente, así que el seed: (1) asigna categoría, marca y precios de compra y de venta a las refacciones del seed 003 donde `sale_price IS NULL`, dejando `BOM-AGU` sin precio de venta; (2) crea una orden Terminada nueva y cobrable, identificada por (placa, problema reportado) = (`VWX-234-H`, «Mantenimiento con refacciones (ejemplo Sprint 5)»), para un vehículo que solo tiene órdenes Entregadas, con mecánico asignado, historial de estados hasta Terminada, servicios, mano de obra y al menos dos refacciones con precio (`unit_price` igual al `sale_price`), cada una con su movimiento de inventario `OUT` ligado a la orden, y recalcula el stock de las refacciones afectadas como la suma de sus movimientos, igual que el seed 003, sin dejarlas en negativo; (3) agrega una línea con precio a la orden `STU-901-G` (pago de Mercado Pago pendiente) para mostrar el pago desfasado; clave natural de las líneas `(orden, refacción)`; no modifica órdenes con pago `PAGADO` ni Entregadas, líneas anteriores, pagos ni tickets existentes
 - [ ] T051 [US4] Modificar `client/lib/widgets/order_parts_section.dart` y `client/test/order_parts_test.dart`: cuando el cobro de la orden está `PAGADO` se deshabilitan agregar, quitar y cambiar cantidad y se muestra «La orden ya está cobrada: no se pueden modificar las refacciones.»; el servidor rechaza igualmente
 
 **Punto de control**: las historias 1 a 4 funcionan; la base de ejemplo muestra los casos de compatibilidad
@@ -205,11 +205,12 @@ P1: US1 (precios en la refacción), US2 (total con refacciones), US3 (pago y tic
 
 - [ ] T056 [P] Buscar y retirar referencias obsoletas: `grep` de «no suman importe», «no forman parte del MVP», «sin precios de refacciones» y «servicios más mano de obra» en `server/`, `client/lib/` y `docs/`, y corregir las que ya no sean ciertas
 - [ ] T057 [P] Revisión de seguridad: confirmar con `grep` que `purchase_price` y `purchasePrice` solo aparecen en `partModel`, `partService`, `partValidators`, migraciones, seeds y pruebas; que no hay secretos en el código; y que `flutter analyze lib` y `npm test` no emiten advertencias nuevas
-- [ ] T058 Ejecutar la regresión completa: `npm test` en `server/` (debe superar las 1003 pruebas de la línea base, con las del sprint) y `flutter test` en `client/` (debe superar las 277), y confirmar que ninguna prueba de la línea base pasó de verde a rojo; registrar los conteos en la sección 8 de `docs/aseguramiento-calidad-sprint-5.md`
-- [ ] T059 Recorrer los 10 escenarios de `quickstart.md` sobre la base `motorix` con los seeds aplicados y registrar el resultado de cada uno, con sus capturas en `docs/evidencias/sprint-5/`
-- [ ] T060 Completar `docs/aseguramiento-calidad-sprint-5.md`: llenar las columnas de tarea, prueba y resultado de la sección 6 (trazabilidad de CA-1 a CA-14), actualizar G-06 a G-08, registrar los hallazgos que aparezcan en la sección 7 y enlazar cada evidencia en el anexo
-- [ ] T061 Control de calidad final: llenar la sección 9 de `docs/aseguramiento-calidad-sprint-5.md` con cinco requisitos funcionales del sprint, priorizando los que pueden fallar (instantáneas, orden pagada, aprobación tardía de Mercado Pago, fuga de precios y compatibilidad de tickets), cada uno con criterio de aceptación, prueba ejecutada, resultado y evidencia
-- [ ] T062 Cerrar el sprint: confirmar que T002 (enmienda de la constitución) está aprobada o documentar la excepción, que no quedan defectos críticos ni altos abiertos, y que la sección 10 del aseguramiento queda firmada
+- [ ] T058 [P] Crear `server/tests/integration/dashboard.listings.regression.test.js` (FR-016, CA-11): con refacciones con precio en órdenes de prueba, el panel de control (`/api/dashboard`) y los listados de órdenes y de pagos devuelven la misma forma y los mismos importes que antes (sus importes salen de los pagos registrados), ningún listado calcula el total de la orden y el total con refacciones solo aparece en el detalle de la orden
+- [ ] T059 Ejecutar la regresión completa: `npm test` en `server/` (debe superar las 1003 pruebas de la línea base, con las del sprint) y `flutter test` en `client/` (debe superar las 277), y confirmar que ninguna prueba de la línea base pasó de verde a rojo; registrar los conteos en la sección 8 de `docs/aseguramiento-calidad-sprint-5.md`
+- [ ] T060 Recorrer los 10 escenarios de `quickstart.md` sobre la base `motorix` con los seeds aplicados y registrar el resultado de cada uno, con sus capturas en `docs/evidencias/sprint-5/`
+- [ ] T061 Completar `docs/aseguramiento-calidad-sprint-5.md`: llenar las columnas de tarea, prueba y resultado de la sección 6 (trazabilidad de CA-1 a CA-14), actualizar G-06 a G-08, registrar los hallazgos que aparezcan en la sección 7 y enlazar cada evidencia en el anexo
+- [ ] T062 Control de calidad final: llenar la sección 9 de `docs/aseguramiento-calidad-sprint-5.md` con cinco requisitos funcionales del sprint, priorizando los que pueden fallar (instantáneas, orden pagada, aprobación tardía de Mercado Pago, fuga de precios y compatibilidad de tickets), cada uno con criterio de aceptación, prueba ejecutada, resultado y evidencia
+- [ ] T063 Cerrar el sprint: confirmar que la enmienda de la constitución (T002) sigue aprobada y registrada, que no quedan defectos críticos ni altos abiertos, y que la sección 10 del aseguramiento queda firmada
 
 ---
 
@@ -217,8 +218,8 @@ P1: US1 (precios en la refacción), US2 (total con refacciones), US3 (pago y tic
 
 ### Dependencias entre fases
 
-- **Preparación (Fase 1)**: sin dependencias; T001 antes de modificar código. T002 a T004 pueden ir en paralelo.
-- **Fundamentos (Fase 2)**: depende de T001. T005 → T006; T008 y T009 pueden ir en paralelo con T005; T010 a T012 dependen de T006 y T008; T013 depende de T006. **Bloquea todas las historias.**
+- **Preparación (Fase 1)**: sin dependencias; T001 antes de modificar código. T003 y T004 pueden ir en paralelo; T002 es una puerta: sin su aprobación no empieza la Fase 2.
+- **Fundamentos (Fase 2)**: depende de T001 y de la aprobación de T002. T005 → T006; T008 y T009 pueden ir en paralelo con T005; T010 a T012 dependen de T006 y T008; T013 depende de T006. **Bloquea todas las historias.**
 - **Historias (Fases 3 a 7)**: todas dependen de la Fase 2.
   - **US1** no depende de otras historias.
   - **US2** usa el precio de venta de la refacción, así que necesita T018 de US1 para tener refacciones con precio (o las fábricas de T013).
@@ -242,7 +243,7 @@ P1: US1 (precios en la refacción), US2 (total con refacciones), US3 (pago y tic
 - US3: T033, T034, T035, T036 (pruebas) y T041, T042
 - US4: T046, T047, T048 (pruebas)
 - US5: T052, T053, T054
-- Fase 8: T056, T057
+- Fase 8: T056, T057, T058
 
 ---
 

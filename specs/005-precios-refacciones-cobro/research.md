@@ -136,7 +136,7 @@ sprints 3 y 4.
 
 - **Decisión**: el seed `005_part_prices.sql` es idempotente. Asigna categoría, marca y precios a las
   refacciones del seed 003 donde `sale_price IS NULL`, dejando una sin precio (`BOM-AGU`) para mostrar el
-  bloqueo. Agrega líneas con precio a órdenes Terminadas sin pago y a la orden con pago de Mercado Pago pendiente
+  bloqueo. Crea una orden Terminada nueva y cobrable (con servicios, mano de obra y refacciones con precio) para un vehículo que solo tiene órdenes Entregadas (por ejemplo `VWX-234-H`), porque los seeds anteriores solo dejan una orden Terminada y esa ya tiene un pago pendiente; agrega líneas con precio a la orden con pago de Mercado Pago pendiente
   (para el pago desfasado), y no toca las líneas anteriores (quedan en `0`). La claves naturales son
   (orden, refacción), así que repetir el seed no duplica.
 - **Nota**: no se modifican órdenes con pago Pagado (FR-026) ni se llama a Mercado Pago.

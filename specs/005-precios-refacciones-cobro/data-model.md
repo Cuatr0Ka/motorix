@@ -93,7 +93,8 @@ de la línea no depende de la refacción después de guardado.
 ## Datos de ejemplo (seed `005_part_prices.sql`)
 
 - Categoría, marca y precios para las refacciones del seed 003, excepto `BOM-AGU` (queda sin precio de venta).
-- Líneas con precio en una orden Terminada sin pago (orden cobrable con refacciones).
+- Una orden Terminada nueva y cobrable, con servicios, mano de obra y refacciones con precio (los seeds
+  anteriores no dejan ninguna orden Terminada sin pago vigente).
 - Líneas con precio en la orden del pago de Mercado Pago pendiente (pago desfasado).
 - Las líneas anteriores y los pagos y tickets del seed 004 no se modifican.
 - Clave natural de las líneas: `(orden, refacción)`; repetir el seed no duplica.

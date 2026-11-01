@@ -250,14 +250,16 @@ que el precio de compra solo llega al administrador y que el mecánico no recibe
   para la administración y la recepción (cobro, órdenes y tickets), no para el mecánico.
 - **FR-014**: El mecánico DEBE seguir pudiendo agregar refacciones a una orden y consultar el inventario con
   la información reducida que ya tenía (código, nombre, unidad y existencia), sin ningún precio: ni el de
-  compra ni el de venta.
+  compra ni el de venta. El total que el mecánico recibe en el detalle de la orden suma solo servicios y mano
+  de obra (no incluye las refacciones), para no revelar sus precios.
 - **FR-015**: Las refacciones existentes antes de este sprint DEBEN conservarse sin precio de venta hasta que
   el administrador lo capture, y las líneas de orden existentes antes de este sprint DEBEN conservarse con
   precio 0 (sin sumar al total), sin perder datos ni modificar pagos y tickets previos. El cambio de esquema
   es aditivo y puede ejecutarse de nuevo tras un fallo sin duplicar ni perder datos.
-- **FR-016**: El panel de control, los listados de órdenes y los listados de pagos DEBEN seguir funcionando;
-  donde hoy muestran el total de una orden DEBEN mostrar el total con refacciones. Los importes del panel
-  siguen saliendo de los pagos registrados y el panel no incorpora indicadores nuevos.
+- **FR-016**: El panel de control, los listados de órdenes y los listados de pagos DEBEN seguir funcionando sin
+  cambios en lo que muestran: hoy ningún listado ni indicador usa el total calculado de la orden (los importes
+  del panel y de los listados de pagos salen de los pagos registrados) y no se agregan indicadores nuevos. El
+  total con refacciones se muestra en el detalle de la orden (bloque de cobro).
 - **FR-017**: Los datos de ejemplo del sprint DEBEN incluir refacciones con categoría, marca y precios, y al
   menos una orden cobrable con refacciones; DEBEN poder cargarse varias veces sin duplicar registros. También
   DEBEN cubrir los casos de compatibilidad: una refacción sin precio de venta, una línea anterior con precio 0,
@@ -292,7 +294,8 @@ que el precio de compra solo llega al administrador y que el mecánico no recibe
 - **FR-025**: Cuando el precio de venta de una refacción sea menor a su precio de compra, el sistema DEBE
   avisar de la posible venta bajo el costo y guardar solo tras la confirmación del administrador; NO DEBE
   rechazarlo. La confirmación es explícita: no se guarda nada hasta que el administrador la da, y el aviso
-  muestra ambos precios.
+  muestra ambos precios. La confirmación se exige solo cuando se envía un precio; editar otros datos de una
+  refacción que ya está bajo el costo no la pide.
 - **FR-026**: El sistema NO DEBE permitir agregar, quitar ni cambiar la cantidad de las refacciones de una
   orden que tiene un pago Pagado, y DEBE indicar que la orden ya está cobrada. Con un pago Pendiente sí se
   permiten, y el pago queda desfasado según FR-012.

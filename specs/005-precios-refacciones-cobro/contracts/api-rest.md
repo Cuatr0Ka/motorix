@@ -64,8 +64,9 @@ Acepta, además de los campos actuales, `category`, `brand`, `purchasePrice`, `s
 ### `PATCH /api/parts/:id` (ADMIN)
 
 Acepta los mismos campos nuevos en edición parcial. Un precio de venta capturado no puede enviarse como `null`.
-Cuando el precio de venta resultante (el enviado o el vigente) es menor al de compra resultante y falta
-`confirmBelowCost: true`, responde `422 PRICE_BELOW_COST` y no guarda nada.
+Cuando el cuerpo trae `salePrice` o `purchasePrice` y el precio de venta resultante (el enviado o el vigente) es menor al de compra resultante y falta
+`confirmBelowCost: true`, responde `422 PRICE_BELOW_COST` y no guarda nada. Si el cuerpo no trae ningún precio (por ejemplo, solo cambia
+el nombre), no se exige la confirmación aunque la refacción ya esté bajo el costo.
 
 ## Refacciones de la orden (`/api/orders/:id/parts`)
 
