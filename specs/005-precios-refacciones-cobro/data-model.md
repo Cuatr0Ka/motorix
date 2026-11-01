@@ -16,7 +16,8 @@ migración `database/migrations/005_sprint5_part_prices.sql`, aditiva y sin toca
 - Tope de 9 999 999.99 por el tipo y por la validación del servidor (FR-002).
 - El precio de compra solo se selecciona en las rutas de refacciones del administrador (FR-013).
 - Regla derivada `priceMissing = sale_price IS NULL`; se expone para la etiqueta del inventario.
-- Una vez capturado, un precio de venta no puede borrarse (`null`), solo cambiarse.
+- Una vez capturado, un precio de venta no puede borrarse (`null`), solo cambiarse. El precio de compra, al
+  ser opcional, sí puede borrarse.
 
 ## Cambios en `order_parts` (Línea de refacción de la orden)
 

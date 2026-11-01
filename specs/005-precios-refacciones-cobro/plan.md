@@ -53,9 +53,7 @@ validados en el backend; no se editan scripts de sprints anteriores; importes en
 `DECIMAL(10,2)`; tope de 9 999 999.99 para precios y total; sin datos de tarjeta; seeds idempotentes que no
 llaman al proveedor; cumplimiento de `docs/design-system.md`
 
-**Escala/Alcance**: 3 roles, 0 tablas nuevas, 5 columnas nuevas, 2 migraciones de datos implícitas (valores por
-omisión), cambios en 4 pantallas (formulario y listado del inventario, refacciones de la orden, cobro y ticket),
-hasta ~1 000 órdenes
+**Escala/Alcance**: 3 roles, 0 tablas nuevas, 5 columnas nuevas (con valores por omisión para los datos existentes), cambios en las pantallas del inventario (listado, formulario y detalle), las refacciones de la orden, el cobro y el ticket, hasta ~1 000 órdenes
 
 ## Verificación de la constitución
 

@@ -215,7 +215,7 @@ que el precio de compra solo llega al administrador y que el mecánico no recibe
 - **FR-002**: El sistema DEBE validar los precios en el servidor: no negativos, numéricos, con a lo sumo dos
   decimales y con un máximo de 9 999 999.99 (el mismo tope de servicios, mano de obra y pagos); los rechazos
   indican el campo y el motivo. El precio de venta DEBE ser mayor a cero (un cero se rechaza); el de compra es
-  opcional y, si se captura, puede ser cero.
+  opcional, puede ser cero y puede borrarse.
 - **FR-003**: Solo el administrador DEBE poder crear o editar categoría, marca y precios de una refacción.
 - **FR-004**: Al agregar una refacción a una orden, el sistema DEBE guardar en esa línea el precio de venta
   vigente en ese momento; los cambios posteriores del precio de la refacción NO DEBEN modificar la línea. Si el

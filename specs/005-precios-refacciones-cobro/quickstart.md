@@ -34,7 +34,7 @@ más las pruebas nuevas del sprint. Las pruebas de `NOTHING_TO_CHARGE` siguen pa
 ## 3. Pruebas del sprint
 
 ```powershell
-cd server; npm test -- tests/unit/orderTotals.test.js tests/integration/parts.prices.test.js tests/integration/orderParts.prices.test.js tests/integration/billing.parts.test.js tests/integration/payments.paidOrder.test.js tests/integration/tickets.v2.test.js tests/integration/prices.leak.test.js tests/integration/seeds.sprint5.test.js
+cd server; npm test -- tests/unit/orderTotals.test.js tests/unit/partPrices.test.js tests/unit/ticketContent.test.js tests/integration/parts.prices.test.js tests/integration/orderParts.prices.test.js tests/integration/orderParts.prices.concurrency.test.js tests/integration/billing.parts.test.js tests/integration/payments.paidOrder.test.js tests/integration/emitted.compat.test.js tests/integration/tickets.v2.test.js tests/integration/prices.leak.test.js tests/integration/orders.mechanicView.test.js tests/integration/dashboard.listings.regression.test.js tests/integration/seeds.sprint5.test.js
 ```
 
 Resultado esperado: todas aprobadas. Los nombres exactos de los archivos los fija `tasks.md`.
@@ -77,5 +77,7 @@ Los pagos y tickets emitidos no se modifican con la migración ni con su reversa
 
 ## Cierre
 
-Registrar en `docs/aseguramiento-calidad-sprint-5.md` los resultados de los pasos 2 a 5, con sus capturas en
+Cronometrar el escenario 1 (SC-001, menos de 2 minutos) y el recorrido de los escenarios 4 y 5 (SC-008, menos
+de 3 minutos), y anotar los tiempos. Registrar en `docs/aseguramiento-calidad-sprint-5.md` los resultados de los
+pasos 2 a 5, con sus capturas en
 `docs/evidencias/sprint-5/`, y repetir la línea base de la sección 8.
