@@ -36,7 +36,7 @@ Códigos existentes que siguen vigentes: `ORDER_READ_ONLY`, `PART_INACTIVE`, `IN
 | Precio y importe de las líneas de una orden (`unitPrice`, `amount`) | ✔ | ✔ | ✘ |
 | Subtotal de refacciones y total con refacciones (`totals.parts`) | ✔ | ✔ | ✘ |
 | Bloque de cobro (`billing`) con desglose | ✔ | ✔ | ✘ |
-| Agregar, quitar o cambiar refacciones de una orden | ✔ | ✔ | ✔ (solo sus órdenes) |
+| Agregar, quitar o cambiar refacciones de una orden | ✔ | ✘ (403; solo consulta la orden) | ✔ (solo sus órdenes) |
 
 ## Refacciones (`/api/parts`)
 
@@ -77,7 +77,7 @@ el nombre), no se exige la confirmación aunque la refacción ya esté bajo el c
 | ADMIN, RECEPTIONIST | `id`, `partId`, `code`, `name`, `unit`, `quantity`, `unitPrice`, `amount`, `legacy` | `services`, `labor`, `parts`, `total` |
 | MECHANIC | `id`, `partId`, `code`, `name`, `unit`, `quantity` | `services`, `labor`, `total` (solo servicios y mano de obra; sin `parts`) |
 
-### `POST /api/orders/:id/parts` (todos los roles de trabajo)
+### `POST /api/orders/:id/parts` (ADMIN y MECHANIC; el mecánico solo en sus órdenes)
 
 Cuerpo: `{ partId, quantity }`. Reglas, en este orden: orden Entregada (`409 ORDER_READ_ONLY`); pago Pagado
 (`409 ORDER_ALREADY_PAID`); refacción desactivada (`409 PART_INACTIVE`); sin precio de venta
@@ -86,13 +86,13 @@ Cuerpo: `{ partId, quantity }`. Reglas, en este orden: orden Entregada (`409 ORD
 cantidad se suma a esa línea y esta conserva su precio guardado; si la línea es anterior (`legacy`), responde
 `422 LEGACY_LINE_LOCKED`. La respuesta sigue la proyección de la tabla anterior según el rol.
 
-### `PATCH /api/orders/:id/parts/:lineId` (todos los roles de trabajo)
+### `PATCH /api/orders/:id/parts/:lineId` (ADMIN y MECHANIC; el mecánico solo en sus órdenes)
 
 Cuerpo: `{ quantity }`. Disminuir se permite siempre que la orden no esté Entregada ni tenga pago Pagado.
 Aumentar aplica las reglas del alta (`ORDER_TOTAL_LIMIT`, `LEGACY_LINE_LOCKED`, `INSUFFICIENT_STOCK`). El precio
 de la línea no cambia.
 
-### `DELETE /api/orders/:id/parts/:lineId` (todos los roles de trabajo)
+### `DELETE /api/orders/:id/parts/:lineId` (ADMIN y MECHANIC; el mecánico solo en sus órdenes)
 
 Sin cambios, salvo `409 ORDER_ALREADY_PAID` si la orden tiene un pago Pagado.
 

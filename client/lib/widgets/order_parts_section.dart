@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../models/order_work.dart';
+import '../utils/formatters.dart';
+import '../utils/status_labels.dart';
 import '../utils/tokens.dart';
 import 'confirm_dialog.dart';
 import 'panel_card.dart';
+import 'status_chip.dart';
 
 /// Acciones de la sección de refacciones de la orden. [onAdd] abre el selector; [onUpdate] y [onRemove]
 /// devuelven el mensaje de error del servidor (o null si salió bien).
@@ -44,9 +47,18 @@ class OrderPartsSection extends StatelessWidget {
     await actions!.onRemove(line);
   }
 
+  /// Suma de los importes de las líneas con precio, en centavos enteros (null si ninguna lo trae: mecánico).
+  String? _subtotal() {
+    final priced = parts.where((line) => line.amount != null).toList();
+    if (priced.isEmpty) return null;
+    final cents = priced.fold<int>(0, (sum, line) => sum + (double.parse(line.amount!) * 100).round());
+    return (cents / 100).toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final subtotal = _subtotal();
     return PanelCard(
       title: 'Refacciones utilizadas',
       trailing: actions == null
@@ -69,6 +81,23 @@ class OrderPartsSection extends StatelessWidget {
                       children: [
                         Expanded(child: Text('${line.code} · ${line.name}', overflow: TextOverflow.ellipsis)),
                         Text('${line.quantity} ${line.unit}', key: ValueKey('cantidad-orden-${line.id}')),
+                        if (line.hasPrice) ...[
+                          const SizedBox(width: AppSpacing.lg),
+                          if (line.legacy)
+                            const StatusChip(label: 'Anterior a los precios', tone: StatusTone.neutral)
+                          else
+                            Text('× ${formatMoney(line.unitPrice!)}', key: ValueKey('precio-orden-${line.id}')),
+                          const SizedBox(width: AppSpacing.lg),
+                          SizedBox(
+                            width: 96,
+                            child: Text(
+                              formatMoney(line.amount ?? '0.00'),
+                              key: ValueKey('importe-orden-${line.id}'),
+                              textAlign: TextAlign.right,
+                              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
                         if (actions != null) ...[
                           IconButton(
                             key: ValueKey('editar-refaccion-orden-${line.id}'),
@@ -88,6 +117,19 @@ class OrderPartsSection extends StatelessWidget {
                       ],
                     ),
                   ),
+                if (subtotal != null) ...[
+                  const Divider(),
+                  Row(
+                    children: [
+                      Expanded(child: Text('Subtotal de refacciones', style: theme.textTheme.bodyMedium)),
+                      Text(
+                        formatMoney(subtotal),
+                        key: const ValueKey('subtotal-refacciones'),
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
     );

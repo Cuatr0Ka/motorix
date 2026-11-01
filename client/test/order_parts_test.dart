@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:motorix_client/models/order_work.dart';
+
 import 'helpers/data.dart';
 import 'helpers/fake_api.dart';
 
@@ -257,6 +259,168 @@ void main() {
       expect(order.stock[1], 10);
       await scrollTo(tester, find.text('Sin refacciones registradas.'));
       expect(find.text('Sin refacciones registradas.'), findsOneWidget);
+    });
+  });
+
+  group('precios de las refacciones de la orden (Sprint 5)', () {
+    Map<String, dynamic> lineaConPrecio(int id, int partId, String name, int quantity, String unitPrice, String amount, {bool legacy = false}) => {
+          'id': id,
+          'partId': partId,
+          'code': 'REF-$partId',
+          'name': name,
+          'unit': 'pieza',
+          'quantity': quantity,
+          'unitPrice': unitPrice,
+          'amount': amount,
+          'legacy': legacy,
+        };
+
+    FakeOrderWithParts conPrecios() {
+      final order = FakeOrderWithParts();
+      order.lines.addAll([
+        lineaConPrecio(1, 1, 'Balatas', 2, '180.00', '360.00'),
+        lineaConPrecio(2, 3, 'Bujía', 4, '45.50', '182.00'),
+      ]);
+      order._nextLine = 3;
+      return order;
+    }
+
+    /// Como el servidor: la operación indicada responde con el error dado (para probar los mensajes).
+    FakeHandler conError(FakeOrderWithParts order, String method, String code, String message) {
+      final inner = order.handler();
+      return (r) {
+        if (r.method == method && r.path.startsWith('/orders/1/parts')) return failure(422, code, message);
+        return inner(r);
+      };
+    }
+
+    testWidgets('test_el_administrador_ve_precio_unitario_importe_y_subtotal_de_refacciones', (tester) async {
+      useDesktopWindow(tester);
+      final api = FakeApi(role: 'ADMIN', handler: conPrecios().handler());
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester, section: 'Órdenes');
+      await scrollTo(tester, find.text('REF-1 · Balatas'));
+
+      expect(find.text('× \$180.00'), findsOneWidget);
+      expect(find.text('\$360.00'), findsOneWidget);
+      expect(find.text('× \$45.50'), findsOneWidget);
+      expect(find.text('\$182.00'), findsOneWidget);
+      expect(find.text('Subtotal de refacciones'), findsOneWidget);
+      expect(find.text('\$542.00'), findsOneWidget);
+    });
+
+    testWidgets('test_recepcion_ve_los_precios_de_las_lineas_pero_no_puede_modificarlas', (tester) async {
+      useDesktopWindow(tester);
+      final api = FakeApi(role: 'RECEPTIONIST', handler: conPrecios().handler());
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester, section: 'Órdenes');
+      await scrollTo(tester, find.text('REF-1 · Balatas'));
+
+      expect(find.byKey(const ValueKey('importe-orden-1')), findsOneWidget);
+      expect(find.text('\$542.00'), findsOneWidget);
+      expect(find.byKey(const ValueKey('agregar-refaccion')), findsNothing);
+      expect(find.byKey(const ValueKey('quitar-refaccion-orden-1')), findsNothing);
+    });
+
+    testWidgets('test_una_linea_anterior_a_los_precios_muestra_la_indicacion_y_el_importe_cero', (tester) async {
+      useDesktopWindow(tester);
+      final order = FakeOrderWithParts();
+      order.lines.add(lineaConPrecio(1, 1, 'Balatas', 2, '0.00', '0.00', legacy: true));
+      final api = FakeApi(role: 'ADMIN', handler: order.handler());
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester, section: 'Órdenes');
+      await scrollTo(tester, find.text('REF-1 · Balatas'));
+
+      expect(find.text('Anterior a los precios'), findsOneWidget);
+      expect(find.byKey(const ValueKey('precio-orden-1')), findsNothing);
+      expect(find.text('\$0.00'), findsWidgets);
+    });
+
+    testWidgets('test_el_mecanico_no_ve_ningun_precio_ni_subtotal', (tester) async {
+      useDesktopWindow(tester);
+      final order = FakeOrderWithParts();
+      order.lines.add({'id': 1, 'partId': 1, 'code': 'REF-1', 'name': 'Balatas', 'unit': 'pieza', 'quantity': 3});
+      final api = FakeApi(role: 'MECHANIC', handler: order.handler());
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.text('REF-1 · Balatas'));
+
+      expect(find.text('3 pieza'), findsOneWidget);
+      expect(find.byKey(const ValueKey('precio-orden-1')), findsNothing);
+      expect(find.byKey(const ValueKey('importe-orden-1')), findsNothing);
+      expect(find.text('Subtotal de refacciones'), findsNothing);
+      expect(find.textContaining('×'), findsNothing);
+    });
+
+    for (final caso in [
+      ('PART_PRICE_MISSING', 'La refacción no tiene precio de venta. Avisa al administrador para que lo capture.'),
+      ('ORDER_TOTAL_LIMIT', 'El total de la orden no puede pasar de 9 999 999.99. Reduce la cantidad.'),
+      ('LEGACY_LINE_LOCKED', 'Esta línea es anterior a los precios: quítala y vuelve a agregarla.'),
+    ]) {
+      testWidgets('test_al_agregar_el_error_${caso.$1}_se_muestra_con_el_mensaje_del_servidor_y_conserva_lo_capturado', (tester) async {
+        useDesktopWindow(tester);
+        final order = FakeOrderWithParts();
+        final api = FakeApi(role: 'MECHANIC', handler: conError(order, 'POST', caso.$1, caso.$2));
+        await pumpAppSignedIn(tester, api);
+        await openOrder(tester);
+        await scrollTo(tester, find.byKey(const ValueKey('agregar-refaccion')));
+
+        await tester.tap(find.byKey(const ValueKey('agregar-refaccion')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('opcion-refaccion-1')));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byKey(const ValueKey('cantidad-refaccion')), '2');
+        await tester.tap(find.byKey(const ValueKey('confirmar-agregar-refaccion')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text(caso.$2), findsOneWidget);
+        expect(find.widgetWithText(TextFormField, '2'), findsOneWidget);
+        expect(order.lines, isEmpty);
+      });
+    }
+
+    testWidgets('test_al_corregir_la_cantidad_de_una_linea_anterior_se_muestra_el_error_del_servidor', (tester) async {
+      useDesktopWindow(tester);
+      final order = FakeOrderWithParts();
+      order.lines.add({'id': 1, 'partId': 1, 'code': 'REF-1', 'name': 'Balatas', 'unit': 'pieza', 'quantity': 3});
+      const mensaje = 'Esta línea es anterior a los precios: quítala y vuelve a agregarla.';
+      final api = FakeApi(role: 'MECHANIC', handler: conError(order, 'PATCH', 'LEGACY_LINE_LOCKED', mensaje));
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('editar-refaccion-orden-1')));
+
+      await tester.tap(find.byKey(const ValueKey('editar-refaccion-orden-1')));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const ValueKey('cantidad-corregida')), '5');
+      await tester.tap(dialogButton('Guardar'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('error-corregir-refaccion')), findsOneWidget);
+      expect(find.text(mensaje), findsOneWidget);
+    });
+
+    test('test_el_modelo_de_la_linea_lee_precio_importe_y_bandera_y_el_del_mecanico_los_deja_vacios', () {
+      final completa = OrderPart.fromJson(lineaConPrecio(1, 1, 'Balatas', 2, '180.00', '360.00'));
+      final reducida = OrderPart.fromJson({'id': 1, 'partId': 1, 'code': 'REF-1', 'name': 'Balatas', 'unit': 'pieza', 'quantity': 2});
+
+      expect(completa.hasPrice, isTrue);
+      expect(completa.unitPrice, '180.00');
+      expect(completa.amount, '360.00');
+      expect(completa.legacy, isFalse);
+      expect(reducida.hasPrice, isFalse);
+      expect(reducida.amount, isNull);
+      expect(reducida.legacy, isFalse);
+    });
+
+    test('test_los_totales_con_refacciones_incluyen_el_subtotal_y_los_del_mecanico_no', () {
+      final admin = OrderTotals.fromJson({'services': '850.00', 'labor': '400.00', 'parts': '360.00', 'total': '1610.00'});
+      final mecanico = OrderTotals.fromJson({'services': '850.00', 'labor': '400.00', 'total': '1250.00'});
+
+      expect(admin.parts, '360.00');
+      expect(admin.total, '1610.00');
+      expect(mecanico.parts, isNull);
+      expect(mecanico.total, '1250.00');
     });
   });
 
