@@ -1,4 +1,4 @@
-`dashboard.listings.regression.test.js` | Mitigado |Revisión de `project-context.md` y `design-system.md` (CA-14) | Mitigado |`billing.parts.test.js`, `paymentRules.test.js` | Mitigado |`orderTotals.test.js`, `partPrices.test.js` | Mitigado |`prices.leak.test.js`, `orders.mechanicView.test.js` | Mitigado |`billing.parts.test.js` | Mitigado |`payments.paidOrder.test.js` y las pruebas de concurrencia de pagos | Mitigado |`emitted.compat.test.js`, `tickets.v2.test.js` | Mitigado |`orderParts.prices.test.js`, `emitted.compat.test.js` | Mitigado |`dashboard.listings.regression.test.js` | Mitigado |Revisión de `project-context.md` y `design-system.md` (CA-14) | Mitigado |`billing.parts.test.js`, `paymentRules.test.js` | Mitigado |`orderTotals.test.js`, `partPrices.test.js` | Mitigado |`prices.leak.test.js`, `orders.mechanicView.test.js` | Mitigado |`billing.parts.test.js` | Mitigado |`payments.paidOrder.test.js` y las pruebas de concurrencia de pagos | Mitigado |`emitted.compat.test.js`, `tickets.v2.test.js` | Mitigado |`orderParts.prices.test.js`, `emitted.compat.test.js` | Mitigado |# Aseguramiento de la calidad - Sprint 5: Precios de refacciones y cobro completo
+# Aseguramiento de la calidad - Sprint 5: Precios de refacciones y cobro completo
 
 Este documento es el registro de calidad del Sprint 5. Se llena durante la preparación, antes de ejecutar `/speckit.implement`, y se completa al cierre del sprint. Al terminar se pasa a Word.
 
@@ -397,30 +397,4 @@ Fecha: 2026-11-01. Se arrancó la API real (`node server.js`, puerto 3055) sobre
 
 Resultado: **Aprobado** (10 de 10 escenarios). Cada escenario tomó menos de 30 ms por la API.
 
-Alcance: esta comprobación cubre la API y los datos. Los **tiempos de uso de las pantallas** (SC-001, menos de 2 minutos; SC-008, menos de 3 minutos) y las **capturas** de la interfaz siguen pendientes de hacerse a mano en la aplicación (T060), y no se dan por cumplidos.
-
-## Modelo para nuevas evidencias
-
-Para agregar una evidencia, copia el modelo siguiente, cambia el identificador y enlaza los tres bloques desde la columna de evidencia de la tabla correspondiente: `[Requisito](#e-01-requisito) · [Prueba](#e-01-prueba) · [Resultado](#e-01-resultado)`.
-
-## E-01 Requisito
-
-Archivo: `specs/005-.../spec.md`, línea N.
-
-> (cita literal del requisito)
-
-## E-01 Prueba
-
-Archivo: `server/tests/...`, líneas N a M.
-
-(qué comprueba la prueba y fragmento clave)
-
-## E-01 Resultado
-
-Comando: `npm test -- ...`
-
-(salida real de la ejecución)
-
-![Descripción de la captura](evidencias/sprint-5/captura-nombre.png)
-
-Resultado: **Pendiente**
+Alcance: esta comprobación cubre la API y los datos. Los tiempos de uso de las pantallas (SC-001 en 50 s y SC-008 en 73 s) y las capturas de la interfaz se hicieron a mano en la aplicación (T060) y están en la sección 10 y en las evidencias E-01 a E-06.
