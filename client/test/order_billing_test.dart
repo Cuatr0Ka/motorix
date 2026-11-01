@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:motorix_client/models/payment.dart';
+
 import 'helpers/billing_fake.dart';
 import 'helpers/data.dart';
 import 'helpers/fake_api.dart';
@@ -8,7 +10,7 @@ import 'helpers/fake_api.dart';
 Finder dialogButton(String label) => find.descendant(
       of: find.byType(AlertDialog),
       matching: find.widgetWithText(
-        ['Continuar', 'Registrar pago', 'Entregar de todos modos', 'Confirmar', 'Cancelar cobro'].contains(label) ? FilledButton : OutlinedButton,
+        ['Continuar', 'Registrar pago', 'Entregar de todos modos', 'Confirmar', 'Cancelar cobro', 'Cancelar pago'].contains(label) ? FilledButton : OutlinedButton,
         label,
       ),
     );
@@ -92,7 +94,7 @@ void main() {
       await openOrder(tester);
       await scrollTo(tester, find.byKey(const ValueKey('motivo-sin-cobro')));
 
-      expect(find.textContaining('no hay nada que cobrar'), findsOneWidget);
+      expect(find.textContaining('nada que cobrar'), findsOneWidget);
     });
   });
 
@@ -218,16 +220,176 @@ void main() {
       final api = FakeApi(
         handler: order.handler(
           extra: (r) => r.method == 'GET' && r.path == '/orders/1'
-              ? ok(orderDetailJson(1, status: 'TERMINADO', mechanic: {'id': 3, 'name': 'Mario'}, billing: billingJson(total: '1350.00', payments: [paymentJson(1)], amountOutdated: true)))
+              ? ok(orderDetailJson(1, status: 'TERMINADO', mechanic: {'id': 3, 'name': 'Mario'}, billing: billingJson(total: '1350.00', payments: [paymentJson(1)], amountOutdated: true, amountDifference: '100.00')))
               : null,
         ),
       );
       await pumpAppSignedIn(tester, api);
       await openOrder(tester);
-      await scrollTo(tester, find.byKey(const ValueKey('importe-desactualizado')));
+      await scrollTo(tester, find.byKey(const ValueKey('diferencia-por-cobrar')));
 
-      expect(find.textContaining('El total cambió después del cobro'), findsOneWidget);
+      expect(find.textContaining('supera el pago registrado por \$100.00'), findsOneWidget);
       expect(find.textContaining('\$1,350.00'), findsWidgets);
+    });
+  });
+
+  group('desglose, pago desfasado y diferencia por cobrar (Sprint 5)', () {
+    /// Orden Terminada con el bloque de cobro que se indique, sin estado (solo lectura).
+    FakeApi apiWith(Map<String, dynamic> billing, {FakeBilledOrder? order}) {
+      final base = order ?? FakeBilledOrder();
+      return FakeApi(
+        handler: base.handler(
+          extra: (r) => r.method == 'GET' && r.path == '/orders/1'
+              ? ok(orderDetailJson(1, status: 'TERMINADO', mechanic: {'id': 3, 'name': 'Mario'}, billing: billing))
+              : null,
+        ),
+      );
+    }
+
+    testWidgets('test_muestra_el_desglose_con_servicios_mano_de_obra_y_refacciones_con_sus_subtotales', (tester) async {
+      useDesktopWindow(tester);
+      final api = apiWith(billingJson(
+        total: '1610.00',
+        breakdown: breakdownJson(parts: [breakdownPartJson(1, 'Balatas', 2, '180.00', '360.00')]),
+      ));
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('desglose-cobro')));
+
+      expect(find.text('Desglose del total'), findsOneWidget);
+      expect(find.text('Cambio de balatas'), findsOneWidget);
+      expect(find.text('Mano de obra frenos'), findsOneWidget);
+      expect(find.textContaining('REF-1 · Balatas'), findsOneWidget);
+      expect(find.textContaining('2 pieza  ×  \$180.00'), findsOneWidget);
+      expect(tester.widget<Text>(find.byKey(const ValueKey('subtotal-servicios'))).data, '\$850.00');
+      expect(tester.widget<Text>(find.byKey(const ValueKey('subtotal-mano-de-obra'))).data, '\$400.00');
+      expect(tester.widget<Text>(find.byKey(const ValueKey('subtotal-refacciones-cobro'))).data, '\$360.00');
+      expect(tester.widget<Text>(find.byKey(const ValueKey('importe-cobro-1'))).data, '\$360.00');
+      expect(find.textContaining('\$1,610.00'), findsWidgets);
+    });
+
+    testWidgets('test_una_linea_anterior_a_los_precios_aparece_con_la_indicacion_y_el_importe_cero', (tester) async {
+      useDesktopWindow(tester);
+      final api = apiWith(billingJson(
+        breakdown: breakdownJson(parts: [breakdownPartJson(2, 'Pieza vieja', 3, '0.00', '0.00', legacy: true)]),
+      ));
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('desglose-cobro')));
+
+      expect(find.textContaining('Anterior a los precios'), findsOneWidget);
+      expect(tester.widget<Text>(find.byKey(const ValueKey('importe-cobro-2'))).data, '\$0.00');
+      expect(tester.widget<Text>(find.byKey(const ValueKey('subtotal-refacciones-cobro'))).data, '\$0.00');
+    });
+
+    testWidgets('test_una_orden_con_solo_refacciones_se_puede_cobrar', (tester) async {
+      useDesktopWindow(tester);
+      final soloPiezas = {
+        'services': <Map<String, dynamic>>[],
+        'labor': <Map<String, dynamic>>[],
+        'parts': [breakdownPartJson(1, 'Balatas', 1, '180.00', '180.00')],
+        'subtotals': {'services': '0.00', 'labor': '0.00', 'parts': '180.00'},
+      };
+      final api = apiWith(billingJson(total: '180.00', breakdown: soloPiezas));
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('desglose-cobro')));
+
+      expect(find.byKey(const ValueKey('cobrar')), findsOneWidget);
+      expect(find.text('Sin conceptos.'), findsNWidgets(2));
+      expect(find.byKey(const ValueKey('motivo-sin-cobro')), findsNothing);
+    });
+
+    testWidgets('test_un_pago_pendiente_desfasado_muestra_el_aviso_y_cancelarlo_pide_confirmacion', (tester) async {
+      useDesktopWindow(tester);
+      final pendiente = paymentJson(1, method: 'MERCADO_PAGO', status: 'PENDIENTE', amount: '1250.00', checkoutUrl: 'https://sandbox.mercadopago.com.mx/c/1');
+      final order = FakeBilledOrder()..payments.add(pendiente);
+      final api = apiWith(
+        billingJson(total: '1350.00', payments: [pendiente], amountOutdated: true, breakdown: breakdownJson()),
+        order: order,
+      );
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('importe-desfasado')));
+
+      expect(find.textContaining('ya no coincide con el total de la orden'), findsOneWidget);
+      expect(find.byKey(const ValueKey('cobrar')), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('cancelar-y-generar-nuevo')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('queda en el historial'), findsOneWidget);
+      await tester.tap(dialogButton('Volver'));
+      await tester.pumpAndSettle();
+      expect(api.requests.where((r) => r.path == '/payments/1/cancel'), isEmpty);
+
+      await tester.tap(find.byKey(const ValueKey('cancelar-y-generar-nuevo')));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogButton('Cancelar pago'));
+      await tester.pumpAndSettle();
+
+      expect(api.requests.where((r) => r.method == 'POST' && r.path == '/payments/1/cancel'), hasLength(1));
+      expect(find.text('Pago cancelado. Usa «Cobrar» para generar uno nuevo con el total vigente.'), findsOneWidget);
+    });
+
+    testWidgets('test_un_pago_pendiente_con_el_importe_vigente_no_muestra_el_aviso', (tester) async {
+      useDesktopWindow(tester);
+      final pendiente = paymentJson(1, method: 'MERCADO_PAGO', status: 'PENDIENTE', checkoutUrl: 'https://sandbox.mercadopago.com.mx/c/1');
+      final api = apiWith(billingJson(payments: [pendiente], breakdown: breakdownJson()));
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('desglose-cobro')));
+
+      expect(find.byKey(const ValueKey('importe-desfasado')), findsNothing);
+      expect(find.byKey(const ValueKey('cancelar-y-generar-nuevo')), findsNothing);
+    });
+
+    testWidgets('test_con_un_pago_pagado_y_diferencia_muestra_el_aviso_sin_boton_de_cobro', (tester) async {
+      useDesktopWindow(tester);
+      final api = apiWith(billingJson(
+        total: '1350.00',
+        payments: [paymentJson(1)],
+        amountOutdated: true,
+        amountDifference: '100.00',
+        breakdown: breakdownJson(),
+      ));
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('diferencia-por-cobrar')));
+
+      expect(
+        find.text('El total de la orden supera el pago registrado por \$100.00. La diferencia se cobra fuera del sistema.'),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('cobrar')), findsNothing);
+      expect(find.byKey(const ValueKey('cancelar-y-generar-nuevo')), findsNothing);
+    });
+
+    testWidgets('test_un_pago_pagado_sin_diferencia_no_muestra_ningun_aviso', (tester) async {
+      useDesktopWindow(tester);
+      final api = apiWith(billingJson(payments: [paymentJson(1)], breakdown: breakdownJson()));
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('desglose-cobro')));
+
+      expect(find.byKey(const ValueKey('diferencia-por-cobrar')), findsNothing);
+      expect(find.byKey(const ValueKey('importe-desfasado')), findsNothing);
+    });
+
+    test('test_el_modelo_lee_el_desglose_y_la_diferencia_y_tolera_su_ausencia', () {
+      final completo = Billing.fromJson(billingJson(
+        total: '1610.00',
+        payments: [paymentJson(1)],
+        amountDifference: '-50.00',
+        breakdown: breakdownJson(parts: [breakdownPartJson(1, 'Balatas', 2, '180.00', '360.00')]),
+      ));
+      final anterior = Billing.fromJson(billingJson());
+
+      expect(completo.breakdown!.parts.single.legacy, isFalse);
+      expect(completo.breakdown!.partsSubtotal, '360.00');
+      expect(completo.hasDifference, isTrue);
+      expect(anterior.breakdown, isNull);
+      expect(anterior.amountDifference, '0.00');
+      expect(anterior.hasDifference, isFalse);
     });
   });
 

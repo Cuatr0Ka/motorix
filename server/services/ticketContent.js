@@ -12,8 +12,10 @@ const iso = (value) => (value ? new Date(value).toISOString() : null);
  * Arma la instantánea del contenido de un ticket (módulo puro, sin acceso a la base). Es lo que se guarda en
  * `tickets.content` y no cambia aunque la orden, el cliente o el vehículo cambien después.
  *
- * Los importes se suman en centavos enteros. Las refacciones se listan con su cantidad y NO suman importe al
- * total (los precios de refacciones no forman parte del MVP). No incluye datos de tarjeta de ningún tipo.
+ * Formato versión 2 (Sprint 5): cada refacción lleva cantidad, precio unitario e importe, y los subtotales de servicios,
+ * mano de obra y refacciones se suman en centavos enteros. El total es el importe del pago registrado: no se
+ * recalcula, así que el ticket siempre dice lo que se cobró. Los tickets anteriores (sin `formatVersion`) no se
+ * convierten. No incluye datos de tarjeta ni el precio de compra de ninguna refacción.
  *
  * @param {object} datos
  * @param {{name:string,address:string,phone:string}} datos.shop
@@ -21,17 +23,19 @@ const iso = (value) => (value ? new Date(value).toISOString() : null);
  * @param {{name:string,phone:?string}} datos.customer
  * @param {{licensePlate:string,brand:string,model:string,year:number}} datos.vehicle
  * @param {Array<{description:string,amount:string}>} datos.services
- * @param {Array<{code:string,name:string,unit:string,quantity:number}>} datos.parts
+ * @param {Array<{code:string,name:string,unit:string,quantity:number,unitPrice:string,amount:string}>} datos.parts
  * @param {Array<{description:string,amount:string}>} datos.labor
- * @param {{method:string,status:string,paidAt:?(Date|string),reference:?string}} datos.payment
+ * @param {{amount:string,method:string,status:string,paidAt:?(Date|string),reference:?string}} datos.payment
  * @param {Date} datos.now
  */
 export function buildTicketContent({ shop, order, customer, vehicle, services, parts, labor, payment, now }) {
   const line = (item) => ({ description: item.description, amount: formatCents(toCents(item.amount)) });
   const servicesCents = services.reduce((sum, item) => sum + toCents(item.amount), 0);
   const laborCents = labor.reduce((sum, item) => sum + toCents(item.amount), 0);
+  const partsCents = parts.reduce((sum, item) => sum + toCents(item.amount ?? 0), 0);
 
   return {
+    formatVersion: 2,
     shop: { name: shop.name, address: shop.address, phone: shop.phone },
     customer: { name: customer.name, phone: customer.phone ?? null },
     vehicle: {
@@ -48,12 +52,20 @@ export function buildTicketContent({ shop, order, customer, vehicle, services, p
       serviceMileage: order.serviceMileage ?? null,
     },
     services: services.map(line),
-    parts: parts.map((part) => ({ code: part.code, name: part.name, unit: part.unit, quantity: part.quantity })),
+    parts: parts.map((part) => ({
+      code: part.code,
+      name: part.name,
+      unit: part.unit,
+      quantity: part.quantity,
+      unitPrice: formatCents(toCents(part.unitPrice ?? 0)),
+      amount: formatCents(toCents(part.amount ?? 0)),
+    })),
     labor: labor.map(line),
     totals: {
       services: formatCents(servicesCents),
       labor: formatCents(laborCents),
-      total: formatCents(servicesCents + laborCents),
+      parts: formatCents(partsCents),
+      total: formatCents(toCents(payment.amount)),
     },
     payment: {
       method: payment.method,

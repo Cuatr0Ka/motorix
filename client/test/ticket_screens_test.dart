@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:motorix_client/models/ticket.dart';
+
 import 'helpers/billing_fake.dart';
 import 'helpers/data.dart';
 import 'helpers/fake_api.dart';
@@ -20,6 +22,9 @@ Future<void> scrollTo(WidgetTester tester, Finder finder) =>
     tester.scrollUntilVisible(finder, 200, scrollable: find.byType(Scrollable).last);
 
 FakeBilledOrder paidOrder() => FakeBilledOrder()..payments.add(paymentJson(1));
+
+/// Ticket que sirve el simulador en las pruebas del formato (versión 1 o 2).
+Map<String, dynamic>? _ticketServido;
 
 void main() {
   group('generar el ticket desde la orden', () {
@@ -91,6 +96,77 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('La orden debe estar cobrada (pago Pagado) para generar su ticket.'), findsOneWidget);
+    });
+  });
+
+  group('formato del ticket: versión 2 y tickets anteriores (Sprint 5)', () {
+    final partesV2 = [
+      {'code': 'BAL-DEL', 'name': 'Balatas delanteras', 'unit': 'juego', 'quantity': 2, 'unitPrice': '180.00', 'amount': '360.00'},
+    ];
+
+    FakeBilledOrder conTicketDe(Map<String, dynamic> json) {
+      final order = paidOrder()..ticket = {'id': 1, 'folio': 'TK-000001'};
+      _ticketServido = json;
+      return order;
+    }
+
+    FakeApi apiConTicket(FakeBilledOrder order) => FakeApi(
+          handler: order.handler(
+            extra: (r) => r.method == 'GET' && r.path == '/tickets/1' ? ok(_ticketServido!) : null,
+          ),
+        );
+
+    Future<void> abrirTicket(WidgetTester tester) async {
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('ver-ticket')));
+      await tester.tap(find.byKey(const ValueKey('ver-ticket')));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('test_el_ticket_version_2_muestra_precio_importe_y_los_tres_subtotales', (tester) async {
+      useDesktopWindow(tester);
+      final order = conTicketDe(ticketJson(1, formatVersion: 2, parts: partesV2, partsTotal: '360.00', total: '1610.00'));
+      await pumpAppSignedIn(tester, apiConTicket(order));
+      await abrirTicket(tester);
+
+      expect(find.text('Balatas delanteras (BAL-DEL)'), findsOneWidget);
+      expect(tester.widget<Text>(find.byKey(const ValueKey('ticket-importe-BAL-DEL'))).data, '\$360.00');
+      expect(tester.widget<Text>(find.byKey(const ValueKey('ticket-detalle-BAL-DEL'))).data, '2 juego × \$180.00');
+      expect(find.text('Subtotal de servicios'), findsOneWidget);
+      expect(find.text('Subtotal de mano de obra'), findsOneWidget);
+      expect(tester.widget<Text>(find.byKey(const ValueKey('ticket-subtotal-refacciones'))).data, '\$360.00');
+      expect(tester.widget<Text>(find.byKey(const ValueKey('ticket-total'))).data, '\$1,610.00');
+    });
+
+    testWidgets('test_el_ticket_anterior_se_muestra_como_se_emitio_sin_precios_ni_subtotal_de_refacciones', (tester) async {
+      useDesktopWindow(tester);
+      final order = conTicketDe(ticketJson(1));
+      await pumpAppSignedIn(tester, apiConTicket(order));
+      await abrirTicket(tester);
+
+      expect(find.text('Balatas delanteras (BAL-DEL)'), findsOneWidget);
+      expect(find.text('2 juego'), findsOneWidget);
+      expect(find.byKey(const ValueKey('ticket-importe-BAL-DEL')), findsNothing);
+      expect(find.byKey(const ValueKey('ticket-subtotal-refacciones')), findsNothing);
+      expect(find.textContaining('×'), findsNothing);
+      expect(find.text('Subtotal de refacciones'), findsNothing);
+      expect(tester.widget<Text>(find.byKey(const ValueKey('ticket-total'))).data, '\$1,250.00');
+    });
+
+    test('test_el_modelo_distingue_la_version_por_el_campo_formatVersion_y_no_por_los_precios', () {
+      final v2 = Ticket.fromJson(ticketJson(1, formatVersion: 2, parts: partesV2, partsTotal: '360.00', total: '1610.00')).content!;
+      final v1 = Ticket.fromJson(ticketJson(2)).content!;
+      // Un ticket versión 1 con campos de precio sueltos sigue siendo versión 1: manda el campo de versión.
+      final v1ConPrecios = Ticket.fromJson(ticketJson(3, parts: partesV2)).content!;
+
+      expect(v2.isV2, isTrue);
+      expect(v2.partsTotal, '360.00');
+      expect(v2.parts.single.amount, '360.00');
+      expect(v1.isV2, isFalse);
+      expect(v1.formatVersion, 1);
+      expect(v1.partsTotal, isNull);
+      expect(v1.parts.single.amount, isNull);
+      expect(v1ConPrecios.isV2, isFalse);
     });
   });
 

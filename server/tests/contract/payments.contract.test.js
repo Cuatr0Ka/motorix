@@ -131,7 +131,14 @@ describe('consultas de pagos (contrato)', () => {
       paidAmount: '1250.00',
       collectionStatus: 'PAGADO',
       amountOutdated: false,
+      amountDifference: '0.00',
       canCharge: false,
+      breakdown: {
+        services: [{ id: expect.any(Number), description: expect.any(String), amount: '850.00' }],
+        labor: [{ id: expect.any(Number), description: expect.any(String), amount: '400.00' }],
+        parts: [],
+        subtotals: { services: '850.00', labor: '400.00', parts: '0.00' },
+      },
       payments: [expect.objectContaining(objetoPago)],
       ticket: null,
     });

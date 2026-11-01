@@ -122,10 +122,82 @@ class OrderBillingSection extends StatelessWidget {
     _report(context, failure, 'Ticket generado correctamente.');
   }
 
+  Payment? _pendingPayment(Billing billing) {
+    for (final payment in billing.payments) {
+      if (payment.status == PaymentStatus.pending) return payment;
+    }
+    return null;
+  }
+
   String? _cannotChargeReason(Billing billing) {
     if (billing.canCharge || billing.collectionStatus != CollectionStatus.unpaid) return null;
     if (!order.isFinishedOrDelivered) return 'La orden debe estar Terminada para poder cobrarse.';
-    return 'La orden no tiene servicios ni mano de obra: no hay nada que cobrar.';
+    return 'La orden no tiene nada que cobrar: el total es cero.';
+  }
+
+  /// Cancela el pago pendiente desfasado, con confirmación. No crea otro: al terminar, la recepción cobra de nuevo con
+  /// el total vigente (el sistema nunca cancela ni crea pagos por sí solo).
+  Future<void> _cancelOutdated(BuildContext context, Payment payment, Billing billing) async {
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Cancelar pago y generar uno nuevo',
+      message: 'El pago pendiente es de ${formatMoney(payment.amount)} y el total vigente de la orden es '
+          '${formatMoney(billing.total)}. Se cancelará ese pago (queda en el historial) y después podrás cobrar con el total vigente.',
+      confirmLabel: 'Cancelar pago',
+      cancelLabel: 'Volver',
+    );
+    if (!confirmed || !context.mounted) return;
+    final failure = await actions.onCancel(payment);
+    if (!context.mounted) return;
+    _report(context, failure, 'Pago cancelado. Usa «Cobrar» para generar uno nuevo con el total vigente.');
+  }
+
+  /// Aviso del pago pendiente cuyo importe ya no coincide con el total, con el botón para cancelarlo (FR-012).
+  Widget _outdatedPendingNotice(BuildContext context, Billing billing, Payment payment) {
+    final theme = Theme.of(context);
+    return Container(
+      key: const ValueKey('importe-desfasado'),
+      margin: const EdgeInsets.only(top: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.warning.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppRadius.panel),
+        border: Border.all(color: AppColors.warning.withValues(alpha: 0.6)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'El importe del pago pendiente (${formatMoney(payment.amount)}) ya no coincide con el total de la orden '
+            '(${formatMoney(billing.total)}).',
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          OutlinedButton.icon(
+            key: const ValueKey('cancelar-y-generar-nuevo'),
+            onPressed: busy ? null : () => _cancelOutdated(context, payment, billing),
+            icon: const Icon(Icons.sync_problem_outlined, size: 18),
+            label: const Text('Cancelar pago y generar uno nuevo'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Aviso de la diferencia entre el total vigente y el pago Pagado: no se cobra desde aquí, se resuelve fuera.
+  Widget _differenceNotice(BuildContext context, Billing billing) {
+    final amount = double.tryParse(billing.amountDifference) ?? 0;
+    final text = amount > 0
+        ? 'El total de la orden supera el pago registrado por ${formatMoney(billing.amountDifference)}. La diferencia se cobra fuera del sistema.'
+        : 'El pago registrado supera el total de la orden por ${formatMoney(amount.abs().toStringAsFixed(2))}.';
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
+      child: Text(
+        text,
+        key: const ValueKey('diferencia-por-cobrar'),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.warning),
+      ),
+    );
   }
 
   @override
@@ -162,15 +234,10 @@ class OrderBillingSection extends StatelessWidget {
               CollectionChip(status: billing.collectionStatus),
             ],
           ),
-          if (billing.amountOutdated)
-            Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.sm),
-              child: Text(
-                'El total cambió después del cobro. El pago conserva su importe (${formatMoney(billing.payments.firstWhere((p) => p.status == PaymentStatus.paid || p.status == PaymentStatus.pending, orElse: () => billing.payments.first).amount)}).',
-                key: const ValueKey('importe-desactualizado'),
-                style: theme.textTheme.bodySmall?.copyWith(color: AppColors.warning),
-              ),
-            ),
+          if (billing.breakdown != null) _Breakdown(breakdown: billing.breakdown!),
+          if (billing.amountOutdated && !billing.isPaid && _pendingPayment(billing) != null)
+            _outdatedPendingNotice(context, billing, _pendingPayment(billing)!),
+          if (billing.isPaid && billing.hasDifference) _differenceNotice(context, billing),
           if (reason != null)
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.sm),
@@ -214,6 +281,67 @@ class OrderBillingSection extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Desglose del total antes de registrar el pago: servicios, mano de obra y refacciones (cantidad, precio e importe)
+/// con sus subtotales (FR-023). Las líneas anteriores a los precios muestran 0.00 y «Anterior a los precios». Sirve a la
+/// recepción para revisar que una pieza no se haya cobrado ya como servicio.
+class _Breakdown extends StatelessWidget {
+  const _Breakdown({required this.breakdown});
+
+  final BillingBreakdown breakdown;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bold = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600);
+
+    Widget row(String left, String right, {TextStyle? style, Key? key}) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: Text(left, style: style ?? theme.textTheme.bodySmall)),
+              const SizedBox(width: AppSpacing.md),
+              Text(right, key: key, style: style ?? theme.textTheme.bodySmall),
+            ],
+          ),
+        );
+
+    Widget group(String title, String subtotal, Key subtotalKey, List<Widget> lines) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: AppSpacing.sm),
+            row(title, formatMoney(subtotal), style: bold, key: subtotalKey),
+            if (lines.isEmpty) Text('Sin conceptos.', style: theme.textTheme.bodySmall) else ...lines,
+          ],
+        );
+
+    return Column(
+      key: const ValueKey('desglose-cobro'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: AppSpacing.md),
+        const Divider(),
+        Text('Desglose del total', style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+        group('Servicios', breakdown.servicesSubtotal, const ValueKey('subtotal-servicios'), [
+          for (final line in breakdown.services) row(line.description, formatMoney(line.amount)),
+        ]),
+        group('Mano de obra', breakdown.laborSubtotal, const ValueKey('subtotal-mano-de-obra'), [
+          for (final line in breakdown.labor) row(line.description, formatMoney(line.amount)),
+        ]),
+        group('Refacciones', breakdown.partsSubtotal, const ValueKey('subtotal-refacciones-cobro'), [
+          for (final part in breakdown.parts)
+            row(
+              '${part.code} · ${part.name}  ${part.quantity} ${part.unit}'
+              '${part.legacy ? '  ·  Anterior a los precios' : '  ×  ${formatMoney(part.unitPrice)}'}',
+              formatMoney(part.amount),
+              key: ValueKey('importe-cobro-${part.id}'),
+            ),
+        ]),
+      ],
     );
   }
 }

@@ -284,6 +284,8 @@ Map<String, dynamic> billingJson({
   List<Map<String, dynamic>> payments = const [],
   bool canCharge = true,
   bool amountOutdated = false,
+  String amountDifference = '0.00',
+  Map<String, dynamic>? breakdown,
   Map<String, dynamic>? ticket,
 }) {
   final paid = payments.where((p) => p['status'] == 'PAGADO').toList();
@@ -293,11 +295,40 @@ Map<String, dynamic> billingJson({
     'paidAmount': paid.isEmpty ? '0.00' : paid.first['amount'],
     'collectionStatus': paid.isNotEmpty ? 'PAGADO' : (active.isNotEmpty ? 'PENDIENTE' : 'SIN_COBRAR'),
     'amountOutdated': amountOutdated,
+    'amountDifference': amountDifference,
     'canCharge': canCharge && active.isEmpty,
+    'breakdown': ?breakdown,
     'payments': payments,
     'ticket': ticket,
   };
 }
+
+/// Desglose del cobro de ejemplo: servicio 850.00, mano de obra 400.00 y las refacciones que se indiquen.
+Map<String, dynamic> breakdownJson({List<Map<String, dynamic>> parts = const []}) {
+  final partsCents = parts.fold<int>(0, (sum, p) => sum + (double.parse('${p['amount']}') * 100).round());
+  return {
+    'services': [
+      {'id': 1, 'description': 'Cambio de balatas', 'amount': '850.00'},
+    ],
+    'labor': [
+      {'id': 1, 'description': 'Mano de obra frenos', 'amount': '400.00'},
+    ],
+    'parts': parts,
+    'subtotals': {'services': '850.00', 'labor': '400.00', 'parts': (partsCents / 100).toStringAsFixed(2)},
+  };
+}
+
+/// Refacción del desglose del cobro.
+Map<String, dynamic> breakdownPartJson(int id, String name, int quantity, String unitPrice, String amount, {bool legacy = false}) => {
+      'id': id,
+      'code': 'REF-$id',
+      'name': name,
+      'unit': 'pieza',
+      'quantity': quantity,
+      'unitPrice': unitPrice,
+      'amount': amount,
+      'legacy': legacy,
+    };
 
 /// Ticket de ejemplo. Con `full` trae el contenido completo; sin él, la forma de los listados.
 Map<String, dynamic> ticketJson(
@@ -309,6 +340,9 @@ Map<String, dynamic> ticketJson(
   ],
   String clientName = 'Ana Morales',
   String plate = 'MNO-345-E',
+  int? formatVersion,
+  String? partsTotal,
+  String total = '1250.00',
 }) {
   final base = {
     'id': id,
@@ -325,6 +359,7 @@ Map<String, dynamic> ticketJson(
   return {
     ...base,
     'content': {
+      'formatVersion': ?formatVersion,
       'shop': {'name': 'Taller de Prueba', 'address': 'Calle 1 #23', 'phone': '5555555555'},
       'customer': {'name': clientName, 'phone': '5512345678'},
       'vehicle': {'plate': plate, 'brand': 'Honda', 'model': 'Civic', 'year': 2020, 'mileage': 51400},
@@ -336,7 +371,7 @@ Map<String, dynamic> ticketJson(
       'labor': [
         {'description': 'Mano de obra frenos', 'amount': '400.00'},
       ],
-      'totals': {'services': '850.00', 'labor': '400.00', 'total': '1250.00'},
+      'totals': {'services': '850.00', 'labor': '400.00', 'parts': ?partsTotal, 'total': total},
       'payment': {'method': 'EFECTIVO', 'status': 'PAGADO', 'paidAt': '2030-10-11T15:00:00.000Z', 'reference': 'TERM-48213'},
       'generatedAt': '2030-10-11T15:10:00.000Z',
     },

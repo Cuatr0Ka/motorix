@@ -83,13 +83,21 @@ pw.Document buildTicketDocument(Ticket ticket, {pw.ThemeData? theme}) {
           if (content.services.isNotEmpty)
             section('Servicios', [for (final line in content.services) row(line.description, formatMoney(line.amount))]),
           if (content.parts.isNotEmpty)
-            section('Refacciones', [for (final part in content.parts) row(part.name, '${part.quantity} ${part.unit}')]),
+            section('Refacciones', [
+              for (final part in content.parts)
+                if (content.isV2 && part.amount != null) ...[
+                  row(part.name, formatMoney(part.amount!)),
+                  pw.Text('${part.quantity} ${part.unit} x ${formatMoney(part.unitPrice ?? '0.00')}', style: small),
+                ] else
+                  row(part.name, '${part.quantity} ${part.unit}'),
+            ]),
           if (content.labor.isNotEmpty)
             section('Mano de obra', [for (final line in content.labor) row(line.description, formatMoney(line.amount))]),
           pw.SizedBox(height: 6),
           pw.Divider(thickness: 0.5, height: 4),
           row('Subtotal servicios', formatMoney(content.servicesTotal)),
           row('Subtotal mano de obra', formatMoney(content.laborTotal)),
+          if (content.isV2 && content.partsTotal != null) row('Subtotal refacciones', formatMoney(content.partsTotal!)),
           row('TOTAL', formatMoney(content.total), style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11)),
           section('Pago', [
             row('Metodo', PaymentMethod.fromApi(content.paymentMethod).label),

@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { buildTicketContent, formatTicketFolio } from '../../services/ticketContent.js';
 
+// Servicios 970.50 + mano de obra 400.00 + refacciones 1200.00 = 2570.50 (el importe del pago registrado).
 const base = () => ({
   shop: { name: 'Taller de Prueba', address: 'Calle 1 #23', phone: '5555555555' },
   order: { id: 12, entryMileage: 84500, serviceMileage: 84620 },
@@ -10,9 +11,9 @@ const base = () => ({
     { description: 'Cambio de balatas', amount: '850.00' },
     { description: 'Rotación de llantas', amount: '120.50' },
   ],
-  parts: [{ code: 'BAL-DEL', name: 'Balatas delanteras', unit: 'juego', quantity: 1 }],
+  parts: [{ code: 'BAL-DEL', name: 'Balatas delanteras', unit: 'juego', quantity: 1, unitPrice: '1200.00', amount: '1200.00' }],
   labor: [{ description: 'Mano de obra frenos', amount: '400.00' }],
-  payment: { method: 'EFECTIVO', status: 'PAGADO', paidAt: new Date('2026-10-11T15:00:00.000Z'), reference: 'TERM-1' },
+  payment: { amount: '2570.50', method: 'EFECTIVO', status: 'PAGADO', paidAt: new Date('2026-10-11T15:00:00.000Z'), reference: 'TERM-1' },
   now: new Date('2026-10-11T15:10:00.000Z'),
 });
 
@@ -22,11 +23,12 @@ describe('folio del ticket', () => {
   });
 });
 
-describe('contenido del ticket (CA-4, FR-013)', () => {
-  it('test_incluye_todos_los_campos_requeridos', () => {
+describe('contenido del ticket versión 2 (FR-007, CA-4, CA-7)', () => {
+  it('test_incluye_todos_los_campos_requeridos_con_el_formato_version_2', () => {
     const contenido = buildTicketContent(base());
 
     expect(contenido).toEqual({
+      formatVersion: 2,
       shop: { name: 'Taller de Prueba', address: 'Calle 1 #23', phone: '5555555555' },
       customer: { name: 'Ana Morales', phone: '5512345678' },
       vehicle: { plate: 'ABC-123-A', brand: 'Nissan', model: 'Versa', year: 2019, mileage: 84620 },
@@ -35,9 +37,9 @@ describe('contenido del ticket (CA-4, FR-013)', () => {
         { description: 'Cambio de balatas', amount: '850.00' },
         { description: 'Rotación de llantas', amount: '120.50' },
       ],
-      parts: [{ code: 'BAL-DEL', name: 'Balatas delanteras', unit: 'juego', quantity: 1 }],
+      parts: [{ code: 'BAL-DEL', name: 'Balatas delanteras', unit: 'juego', quantity: 1, unitPrice: '1200.00', amount: '1200.00' }],
       labor: [{ description: 'Mano de obra frenos', amount: '400.00' }],
-      totals: { services: '970.50', labor: '400.00', total: '1370.50' },
+      totals: { services: '970.50', labor: '400.00', parts: '1200.00', total: '2570.50' },
       payment: { method: 'EFECTIVO', status: 'PAGADO', paidAt: '2026-10-11T15:00:00.000Z', reference: 'TERM-1' },
       generatedAt: '2026-10-11T15:10:00.000Z',
     });
@@ -53,20 +55,55 @@ describe('contenido del ticket (CA-4, FR-013)', () => {
     expect(contenido.order.serviceMileage).toBeNull();
   });
 
-  it('test_las_refacciones_se_listan_con_cantidad_y_no_suman_importe', () => {
+  it('test_cada_refaccion_lleva_cantidad_precio_unitario_e_importe_y_el_subtotal_las_suma', () => {
     const datos = base();
     datos.parts = [
-      { code: 'A', name: 'Pieza A', unit: 'pieza', quantity: 4, amount: '9999.00', price: '5000' },
-      { code: 'B', name: 'Pieza B', unit: 'litro', quantity: 2 },
+      { code: 'A', name: 'Pieza A', unit: 'pieza', quantity: 4, unitPrice: '180.00', amount: '720.00' },
+      { code: 'B', name: 'Pieza B', unit: 'litro', quantity: 3, unitPrice: '0.10', amount: '0.30' },
     ];
+    datos.payment.amount = '2060.80';
 
     const contenido = buildTicketContent(datos);
 
     expect(contenido.parts).toEqual([
-      { code: 'A', name: 'Pieza A', unit: 'pieza', quantity: 4 },
-      { code: 'B', name: 'Pieza B', unit: 'litro', quantity: 2 },
+      { code: 'A', name: 'Pieza A', unit: 'pieza', quantity: 4, unitPrice: '180.00', amount: '720.00' },
+      { code: 'B', name: 'Pieza B', unit: 'litro', quantity: 3, unitPrice: '0.10', amount: '0.30' },
     ]);
-    expect(contenido.totals.total).toBe('1370.50');
+    expect(contenido.totals.parts).toBe('720.30');
+  });
+
+  it('test_no_arrastra_campos_ajenos_a_las_refacciones', () => {
+    const datos = base();
+    datos.parts = [{ code: 'A', name: 'Pieza A', unit: 'pieza', quantity: 1, unitPrice: '10.00', amount: '10.00', purchasePrice: '4.00', partId: 7 }];
+    datos.payment.amount = '1390.50';
+
+    const texto = JSON.stringify(buildTicketContent(datos));
+
+    expect(texto).not.toContain('purchasePrice');
+    expect(texto).not.toContain('partId');
+  });
+
+  it('test_las_lineas_anteriores_a_los_precios_aparecen_con_cero_y_no_suman', () => {
+    const datos = base();
+    datos.parts = [{ code: 'OLD', name: 'Pieza anterior', unit: 'pieza', quantity: 2, unitPrice: '0.00', amount: '0.00' }];
+    datos.payment.amount = '1370.50';
+
+    const contenido = buildTicketContent(datos);
+
+    expect(contenido.parts[0]).toMatchObject({ unitPrice: '0.00', amount: '0.00' });
+    expect(contenido.totals).toEqual({ services: '970.50', labor: '400.00', parts: '0.00', total: '1370.50' });
+  });
+
+  it('test_el_total_es_el_importe_del_pago_registrado_y_no_se_recalcula', () => {
+    const datos = base();
+    // Si los conceptos cambian después del pago, el total del ticket sigue siendo lo que se cobró.
+    datos.payment.amount = '2000.00';
+
+    const contenido = buildTicketContent(datos);
+
+    expect(contenido.totals.total).toBe('2000.00');
+    expect(contenido.totals.services).toBe('970.50');
+    expect(contenido.totals.parts).toBe('1200.00');
   });
 
   it('test_suma_en_centavos_exactos_sin_errores_de_redondeo', () => {
@@ -77,22 +114,37 @@ describe('contenido del ticket (CA-4, FR-013)', () => {
       { description: 'C', amount: '19.99' },
     ];
     datos.labor = [{ description: 'D', amount: '0.01' }];
+    datos.parts = [];
+    datos.payment.amount = '20.30';
 
     const contenido = buildTicketContent(datos);
 
-    expect(contenido.totals).toEqual({ services: '20.29', labor: '0.01', total: '20.30' });
+    expect(contenido.totals).toEqual({ services: '20.29', labor: '0.01', parts: '0.00', total: '20.30' });
   });
 
   it('test_una_orden_sin_refacciones_ni_mano_de_obra_tiene_listas_vacias_y_subtotales_en_cero', () => {
     const datos = base();
     datos.parts = [];
     datos.labor = [];
+    datos.payment.amount = '970.50';
 
     const contenido = buildTicketContent(datos);
 
     expect(contenido.parts).toEqual([]);
     expect(contenido.labor).toEqual([]);
-    expect(contenido.totals).toEqual({ services: '970.50', labor: '0.00', total: '970.50' });
+    expect(contenido.totals).toEqual({ services: '970.50', labor: '0.00', parts: '0.00', total: '970.50' });
+  });
+
+  it('test_una_orden_con_solo_refacciones_tiene_total_igual_al_subtotal_de_refacciones', () => {
+    const datos = base();
+    datos.services = [];
+    datos.labor = [];
+    datos.parts = [{ code: 'A', name: 'Pieza A', unit: 'pieza', quantity: 1, unitPrice: '180.00', amount: '180.00' }];
+    datos.payment.amount = '180.00';
+
+    const contenido = buildTicketContent(datos);
+
+    expect(contenido.totals).toEqual({ services: '0.00', labor: '0.00', parts: '180.00', total: '180.00' });
   });
 
   it('test_el_cliente_sin_telefono_y_el_pago_sin_referencia_quedan_en_null', () => {
@@ -125,10 +177,12 @@ describe('contenido del ticket (CA-4, FR-013)', () => {
     const contenido = buildTicketContent(datos);
 
     datos.services[0].amount = '1.00';
+    datos.parts[0].unitPrice = '1.00';
     datos.customer.name = 'Otra persona';
     datos.vehicle.licensePlate = 'ZZZ-999-Z';
 
     expect(contenido.services[0].amount).toBe('850.00');
+    expect(contenido.parts[0].unitPrice).toBe('1200.00');
     expect(contenido.customer.name).toBe('Ana Morales');
     expect(contenido.vehicle.plate).toBe('ABC-123-A');
   });

@@ -1,6 +1,7 @@
 import { withTransaction } from '../config/db.js';
 import { getGateway } from '../integrations/mercadoPago.js';
 import * as orderModel from '../models/orderModel.js';
+import * as orderPartModel from '../models/orderPartModel.js';
 import * as orderWorkModel from '../models/orderWorkModel.js';
 import * as paymentModel from '../models/paymentModel.js';
 import { AppError } from '../utils/AppError.js';
@@ -20,18 +21,54 @@ import {
 
 const orderNotFound = () => AppError.notFound('La orden no existe.');
 const paymentNotFound = () => AppError.notFound('El pago no existe.');
-const alreadyExists = (active) =>
+/**
+ * Ya hay un pago vigente. Con `totalCents` indica en `details.outdated` si su importe ya no coincide con el total
+ * de la orden, para que la recepción pueda cancelar el pago desfasado y generar uno nuevo (FR-012).
+ */
+const alreadyExists = (active, totalCents) =>
   AppError.conflict(
     'PAYMENT_ALREADY_EXISTS',
     active
       ? `La orden ya tiene un pago ${active.status === 'PAGADO' ? 'registrado' : 'pendiente'}. Cancela el pago pendiente antes de crear otro.`
       : 'La orden ya tiene un pago vigente.',
-    active ? { paymentId: active.id, status: active.status } : undefined,
+    active
+      ? {
+          paymentId: active.id,
+          status: active.status,
+          ...(totalCents === undefined ? {} : { outdated: toCents(active.amount) !== totalCents }),
+        }
+      : undefined,
   );
 
+/** Desglose del total: servicios, mano de obra y refacciones (cantidad, precio guardado e importe) con sus subtotales. */
+async function getBreakdown(orderId, totals, connection) {
+  const [services, labor, parts] = await Promise.all([
+    orderWorkModel.listServices(orderId, connection),
+    orderWorkModel.listLabor(orderId, connection),
+    orderPartModel.listByOrder(orderId, connection),
+  ]);
+  return {
+    services,
+    labor,
+    parts: parts.map(({ id, code, name, unit, quantity, unitPrice, amount, legacy }) => ({
+      id,
+      code,
+      name,
+      unit,
+      quantity,
+      unitPrice,
+      amount,
+      legacy,
+    })),
+    subtotals: { services: totals.services, labor: totals.labor, parts: totals.parts },
+  };
+}
+
 /**
- * Bloque de cobro de una orden (solo para administración y recepción): total a cobrar, pagos, estado de cobro y
- * ticket. El total se calcula (servicios + mano de obra) y nunca se guarda en la orden.
+ * Bloque de cobro de una orden (solo para administración y recepción): total a cobrar con su desglose, pagos, estado
+ * de cobro y ticket. El total se calcula (servicios + mano de obra + refacciones) y nunca se guarda en la orden.
+ * `amountDifference` es el total vigente menos el pago Pagado cuando difieren (por ejemplo, tras una aprobación
+ * tardía de Mercado Pago): no se cobra sola, se muestra para resolverla fuera del sistema.
  */
 export async function getBilling(order, connection) {
   const [totals, payments, ticket] = await Promise.all([
@@ -43,12 +80,15 @@ export async function getBilling(order, connection) {
   const active = payments.find((payment) => payment.status === 'PENDIENTE' || payment.status === 'PAGADO') ?? null;
   const paid = payments.find((payment) => payment.status === 'PAGADO') ?? null;
   const collectionStatus = paid ? 'PAGADO' : active ? 'PENDIENTE' : 'SIN_COBRAR';
+  const paidCents = paid ? toCents(paid.amount) : 0;
   return {
     total: formatCents(totalCents),
     paidAmount: paid ? paid.amount : '0.00',
     collectionStatus,
     amountOutdated: active ? toCents(active.amount) !== totalCents : false,
+    amountDifference: paid && paidCents !== totalCents ? formatCents(totalCents - paidCents) : '0.00',
     canCharge: PAYABLE_ORDER_STATUSES.includes(order.status) && totalCents > 0 && !active,
+    breakdown: await getBreakdown(order.id, totals, connection),
     payments,
     ticket: ticket ? { id: ticket.id, folio: `TK-${String(ticket.id).padStart(6, '0')}` } : null,
   };
@@ -105,7 +145,7 @@ export async function create(orderId, data, actor) {
       assertAmountMatches({ amountCents: data.amount === undefined ? undefined : toCents(data.amount), totalCents });
 
       const active = await paymentModel.findActiveByOrder(orderId, connection);
-      if (active) throw alreadyExists(active);
+      if (active) throw alreadyExists(active, totalCents);
 
       const id = await paymentModel.insert(
         { orderId, amount: formatCents(totalCents), method: data.method, status, reference: data.reference, createdBy: actor.id },

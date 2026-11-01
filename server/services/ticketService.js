@@ -50,7 +50,8 @@ export async function generate(orderId, actor) {
         services,
         parts,
         labor,
-        payment: { method: paid.method, status: paid.status, paidAt: paid.paidAt, reference: paid.reference },
+        // El total del ticket es el importe del pago registrado (FR-007): no se recalcula al generarlo.
+        payment: { amount: paid.amount, method: paid.method, status: paid.status, paidAt: paid.paidAt, reference: paid.reference },
         now: new Date(),
       });
       const id = await ticketModel.insert({ orderId, paymentId: paid.id, content, generatedBy: actor.id }, connection);

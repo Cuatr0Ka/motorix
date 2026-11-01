@@ -75,16 +75,17 @@ describe('seed del Sprint 4 (FR-026, SC-011)', () => {
       customer: { name: 'n', phone: 'p' },
       vehicle: { licensePlate: 'x', brand: 'b', model: 'm', year: 2020 },
       services: [{ description: 'd', amount: '1.00' }],
-      parts: [{ code: 'c', name: 'n', unit: 'u', quantity: 1 }],
+      parts: [{ code: 'c', name: 'n', unit: 'u', quantity: 1, unitPrice: '1.00', amount: '1.00' }],
       labor: [{ description: 'd', amount: '1.00' }],
-      payment: { method: 'EFECTIVO', status: 'PAGADO', paidAt: new Date(), reference: 'r' },
+      payment: { amount: '3.00', method: 'EFECTIVO', status: 'PAGADO', paidAt: new Date(), reference: 'r' },
       now: new Date(),
     });
     for (const ticket of tickets) {
       expect(ticket.status).toBe('PAGADO');
       expect(ticket.pago_orden).toBe(ticket.order_id);
       const contenido = typeof ticket.content === 'string' ? JSON.parse(ticket.content) : ticket.content;
-      const esperadas = claves(referencia).filter((c) => !c.startsWith('.services[]') || true);
+      // Los tickets sembrados son anteriores al Sprint 5 (formato versión 1): no traen `formatVersion` ni `totals.parts`.
+      const esperadas = claves(referencia).filter((c) => c !== '.formatVersion' && c !== '.totals.parts');
       const obtenidas = new Set(claves(contenido));
       for (const clave of esperadas.filter((c) => !/\.(services|parts|labor)\[\]/.test(c))) expect(obtenidas.has(clave)).toBe(true);
       expect(contenido.totals.total).toMatch(/^\d+\.\d{2}$/);

@@ -31,13 +31,13 @@ export function assertTransition(from, to) {
   }
 }
 
-/** La orden debe estar Terminada o Entregada y tener algo que cobrar (total en centavos o cadena decimal mayor a cero). */
+/** La orden debe estar Terminada o Entregada y tener algo que cobrar: su total con refacciones, en centavos, debe ser mayor a cero. */
 export function assertOrderPayable({ status, totalCents }) {
   if (!PAYABLE_ORDER_STATUSES.includes(status)) {
     throw AppError.conflict('ORDER_NOT_PAYABLE', 'Solo se puede cobrar una orden Terminada o Entregada.');
   }
   if (!Number.isInteger(totalCents) || totalCents <= 0) {
-    throw AppError.unprocessable('NOTHING_TO_CHARGE', 'La orden no tiene servicios ni mano de obra: no hay nada que cobrar.');
+    throw AppError.unprocessable('NOTHING_TO_CHARGE', 'La orden no tiene nada que cobrar: el total es cero.');
   }
 }
 
