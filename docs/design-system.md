@@ -255,7 +255,7 @@ Nombre de sección, buscador cuando sea útil, notificaciones, usuario actual y 
 
 ### 8.1 Dashboard
 
-- Fila de indicadores arriba (**máximo 4**): órdenes en reparación, citas de hoy, mantenimientos vencidos, refacciones con stock bajo. Número grande y, si aplica, indicador de cambio.
+- Fila de tarjetas de indicadores arriba (**máximo 4 tarjetas** destacadas, por ejemplo órdenes en reparación, citas próximas, mantenimientos vencidos y refacciones con stock bajo) y un resumen operativo con el resto de los **10 indicadores** definidos en el Sprint 4 (vehículos atendidos en 30 días, órdenes pendientes, terminadas por entregar, mantenimientos próximos, terminadas por cobrar y pagos de Mercado Pago pendientes). Número grande y, si aplica, indicador de cambio.
 - Al menos una gráfica principal (por ejemplo, dona de órdenes por estado). Puede acompañarse de una o dos gráficas secundarias sencillas (por ejemplo, barras de servicios por mes, línea de ingresos), siempre que aporten información real.
 - Una lista o tabla de actividad reciente (últimas órdenes, últimas citas).
 - Los datos vienen de los módulos reales; no duplicar información solo para estadísticas.
@@ -300,6 +300,15 @@ Antes de ejecutar cualquiera de las siguientes acciones, el sistema **DEBE** mos
 El diálogo debe ser breve, claro y en español. Texto sugerido:
 
 > "¿Seguro que quieres [acción]? Esta acción no se puede deshacer." *(cuando aplique)*
+
+### 8.5.1 Elementos de precios y cobro (Sprint 5)
+
+- **Chip «Sin precio de venta»**: ámbar (advertencia), en el listado y el detalle del inventario del administrador.
+- **Columnas de precio** en el inventario: Categoría, Marca y Precio de venta; el precio de compra solo aparece en el detalle y el formulario del administrador. El mecánico no ve ninguna columna de precio.
+- **Diálogo de venta bajo el costo**: «El precio de venta ($X) es menor al de compra ($Y). ¿Guardar de todos modos?» con **Cancelar** y **Guardar de todos modos**.
+- **Desglose del cobro**: servicios, mano de obra y refacciones (cantidad, precio e importe) con tres subtotales y el total; las líneas anteriores a los precios muestran 0.00 y «Anterior a los precios».
+- **Aviso de importe desfasado** (ámbar) con el botón «Cancelar pago y generar uno nuevo», que pide confirmación.
+- **Aviso de diferencia por cobrar** (ámbar), sin botón de cobro: «El total de la orden supera el pago registrado por $X. La diferencia se cobra fuera del sistema.»
 
 ### 8.6 Tarjetas
 

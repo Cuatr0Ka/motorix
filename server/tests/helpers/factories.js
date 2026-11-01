@@ -198,11 +198,30 @@ export async function createPart(createdBy, overrides = {}) {
     stock: 10,
     minStock: 3,
     active: 1,
+    // Sprint 5: por omisión la refacción tiene precio de venta, para que las pruebas que la agregan a una orden no
+    // choquen con PART_PRICE_MISSING. Las pruebas de «sin precio» pasan `salePrice: null` de forma explícita.
+    category: null,
+    brand: null,
+    purchasePrice: null,
+    salePrice: 100,
     ...overrides,
   };
   const result = await query(
-    'INSERT INTO parts (code, name, description, unit, stock, min_stock, active) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [data.code, data.name, data.description, data.unit, data.stock, data.minStock, data.active],
+    `INSERT INTO parts (code, name, description, unit, stock, min_stock, active, category, brand, purchase_price, sale_price)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      data.code,
+      data.name,
+      data.description,
+      data.unit,
+      data.stock,
+      data.minStock,
+      data.active,
+      data.category,
+      data.brand,
+      data.purchasePrice,
+      data.salePrice,
+    ],
   );
   if (data.stock > 0) {
     await query(
@@ -223,15 +242,17 @@ export async function createMovement(partId, createdBy, overrides = {}) {
   return { id: result.insertId, partId, ...data };
 }
 
-/** Línea de refacción de una orden directo en la base (no genera movimiento ni cambia el stock). */
-export async function createOrderPart(orderId, partId, createdBy, quantity = 1) {
-  const result = await query('INSERT INTO order_parts (order_id, part_id, quantity, created_by) VALUES (?, ?, ?, ?)', [
-    orderId,
-    partId,
-    quantity,
-    createdBy,
-  ]);
-  return { id: result.insertId, orderId, partId, quantity };
+/**
+ * Línea de refacción de una orden directo en la base (no genera movimiento ni cambia el stock). `unitPrice` es la
+ * instantánea del precio de venta; por omisión es 0 (línea anterior a los precios), para no alterar las pruebas
+ * que no hablan de precios.
+ */
+export async function createOrderPart(orderId, partId, createdBy, quantity = 1, unitPrice = 0) {
+  const result = await query(
+    'INSERT INTO order_parts (order_id, part_id, quantity, unit_price, created_by) VALUES (?, ?, ?, ?, ?)',
+    [orderId, partId, quantity, unitPrice, createdBy],
+  );
+  return { id: result.insertId, orderId, partId, quantity, unitPrice };
 }
 
 /** Mantenimiento de prueba (PENDIENTE por defecto, con fecha objetivo dentro de 6 meses). */

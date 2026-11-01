@@ -8,6 +8,7 @@ import * as userModel from '../models/userModel.js';
 import * as vehicleModel from '../models/vehicleModel.js';
 import { AppError } from '../utils/AppError.js';
 import { presentMaintenance } from './maintenancePresenter.js';
+import { presentOrderPart, presentTotals } from './orderTotals.js';
 import { getBilling } from './paymentService.js';
 import { assertEntryMileage } from './mileageRule.js';
 import { ORDER_STATUS_LABELS, allowedFor, assertTransition, canActorTransition } from './orderTransitions.js';
@@ -86,8 +87,9 @@ export async function buildDetail(order, actor, connection) {
     appointment: order.appointment,
     services,
     labor,
-    parts,
-    totals,
+    // El mecánico no recibe ningún precio de refacciones (FR-014); administración y recepción reciben el detalle completo.
+    parts: parts.map((line) => presentOrderPart(line, actor.role)),
+    totals: presentTotals(totals, actor.role),
     allowedTransitions,
     statusHistory,
     deliveredAt: order.deliveredAt,

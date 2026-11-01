@@ -289,6 +289,11 @@ Datos mínimos sugeridos: - Código o número de parte. - Nombre. -
 Categoría. - Marca. - Stock actual. - Stock mínimo. - Precio de
 compra. - Precio de venta.
 
+> **Sprint 5:** la refacción incluye categoría y marca (texto libre de hasta 60 caracteres),
+> precio de compra (opcional) y precio de venta. Una refacción sin precio de venta no se puede
+> agregar a una orden. Cada línea de la orden guarda el precio de venta vigente al agregarla.
+> El precio de compra solo lo ve el administrador y el mecánico no ve ningún precio.
+
 ### Regla de negocio
 
 Cuando una refacción sea utilizada en una orden, el sistema debe
@@ -311,6 +316,10 @@ Métodos contemplados: - Efectivo. - Tarjeta. - Transferencia. - Mercado
 Pago.
 
 Estados sugeridos: - Pendiente. - Pagado. - Rechazado. - Cancelado.
+
+> **Sprint 5:** el importe del pago es el total de la orden con refacciones (servicios, mano de obra
+> y refacciones), calculado al registrar el pago. Una orden con un pago Pagado no admite cambios
+> en sus refacciones.
 
 ------------------------------------------------------------------------
 
@@ -338,6 +347,10 @@ obra. - Subtotal. - Total. - Método de pago. - Estado del pago. - Fecha.
 
 Debe contemplarse visualización e impresión. La generación PDF puede
 implementarse conforme avance el MVP.
+
+> **Sprint 5:** el ticket nuevo (formato versión 2) detalla cada refacción con cantidad, precio e
+> importe, y trae subtotales de servicios, mano de obra y refacciones; su total es el importe del
+> pago. Los tickets anteriores se muestran tal como se emitieron.
 
 ------------------------------------------------------------------------
 
@@ -587,7 +600,7 @@ definitivos deben validarse durante cada sprint.
 > **Decisión del Sprint 3:** las entidades `Part`, `InventoryMovement` y `Maintenance`
 > usan los campos de la especificación del sprint, no los de la lista inicial de abajo:
 > - `Part` (`parts`): `code` único, `name`, `description`, `unit`, `stock`, `minimumStock`
->   (`min_stock`) y `active`. No incluye categoría, marca ni precios (se difieren a los sprints
+>   (`min_stock`) y `active`. En el Sprint 3 no incluía categoría, marca ni precios (el Sprint 5 los agrega; se habían diferido a los sprints
 >   de pagos y tickets). Las refacciones no se eliminan; se desactivan.
 > - `InventoryMovement` (`inventory_movements`): tabla de solo agregar; `quantity` lleva signo
 >   (entrada +, salida −, ajuste ±), con `reason`, `order_id` opcional y `created_by`. El stock
@@ -776,11 +789,26 @@ generatedAt
 >   contenido tal como se generó), `generated_by` y `generated_at`. El folio (`TK-000012`) se
 >   deriva del identificador. No se generan archivos PDF: el ticket se visualiza e imprime.
 > - El total de cobro es **servicios más mano de obra**; las refacciones se listan con su
->   cantidad pero no suman importe (los precios de refacciones quedan fuera del MVP).
+>   cantidad pero no suman importe (los precios de refacciones quedan fuera del MVP; el Sprint 5 los incorpora).
 > - Mercado Pago se usa en modo de pruebas con un enlace de cobro; el estado se confirma por
 >   consulta bajo demanda (sin avisos automáticos). El token vive solo en `MERCADOPAGO_ACCESS_TOKEN`.
 > - El panel de control es exclusivo del administrador y se calcula con datos reales, sin tablas
 >   de estadísticas.
+
+> **Decisión del Sprint 5:** precios de refacciones y cobro completo.
+> - `Part` (`parts`) agrega `category`, `brand` (texto libre de hasta 60 caracteres), `purchase_price`
+>   (opcional, mayor o igual a cero) y `sale_price` (mayor a cero; `NULL` = sin precio de venta). Las
+>   refacciones existentes quedan sin precio y no se pueden agregar a una orden hasta que el
+>   administrador capture el precio de venta.
+> - La línea de refacción de la orden (`order_parts`) agrega `unit_price`, la instantánea del precio de
+>   venta. Las líneas anteriores al sprint quedan en `0` y no suman al total; el precio de una línea no
+>   se edita (se quita y se vuelve a agregar).
+> - El total de la orden (calculado, no almacenado) es servicios más mano de obra más refacciones,
+>   con un tope de 9 999 999.99 para precios y total. Una orden con solo refacciones es cobrable.
+> - El ticket nuevo lleva `formatVersion: 2`; los anteriores no cambian. Un pago Pagado no se modifica
+>   y bloquea los cambios de refacciones de su orden.
+> - Un pago de Mercado Pago pendiente cuyo importe ya no coincide con el total se señala como
+>   desfasado y la recepción lo cancela con confirmación para generar uno nuevo.
 
 ------------------------------------------------------------------------
 
@@ -819,7 +847,9 @@ generatedAt
 
 # 14. Plan de desarrollo del MVP
 
-El MVP se construirá mediante cuatro sprints.
+El MVP se construirá mediante cuatro sprints. Los sprints posteriores al MVP se proponen en
+`docs/sprints/propuesta-sprints-post-mvp.md` y se rigen por la enmienda 1.1.0 de la constitución;
+el Sprint 5 (precios de refacciones y cobro completo) es el primero.
 
 ## 14.1 Base de datos del MVP (Sprints 1 a 4)
 
@@ -1079,7 +1109,7 @@ La interfaz de Motorix debe verse **profesional, sobria y con identidad propia**
 - **Tokens**: color, tipografía, espaciado (escala de 4 px: 4, 8, 12, 16, 24, 32) y radios (6 px botones/inputs; 8 px paneles, tarjetas, chips y diálogos; 12 px o completo en elementos tipo pill) se definen una sola vez en el tema. Las pantallas no llevan valores sueltos.
 - **Movimiento**: toda transición y cambio de estado DEBE ser suave (150 ms estados, 200 ms aparición de elementos y sidebar, 250 ms navegación), con `Curves.easeInOut` o `Curves.easeOutCubic`. Sin rebotes, zooms ni efectos vistosos, y respetando la preferencia de reducir movimiento.
 - **Layout**: sidebar colapsable (`NavigationRail` extendido, ~260 px expandido / ~72 px colapsado, estado guardado en un `Provider`), header con título, buscador, notificaciones, usuario y rol. Solo se muestran los módulos del sprint actual y del rol del usuario; los permisos se validan también en backend.
-- **Componentes**: dashboard con máximo 4 indicadores y una gráfica principal; tablas densas con filtros, chips de estado y acciones al final; tarjetas solo cuando agrupen contenido que lo necesite.
+- **Componentes**: panel de control con los 10 indicadores definidos en el Sprint 4 y una gráfica principal; tablas densas con filtros, chips de estado y acciones al final; tarjetas solo cuando agrupen contenido que lo necesite.
 - **Estados de la interfaz**: toda pantalla muestra estados vacío, cargando, error (en español, sin trazas internas) y éxito.
 - **Confirmaciones obligatorias**: cerrar sesión, cancelar citas, cancelar/anular/entregar órdenes, eliminar o desactivar registros, registrar pagos y salir de formularios con cambios sin guardar DEBEN pedir confirmación ("Confirmar" / "Cancelar").
 - **Qué evitar**: degradados morados o neón, glassmorphism, todo en tarjetas, emojis como íconos, gráficas decorativas, textos genéricos de marketing y cambios de estado bruscos.
@@ -1354,6 +1384,19 @@ Antes de asumirlas como definitivas, el equipo debe decidir:
   Node.js desde un adaptador aislado; el estado se confirma por consulta bajo demanda de la recepción.
 - **Panel de control**: solo ADMIN; indicadores a 30 días (vehículos atendidos) y 7 días (citas próximas).
 - **Reembolsos**: fuera del sistema; un pago Pagado no se modifica ni se cancela.
+
+### Decisiones resueltas durante el Sprint 5
+
+- **Refacción sin precio de venta**: se bloquea agregarla a una orden hasta que el administrador capture el precio (D-01).
+- **Orden con solo refacciones**: es cobrable si su total es mayor a cero (D-02).
+- **Líneas anteriores al sprint**: cuentan con precio 0 y no suman al total (D-03).
+- **Pago de Mercado Pago pendiente cuando cambia el total**: se señala como desfasado y la recepción lo cancela con confirmación para generar uno nuevo; no es automático (D-04).
+- **Corrección del precio de una línea**: no se edita; se quita y se vuelve a agregar con el precio vigente (D-05).
+- **Categoría y marca**: texto libre de hasta 60 caracteres, sin catálogo (D-06).
+- **Precio de venta menor al de compra**: se permite, con aviso y confirmación (D-07).
+- **Límites**: precio de refacción y total de la orden hasta 9 999 999.99; el redondeo no aplica porque la cantidad es entera (D-08).
+- **Tickets anteriores**: se muestran e imprimen como se emitieron; solo los nuevos llevan precio e importe (D-09).
+- **Visibilidad**: el mecánico no ve ningún precio; el precio de compra solo lo ve el administrador (D-10).
 
 CLAUDE puede proponer opciones para estas decisiones, pero no debe
 introducir dependencias grandes sin justificar su necesidad.

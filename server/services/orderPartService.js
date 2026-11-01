@@ -6,6 +6,7 @@ import { AppError } from '../utils/AppError.js';
 import { formatFolio } from '../utils/orderFolio.js';
 import { registerMovement } from './inventoryService.js';
 import { loadOrderForActor } from './orderService.js';
+import { presentOrderPart } from './orderTotals.js';
 import { assertPositiveInteger, signedQuantity } from './stockRules.js';
 
 const readOnly = () =>
@@ -58,7 +59,7 @@ export async function add(orderId, { partId, quantity }, actor) {
       await orderPartModel.insert({ orderId, partId, quantity, createdBy: actor.id }, connection);
     }
     return {
-      item: await orderPartModel.findByOrderAndPart(orderId, partId, connection),
+      item: presentOrderPart(await orderPartModel.findByOrderAndPart(orderId, partId, connection), actor.role),
       part: updatedPart,
     };
   });
@@ -93,7 +94,7 @@ export async function updateQuantity(orderId, lineId, quantity, actor) {
     } else {
       updatedPart = partModel.toPart(await partModel.findById(line.partId, connection));
     }
-    return { item: await orderPartModel.findLine(orderId, lineId, connection), part: updatedPart };
+    return { item: presentOrderPart(await orderPartModel.findLine(orderId, lineId, connection), actor.role), part: updatedPart };
   });
 }
 

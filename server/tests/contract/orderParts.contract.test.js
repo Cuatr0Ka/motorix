@@ -10,6 +10,7 @@ let mecanico;
 let orden;
 let parte;
 
+// Línea para el mecánico: sin ningún precio (FR-014).
 const linea = {
   id: expect.any(Number),
   partId: expect.any(Number),
@@ -18,6 +19,9 @@ const linea = {
   unit: expect.any(String),
   quantity: expect.any(Number),
 };
+
+// Línea para administración y recepción: con precio unitario, importe y bandera de línea anterior (Sprint 5).
+const lineaConPrecio = { ...linea, unitPrice: expect.any(String), amount: expect.any(String), legacy: expect.any(Boolean) };
 
 beforeEach(async () => {
   await resetDatabase();
@@ -66,7 +70,7 @@ describe('PATCH y DELETE /api/orders/:id/parts/:lineId (contrato)', () => {
     const res = await request(app).patch(`/api/orders/${orden.id}/parts/${lineId}`).set(auth(admin.token)).send({ quantity: 4 });
 
     expect(res.status).toBe(200);
-    expect(res.body.data.item).toEqual({ ...linea, quantity: 4 });
+    expect(res.body.data.item).toEqual({ ...lineaConPrecio, quantity: 4 });
     expect(res.body.data.part.stock).toBe(1);
   });
 
@@ -99,7 +103,7 @@ describe('GET /api/orders/:id (contrato ampliado)', () => {
     for (const user of [admin, recepcion, mecanico]) {
       const res = await request(app).get(`/api/orders/${orden.id}`).set(auth(user.token));
       expect(res.status).toBe(200);
-      expect(res.body.data.parts).toEqual([{ ...linea, quantity: 1 }]);
+      expect(res.body.data.parts).toEqual([{ ...(user === mecanico ? linea : lineaConPrecio), quantity: 1 }]);
       expect(res.body.data).toHaveProperty('serviceMileage', null);
       expect(res.body.data).toHaveProperty('maintenance', null);
     }

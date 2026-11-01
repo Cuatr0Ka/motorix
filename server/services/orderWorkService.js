@@ -4,6 +4,7 @@ import * as orderWorkModel from '../models/orderWorkModel.js';
 import { AppError } from '../utils/AppError.js';
 import { assertServiceMileage } from './mileageRule.js';
 import { buildDetail, loadOrderForActor } from './orderService.js';
+import { presentTotals } from './orderTotals.js';
 
 const readOnly = () =>
   AppError.conflict('ORDER_READ_ONLY', 'La orden está entregada: es de solo lectura y no admite cambios.');
@@ -40,7 +41,7 @@ export async function addLine(kind, orderId, data, actor) {
     const lineId = await orderWorkModel.insertLine(kind, orderId, data, connection);
     return {
       item: await orderWorkModel.findLine(kind, orderId, lineId, connection),
-      totals: await orderWorkModel.totals(orderId, connection),
+      totals: presentTotals(await orderWorkModel.totals(orderId, connection), actor.role),
     };
   });
 }
@@ -55,7 +56,7 @@ export async function updateLine(kind, orderId, lineId, data, actor) {
     await orderWorkModel.updateLine(kind, orderId, lineId, data, connection);
     return {
       item: await orderWorkModel.findLine(kind, orderId, lineId, connection),
-      totals: await orderWorkModel.totals(orderId, connection),
+      totals: presentTotals(await orderWorkModel.totals(orderId, connection), actor.role),
     };
   });
 }
@@ -68,7 +69,7 @@ export async function removeLine(kind, orderId, lineId, actor) {
     if (locked.status === 'ENTREGADO') throw readOnly();
     if (!(await orderWorkModel.findLine(kind, orderId, lineId, connection))) throw lineNotFound();
     await orderWorkModel.deleteLine(kind, orderId, lineId, connection);
-    return { deleted: true, totals: await orderWorkModel.totals(orderId, connection) };
+    return { deleted: true, totals: presentTotals(await orderWorkModel.totals(orderId, connection), actor.role) };
   });
 }
 

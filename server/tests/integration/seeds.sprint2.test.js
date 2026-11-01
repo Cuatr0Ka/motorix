@@ -112,7 +112,7 @@ describe('seed del Sprint 2 (FR-026, SC-009)', () => {
 
     const res = await request(app).get(`/api/orders/${orden.id}`).set(auth(admin.token));
 
-    expect(res.body.data.totals).toEqual({ services: '1870.00', labor: '700.00', total: '2570.00' });
+    expect(res.body.data.totals).toEqual({ services: '1870.00', labor: '700.00', parts: '0.00', total: '2570.00' });
     expect(res.body.data.statusHistory.map((c) => c.toStatus)).toEqual(['RECIBIDO', 'DIAGNOSTICO', 'EN_REPARACION', 'TERMINADO']);
   });
 

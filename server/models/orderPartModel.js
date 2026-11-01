@@ -1,17 +1,32 @@
 import { query } from '../config/db.js';
 
-const SELECT = `SELECT op.id, op.order_id, op.part_id, op.quantity, p.code, p.name, p.unit
+const SELECT = `SELECT op.id, op.order_id, op.part_id, op.quantity, op.unit_price, p.code, p.name, p.unit
   FROM order_parts op
   JOIN parts p ON p.id = op.part_id`;
 
-const toLine = (row) => ({
-  id: row.id,
-  partId: row.part_id,
-  code: row.code,
-  name: row.name,
-  unit: row.unit,
-  quantity: row.quantity,
-});
+/** Importe decimal de la base ("180.00") → centavos enteros. */
+const toCents = (amount) => Math.round(Number(amount) * 100);
+const fromCents = (cents) => (cents / 100).toFixed(2);
+
+/**
+ * Línea completa (vista de administración y recepción). `unitPrice` es la instantánea del precio de venta;
+ * `legacy` marca las líneas anteriores a los precios (precio 0), que no suman al total. Las respuestas para el
+ * mecánico pasan por `presentOrderPart`, que quita los precios.
+ */
+const toLine = (row) => {
+  const unitPriceCents = toCents(row.unit_price);
+  return {
+    id: row.id,
+    partId: row.part_id,
+    code: row.code,
+    name: row.name,
+    unit: row.unit,
+    quantity: row.quantity,
+    unitPrice: fromCents(unitPriceCents),
+    amount: fromCents(row.quantity * unitPriceCents),
+    legacy: unitPriceCents === 0,
+  };
+};
 
 /** Refacciones usadas en la orden, en el orden en que se agregaron. */
 export async function listByOrder(orderId, connection) {
@@ -29,10 +44,11 @@ export async function findByOrderAndPart(orderId, partId, connection) {
   return rows[0] ? toLine(rows[0]) : null;
 }
 
-export async function insert({ orderId, partId, quantity, createdBy }, connection) {
+/** `unitPrice` es el precio de venta vigente de la refacción al agregarla (cadena decimal); queda guardado en la línea. */
+export async function insert({ orderId, partId, quantity, unitPrice = 0, createdBy }, connection) {
   const result = await query(
-    'INSERT INTO order_parts (order_id, part_id, quantity, created_by) VALUES (?, ?, ?, ?)',
-    [orderId, partId, quantity, createdBy],
+    'INSERT INTO order_parts (order_id, part_id, quantity, unit_price, created_by) VALUES (?, ?, ?, ?, ?)',
+    [orderId, partId, quantity, unitPrice, createdBy],
     connection,
   );
   return result.insertId;

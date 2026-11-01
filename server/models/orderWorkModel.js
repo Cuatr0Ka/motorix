@@ -26,7 +26,10 @@ export async function listLabor(orderId, connection) {
   return rows.map(toLine);
 }
 
-/** Totales calculados al leer (no se almacenan): servicios, mano de obra y total. */
+/**
+ * Totales calculados al leer (no se almacenan): servicios, mano de obra, refacciones y total. Las refacciones suman
+ * cantidad por el precio guardado en cada línea (las líneas anteriores al Sprint 5 tienen precio 0 y no suman).
+ */
 export async function totals(orderId, connection) {
   const [services] = await query(
     'SELECT COALESCE(SUM(amount), 0) AS total FROM order_services WHERE order_id = ?',
@@ -38,12 +41,19 @@ export async function totals(orderId, connection) {
     [orderId],
     connection,
   );
+  const [parts] = await query(
+    'SELECT COALESCE(SUM(quantity * unit_price), 0) AS total FROM order_parts WHERE order_id = ?',
+    [orderId],
+    connection,
+  );
   const servicesCents = toCents(services.total);
   const laborCents = toCents(labor.total);
+  const partsCents = toCents(parts.total);
   return {
     services: fromCents(servicesCents),
     labor: fromCents(laborCents),
-    total: fromCents(servicesCents + laborCents),
+    parts: fromCents(partsCents),
+    total: fromCents(servicesCents + laborCents + partsCents),
   };
 }
 
