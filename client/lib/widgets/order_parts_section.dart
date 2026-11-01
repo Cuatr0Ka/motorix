@@ -21,11 +21,14 @@ class OrderPartsActions {
 /// Tarjeta «Refacciones utilizadas» del detalle de la orden. [actions] llega solo si el rol puede
 /// modificarlas (mecánico asignado y administración, con la orden no entregada); sin él, es de consulta.
 class OrderPartsSection extends StatelessWidget {
-  const OrderPartsSection({super.key, required this.parts, this.actions, this.busy = false});
+  const OrderPartsSection({super.key, required this.parts, this.actions, this.busy = false, this.locked = false});
 
   final List<OrderPart> parts;
   final OrderPartsActions? actions;
   final bool busy;
+
+  /// Verdadero si la orden ya tiene un pago Pagado: agregar, quitar y cambiar cantidades quedan deshabilitados.
+  final bool locked;
 
   Future<void> _edit(BuildContext context, OrderPart line) async {
     await showDialog<bool>(
@@ -65,14 +68,37 @@ class OrderPartsSection extends StatelessWidget {
           ? null
           : TextButton.icon(
               key: const ValueKey('agregar-refaccion'),
-              onPressed: busy ? null : () => actions!.onAdd(),
+              onPressed: busy || locked ? null : () => actions!.onAdd(),
               icon: const Icon(Icons.add, size: 16),
               label: const Text('Agregar refacción'),
             ),
       child: parts.isEmpty
-          ? Text('Sin refacciones registradas.', style: theme.textTheme.bodyMedium)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Sin refacciones registradas.', style: theme.textTheme.bodyMedium),
+                if (locked)
+                  Text(
+                    'La orden ya está cobrada: no se pueden modificar las refacciones.',
+                    key: const ValueKey('refacciones-bloqueadas'),
+                    style: theme.textTheme.bodySmall?.copyWith(color: AppColors.warning),
+                  ),
+              ],
+            )
           : Column(
               children: [
+                if (locked)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'La orden ya está cobrada: no se pueden modificar las refacciones.',
+                        key: const ValueKey('refacciones-bloqueadas'),
+                        style: theme.textTheme.bodySmall?.copyWith(color: AppColors.warning),
+                      ),
+                    ),
+                  ),
                 for (final line in parts)
                   Padding(
                     key: ValueKey('refaccion-orden-${line.id}'),
@@ -103,14 +129,14 @@ class OrderPartsSection extends StatelessWidget {
                             key: ValueKey('editar-refaccion-orden-${line.id}'),
                             tooltip: 'Corregir cantidad',
                             visualDensity: VisualDensity.compact,
-                            onPressed: busy ? null : () => _edit(context, line),
+                            onPressed: busy || locked ? null : () => _edit(context, line),
                             icon: const Icon(Icons.edit_outlined, size: 18),
                           ),
                           IconButton(
                             key: ValueKey('quitar-refaccion-orden-${line.id}'),
                             tooltip: 'Quitar',
                             visualDensity: VisualDensity.compact,
-                            onPressed: busy ? null : () => _remove(context, line),
+                            onPressed: busy || locked ? null : () => _remove(context, line),
                             icon: const Icon(Icons.delete_outline, size: 18),
                           ),
                         ],

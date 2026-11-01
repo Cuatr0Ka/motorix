@@ -3,6 +3,7 @@ import * as orderModel from '../models/orderModel.js';
 import * as orderPartModel from '../models/orderPartModel.js';
 import * as orderWorkModel from '../models/orderWorkModel.js';
 import * as partModel from '../models/partModel.js';
+import * as paymentModel from '../models/paymentModel.js';
 import { AppError } from '../utils/AppError.js';
 import { formatFolio } from '../utils/orderFolio.js';
 import { registerMovement } from './inventoryService.js';
@@ -13,6 +14,8 @@ import { assertPositiveInteger, signedQuantity } from './stockRules.js';
 const readOnly = () =>
   AppError.conflict('ORDER_READ_ONLY', 'La orden está entregada: es de solo lectura y no admite cambios.');
 const partNotFound = () => AppError.notFound('La refacción no existe.');
+const alreadyPaid = () =>
+  AppError.conflict('ORDER_ALREADY_PAID', 'La orden ya está cobrada: no se pueden modificar las refacciones.');
 const lineNotFound = () => AppError.notFound('La refacción no está en esta orden.');
 const partInactive = () =>
   AppError.conflict('PART_INACTIVE', 'La refacción está desactivada: no se puede usar en nuevas órdenes.');
@@ -35,11 +38,17 @@ async function assertRoomForLine(orderId, extraCents, connection) {
  * después la refacción, en ese orden, para no provocar interbloqueos. El bloqueo se toma ANTES de
  * cualquier lectura normal de la transacción: así las lecturas posteriores ven lo que confirmaron las
  * solicitudes que esperaban el mismo bloqueo (nivel REPEATABLE READ).
+ *
+ * Una orden con un pago Pagado tampoco admite cambios de refacciones (FR-026): un pago Pagado es final y solo se
+ * admite un pago vigente, así que lo agregado después nunca podría cobrarse. Con un pago Pendiente sí se permite
+ * (el pago queda desfasado, FR-012). Como el registro del pago bloquea la misma orden, ambas operaciones se ordenan.
  */
 async function lockEditableOrder(orderId, connection) {
   const locked = await orderModel.lockById(orderId, connection);
   if (!locked) throw AppError.notFound('La orden no existe.');
   if (locked.status === 'ENTREGADO') throw readOnly();
+  const active = await paymentModel.findActiveByOrder(orderId, connection);
+  if (active?.status === 'PAGADO') throw alreadyPaid();
 }
 
 /**

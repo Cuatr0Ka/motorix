@@ -424,6 +424,94 @@ void main() {
     });
   });
 
+  group('orden cobrada: refacciones bloqueadas (Sprint 5)', () {
+    Map<String, dynamic> lineaConPrecio() => {
+          'id': 1,
+          'partId': 1,
+          'code': 'REF-1',
+          'name': 'Balatas',
+          'unit': 'pieza',
+          'quantity': 2,
+          'unitPrice': '180.00',
+          'amount': '360.00',
+          'legacy': false,
+        };
+
+    /// Orden Terminada cuyo bloque de cobro trae los pagos indicados.
+    FakeApi apiConCobro(List<Map<String, dynamic>> payments, {String role = 'ADMIN'}) => FakeApi(
+          role: role,
+          handler: ordersHandler(
+            items: [orderSummaryJson(1, status: 'TERMINADO', mechanic: _mio)],
+            extra: (r) => r.method == 'GET' && r.path == '/orders/1'
+                ? ok(orderDetailJson(1, status: 'TERMINADO', mechanic: _mio, parts: [lineaConPrecio()], billing: billingJson(payments: payments)))
+                : null,
+          ),
+        );
+
+    testWidgets('test_con_un_pago_pagado_se_deshabilitan_agregar_corregir_y_quitar_y_se_explica_el_motivo', (tester) async {
+      useDesktopWindow(tester);
+      final api = apiConCobro([paymentJson(1)]);
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester, section: 'Órdenes');
+      await scrollTo(tester, find.byKey(const ValueKey('agregar-refaccion')));
+
+      expect(find.byKey(const ValueKey('refacciones-bloqueadas')), findsOneWidget);
+      expect(find.text('La orden ya está cobrada: no se pueden modificar las refacciones.'), findsOneWidget);
+      expect(tester.widget<TextButton>(find.byKey(const ValueKey('agregar-refaccion'))).onPressed, isNull);
+      expect(tester.widget<IconButton>(find.byKey(const ValueKey('editar-refaccion-orden-1'))).onPressed, isNull);
+      expect(tester.widget<IconButton>(find.byKey(const ValueKey('quitar-refaccion-orden-1'))).onPressed, isNull);
+    });
+
+    testWidgets('test_con_un_pago_pendiente_las_refacciones_siguen_editables', (tester) async {
+      useDesktopWindow(tester);
+      final pendiente = paymentJson(1, method: 'MERCADO_PAGO', status: 'PENDIENTE', checkoutUrl: 'https://sandbox.mercadopago.com.mx/c/1');
+      final api = apiConCobro([pendiente]);
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester, section: 'Órdenes');
+      await scrollTo(tester, find.byKey(const ValueKey('agregar-refaccion')));
+
+      expect(find.byKey(const ValueKey('refacciones-bloqueadas')), findsNothing);
+      expect(tester.widget<TextButton>(find.byKey(const ValueKey('agregar-refaccion'))).onPressed, isNotNull);
+      expect(tester.widget<IconButton>(find.byKey(const ValueKey('editar-refaccion-orden-1'))).onPressed, isNotNull);
+    });
+
+    testWidgets('test_sin_pagos_las_refacciones_no_estan_bloqueadas', (tester) async {
+      useDesktopWindow(tester);
+      final api = apiConCobro(const []);
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester, section: 'Órdenes');
+      await scrollTo(tester, find.byKey(const ValueKey('agregar-refaccion')));
+
+      expect(find.byKey(const ValueKey('refacciones-bloqueadas')), findsNothing);
+      expect(tester.widget<TextButton>(find.byKey(const ValueKey('agregar-refaccion'))).onPressed, isNotNull);
+    });
+
+    testWidgets('test_el_mecanico_no_ve_el_bloqueo_pero_el_servidor_responde_ORDER_ALREADY_PAID_con_su_mensaje', (tester) async {
+      useDesktopWindow(tester);
+      const mensaje = 'La orden ya está cobrada: no se pueden modificar las refacciones.';
+      final order = FakeOrderWithParts();
+      final inner = order.handler();
+      final api = FakeApi(
+        role: 'MECHANIC',
+        handler: (r) => r.method == 'POST' && r.path == '/orders/1/parts' ? failure(409, 'ORDER_ALREADY_PAID', mensaje) : inner(r),
+      );
+      await pumpAppSignedIn(tester, api);
+      await openOrder(tester);
+      await scrollTo(tester, find.byKey(const ValueKey('agregar-refaccion')));
+
+      expect(find.byKey(const ValueKey('refacciones-bloqueadas')), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('agregar-refaccion')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('opcion-refaccion-1')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('confirmar-agregar-refaccion')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(mensaje), findsOneWidget);
+      expect(order.lines, isEmpty);
+    });
+  });
+
   group('solo lectura y permisos', () {
     testWidgets('test_la_orden_entregada_se_muestra_en_solo_lectura', (tester) async {
       useDesktopWindow(tester);

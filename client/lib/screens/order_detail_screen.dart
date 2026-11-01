@@ -246,6 +246,8 @@ class _OrderDetailView extends StatelessWidget {
                                   parts: order.parts,
                                   busy: provider.busy,
                                   actions: canEditWork ? _partsActions(context) : null,
+                                  // Con un pago Pagado las refacciones no se pueden modificar (el servidor lo rechaza igualmente).
+                                  locked: order.billing?.isPaid ?? false,
                                 ),
                                 if (order.isFinishedOrDelivered)
                                   OrderMaintenanceSection(
