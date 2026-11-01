@@ -30,11 +30,11 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 
 - [ ] Las 8 puertas de la sección 3 están Aprobadas o Aprobadas con observación.
 - [ ] La enmienda de la constitución (hallazgo H-01, tarea T002) está aprobada y registrada: es una puerta previa a `/speckit.implement`.
-- [ ] Las 10 decisiones de la sección 4 están resueltas y registradas.
-- [ ] No hay hallazgos críticos ni altos abiertos en `/speckit.analyze`.
-- [ ] Cada criterio de aceptación tiene al menos una prueba planeada (sección 6).
-- [ ] La línea base de regresión está registrada (sección 8).
-- [ ] La documentación desfasada de los sprints anteriores está identificada.
+- [x] Las 10 decisiones de la sección 4 están resueltas y registradas.
+- [x] No hay hallazgos críticos ni altos abiertos en `/speckit.analyze`.
+- [x] Cada criterio de aceptación tiene al menos una prueba planeada (sección 6).
+- [x] La línea base de regresión está registrada (sección 8).
+- [x] La documentación desfasada de los sprints anteriores está identificada.
 
 **Salida (para cerrar el sprint):**
 
@@ -48,14 +48,14 @@ Este documento es el registro de calidad del Sprint 5. Se llena durante la prepa
 
 | ID | Puerta | Cómo se verifica | Criterio de paso | Estado | Fecha | Evidencia |
 |:--:|---|---|---|---|---|---|
-| G-01 | Insumo del sprint revisado | Lectura contra el código y el contexto maestro | Sin contradicciones con `project-context.md`; decisiones abiertas listadas | Pendiente | | |
+| G-01 | Insumo del sprint revisado | Lectura contra el código y el contexto maestro | Sin contradicciones con `project-context.md`; decisiones abiertas listadas | Aprobado con observación | 2026-10-31 | `docs/sprints/sprint-5-precios-refacciones-cobro.md` contrastado con el código (modelo de refacciones, total del cobro y ticket) y con las secciones 6.7, 6.8, 6.10 y 13 del contexto maestro; las 10 decisiones abiertas de su sección 9 quedaron listadas y se resolvieron en `/speckit.clarify`. Observación: la entidad `Part` del contexto maestro (sección 12) excluía categoría, marca y precios; se actualiza en T003 |
 | G-02 | Especificación (`/speckit.specify`) | `specs/005-*/spec.md` | Historias en formato "Como... quiero... para..." y escenarios Dado / Cuando / Entonces | Aprobado con observación | 2026-10-31 | `specs/005-precios-refacciones-cobro/spec.md` y su lista de calidad. Observación: la primera versión tenía 3 marcadores de aclaración, que se resolvieron en G-03 |
 | G-03 | Aclaraciones (`/speckit.clarify`) | Sección 4 de este documento | Cero marcadores `[NEEDS CLARIFICATION]` y 10 decisiones registradas | Aprobado | 2026-10-31 | Las 10 decisiones resueltas en tres rondas de clarify (sección 4) y sin marcadores en la especificación. Además se resolvió el posible doble cobro de piezas capturadas como servicio (FR-023) |
 | G-04 | Lista de calidad de requisitos (`/speckit.checklist`) | `specs/005-*/checklists/` | Requisitos completos, medibles, sin ambigüedad ni contradicción | En curso | 2026-10-31 | `specs/005-precios-refacciones-cobro/checklists/cobro.md`: 41 de 42 puntos revisados y resueltos con cambios en `spec.md` (H-02); queda CHK041, la enmienda de la constitución (H-01) |
 | G-05 | Plan (`/speckit.plan`) | `plan.md`, `data-model.md`, `contracts/` | Cumple la constitución; migración `005` aditiva; contratos de API definidos | Aprobado con observación | 2026-10-31 | `specs/005-precios-refacciones-cobro/plan.md`, `research.md`, `data-model.md`, `contracts/` y `quickstart.md`. Observación: el principio I exige la enmienda de la constitución (H-01) antes de implementar |
 | G-06 | Tareas (`/speckit.tasks`) | `tasks.md` | Tareas ordenadas, con las pruebas antes del código y cobertura de cada historia | Aprobado | 2026-10-31 | `specs/005-precios-refacciones-cobro/tasks.md`: 62 tareas en 8 fases, con las pruebas antes del código en cada historia |
 | G-07 | Consistencia (`/speckit.analyze`) | Informe del análisis | Sin hallazgos críticos ni altos; todo requisito con tarea y toda tarea con requisito | Aprobado con observación | 2026-10-31 | Segunda pasada de `/speckit.analyze` sobre el commit `4907e8f`: 0 críticos, 0 altos, 0 medios y 2 bajos (corregidos), cobertura de 27 de 27 requisitos con 63 tareas. Observación: la puerta T002 (enmienda de la constitución, H-01) sigue pendiente de aprobación |
-| G-08 | Pruebas planeadas y línea base | Secciones 6 y 8 | Cada criterio de aceptación con prueba; regresión de los sprints 1 a 4 registrada | Pendiente | | |
+| G-08 | Pruebas planeadas y línea base | Secciones 6 y 8 | Cada criterio de aceptación con prueba; regresión de los sprints 1 a 4 registrada | Aprobado | 2026-10-31 | Sección 6: los 14 criterios de aceptación tienen tarea y prueba planeadas (CA-14 se verifica por revisión documental). Sección 8: línea base de 1003 pruebas de backend y 277 de frontend sobre el commit `4fdfaf1`, con capturas |
 
 ## 4. Decisiones de aclaración
 
@@ -94,20 +94,20 @@ Se llena después de `/speckit.tasks` y se actualiza durante la implementación.
 
 | CA | Criterio de aceptación (resumen) | Requisito (FR) | Tarea | Prueba | Resultado | Evidencia |
 |:--:|---|---|---|---|---|---|
-| CA-1 | Refacción con categoría, marca y precios persistidos | FR-001, FR-025 | | | Pendiente | |
-| CA-2 | Validación de precios (negativos, no numéricos, decimales, límites) | FR-002 | | | Pendiente | |
-| CA-3 | El precio vigente se guarda al agregar la refacción a una orden | FR-004, FR-024 | | | Pendiente | |
-| CA-4 | Total = servicios + mano de obra + refacciones, en centavos | FR-005, FR-022 | | | Pendiente | |
-| CA-5 | El pago se registra por el nuevo total; importe distinto se rechaza | FR-006, FR-021 | | | Pendiente | |
-| CA-6 | Pagos y tickets anteriores conservan importe y contenido | FR-008, FR-009, FR-015 | | | Pendiente | |
-| CA-7 | El ticket nuevo detalla las refacciones, subtotal y total | FR-007 | | | Pendiente | |
-| CA-8 | Un solo pago vigente, incluso con solicitudes simultáneas; sin datos de tarjeta | FR-010, FR-026 | | | Pendiente | |
-| CA-9 | Mercado Pago recibe el importe correcto; pago pendiente desfasado resuelto | FR-011, FR-012, FR-027 | | | Pendiente | |
-| CA-10 | El precio de compra solo lo ve el administrador | FR-013, FR-014 | | | Pendiente | |
-| CA-11 | Dashboard y listados funcionan con el nuevo total | FR-016 | | | Pendiente | |
-| CA-12 | Seeds con precios y una orden cobrable con refacciones, idempotentes | FR-017 | | | Pendiente | |
-| CA-13 | Pruebas de total, instantáneas, redondeo, permisos, concurrencia y compatibilidad | FR-019 y todos los demás | | | Pendiente | |
-| CA-14 | Documentación del proyecto actualizada | FR-018 | | | Pendiente | |
+| CA-1 | Refacción con categoría, marca y precios persistidos | FR-001, FR-025 | T017–T023 | T015, T016 | Pendiente | |
+| CA-2 | Validación de precios (negativos, no numéricos, decimales, límites) | FR-002 | T005, T017 | T014, T015 | Pendiente | |
+| CA-3 | El precio vigente se guarda al agregar la refacción a una orden | FR-004, FR-024 | T011, T028, T029 | T025, T026 | Pendiente | |
+| CA-4 | Total = servicios + mano de obra + refacciones, en centavos | FR-005, FR-022 | T008, T010, T028 | T009, T025 | Pendiente | |
+| CA-5 | El pago se registra por el nuevo total; importe distinto se rechaza | FR-006, FR-021 | T038 | T034 | Pendiente | |
+| CA-6 | Pagos y tickets anteriores conservan importe y contenido | FR-008, FR-009, FR-015 | T005, T006, T042, T044 | T047 | Pendiente | |
+| CA-7 | El ticket nuevo detalla las refacciones, subtotal y total | FR-007 | T039, T040, T044 | T033, T035 | Pendiente | |
+| CA-8 | Un solo pago vigente, incluso con solicitudes simultáneas; sin datos de tarjeta | FR-010, FR-026 | T049 | T046, T034 | Pendiente | |
+| CA-9 | Mercado Pago recibe el importe correcto; pago pendiente desfasado resuelto | FR-011, FR-012, FR-027 | T038, T043 | T034 | Pendiente | |
+| CA-10 | El precio de compra solo lo ve el administrador | FR-013, FR-014 | T012, T055 | T052, T053, T054 | Pendiente | |
+| CA-11 | Dashboard y listados funcionan con el nuevo total | FR-016 | T058 | T058 | Pendiente | |
+| CA-12 | Seeds con precios y una orden cobrable con refacciones, idempotentes | FR-017 | T050 | T048 | Pendiente | |
+| CA-13 | Pruebas de total, instantáneas, redondeo, permisos, concurrencia y compatibilidad | FR-019 y todos los demás | T014–T058 (las pruebas del sprint) | todas las anteriores y T059 | Pendiente | |
+| CA-14 | Documentación del proyecto actualizada | FR-018 | T003, T004, T056 | Revisión documental en T056 (sin prueba automática) | Pendiente | |
 
 ## 7. Hallazgos y defectos
 
