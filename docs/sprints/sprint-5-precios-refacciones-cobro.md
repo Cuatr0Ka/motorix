@@ -85,8 +85,8 @@ Que cada refacción tenga categoría, marca, precio de compra y precio de venta,
 - Descuentos, promociones y pagos parciales o a plazos.
 - Reembolsos dentro del sistema.
 - Catálogo de proveedores y órdenes de compra.
-- Notificaciones, reportes, configuración del taller y WhatsApp (Sprints 6 a 9).
-- Fotos del vehículo y puesta en producción (Sprint 10).
+- Notificaciones, reportes y configuración del taller (Sprints 6 y 7); la mensajería al cliente no está planeada.
+- Fotos del vehículo y puesta en producción (descartadas del alcance).
 
 ## 9. Decisiones pendientes que deben resolverse en /speckit.clarify
 

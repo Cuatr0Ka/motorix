@@ -28,8 +28,9 @@ requisitos, reglas de negocio y plan de sprints antes de generar código.
     integraciones externas.
 6.  No almacenar datos sensibles de tarjetas o credenciales de Mercado
     Pago.
-7.  El chatbot de WhatsApp **no forma parte de la interfaz ni del MVP
-    actual**; se considera una integración externa futura.
+7.  El chatbot de WhatsApp **está fuera del alcance del proyecto**: no se
+    implementa, no se prepara en ningún sprint y no forma parte de la
+    interfaz.
 8.  Mantener una UX profesional, sencilla y orientada a personal de
     taller.
 9.  Si existe una decisión técnica no definida aquí, proponer opciones
@@ -137,7 +138,7 @@ En el MVP el cliente es principalmente un **beneficiario externo**, no
 necesariamente un usuario autenticado.
 
 Funciones relacionadas: - Recibir información y tickets de servicios
-realizados. - Recibir recordatorios de próximos mantenimientos.
+realizados. - Recibir recordatorios de próximos mantenimientos, que la recepción le comunica por teléfono o en persona a partir de la lista de clientes por avisar, y con la fecha del próximo servicio impresa en su ticket.
 
 ### Reglas de autenticación del MVP
 
@@ -378,21 +379,15 @@ atención.
 
 # 7. Funcionalidad fuera del MVP actual
 
-## Chatbot de WhatsApp
+## Chatbot de WhatsApp (fuera del alcance)
 
-Existe como propuesta una integración externa con WhatsApp para
-respuestas iniciales breves, por ejemplo:
+El chatbot de WhatsApp quedó fuera del alcance del proyecto. No se
+implementa, no se recibe ningún mensaje del cliente por ese medio y
+ningún sprint lo incluye ni lo prepara.
 
-> "Gracias por tu preferencia. Revisaremos tu solicitud y te
-> responderemos."
-
-Sin embargo:
-
--   No forma parte de la interfaz principal.
--   No debe bloquear el desarrollo del MVP.
--   No debe implementarse hasta que el núcleo del sistema esté
-    funcional.
--   Su integración futura deberá tratarse como un servicio externo.
+Tampoco hay mensajería automática al cliente (WhatsApp, correo o SMS): el
+cliente sigue siendo un beneficiario externo que no usa el sistema. Ver
+`docs/sprints/propuesta-sprints-post-mvp.md`.
 
 ------------------------------------------------------------------------
 
