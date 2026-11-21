@@ -20,6 +20,7 @@ enum AppSection {
   users('Usuarios'),
   settings('Configuración'),
   terms('Términos'),
+  reports('Reportes'),
   auditLog('Bitácora'),
   changePassword('Cambiar contraseña');
 
@@ -52,6 +53,7 @@ class NavigationProvider extends ChangeNotifier {
         if (role == UserRole.admin) AppSection.inventory,
         if (role == UserRole.admin) AppSection.users,
         if (role == UserRole.admin) AppSection.settings,
+        if (role == UserRole.admin) AppSection.reports,
         if (role == UserRole.admin) AppSection.terms,
         if (role == UserRole.admin) AppSection.auditLog,
       ];

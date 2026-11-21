@@ -12,7 +12,7 @@
 
 ### Sesión 2026-11-21 (primera ronda)
 
-- Q: ¿En qué formato se exportan los reportes? → A: CSV, sin dependencias nuevas: codificación UTF-8 con marca de orden de bytes para que Excel lo abra bien, separador coma, importes con punto decimal y dos decimales, y fechas `AAAA-MM-DD` (D-01).
+- Q: ¿En qué formato se exportan los reportes? → A: Excel (.xlsx) con el diseño de Motorix (logo, colores del sistema de diseño, importes como números con formato de moneda y fechas `AAAA-MM-DD`); la única dependencia nueva es `exceljs` en el servidor (D-01, revisada el 2026-11-21: antes era CSV sin dependencias).
 - Q: ¿Cómo se publican los términos y condiciones y quién los redacta? → A: Texto fijo entregado con el sistema y versionado por el equipo (versión 1.0 con los datos de ejemplo); no hay editor en la aplicación. El administrador consulta la versión vigente y las aceptaciones. Una versión nueva se publica agregando su texto en una migración o en los datos de ejemplo (D-02).
 - Q: ¿Qué exige la política de contraseñas y cuándo se cierra la sesión por inactividad? → A: Mínimo 10 caracteres con al menos una mayúscula, una minúscula y un número; la sesión se cierra a los 30 minutos sin actividad y se avisa 2 minutos antes con la opción de seguir conectado. Las cuentas sembradas con la contraseña estándar no se obligan a cambiarla (D-03).
 
@@ -203,8 +203,8 @@ datos y filtros que la pantalla.
 2. **Dado** los importes del reporte, **cuando** los exporto, **entonces** coinciden con la pantalla al centavo.
 3. **Dado** un reporte vacío, **cuando** lo exporto, **entonces** el archivo trae los encabezados y ninguna fila de
    datos.
-4. **Dado** un reporte exportado, **cuando** lo abro en una hoja de cálculo, **entonces** es un archivo CSV en UTF-8
-   con las tildes y la eñe correctas, importes con dos decimales y fechas `AAAA-MM-DD`.
+4. **Dado** un reporte exportado, **cuando** lo abro en una hoja de cálculo, **entonces** es un libro de Excel con el
+   logo y los colores de Motorix, las tildes y la eñe correctas, importes numéricos con formato de moneda y fechas `AAAA-MM-DD`.
 5. **Dado** un periodo inválido, **cuando** intento exportar, **entonces** el sistema lo rechaza igual que en pantalla.
 
 ---
@@ -361,8 +361,8 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 - **FR-013**: Los importes DEBEN calcularse en centavos enteros y coincidir con los pagos y las órdenes que los
   originan; la suma de las partes DEBE ser igual al total mostrado.
 - **FR-014**: Cada reporte DEBE poder exportarse a un archivo con los mismos datos, periodo y filtros que la
-  pantalla, en formato CSV (UTF-8 con marca de orden de bytes, separador coma, importes con punto decimal y dos decimales y fechas
-  `AAAA-MM-DD`), sin dependencias nuevas.
+  pantalla, en formato Excel (.xlsx) con el diseño de Motorix (logo, colores y tipografía del sistema de diseño, importes numéricos con
+  formato de moneda, filas alternadas, encabezado fijo y filtros); los textos nunca se interpretan como fórmulas.
 - **FR-015**: Los reportes DEBEN responder en un tiempo razonable con muchos datos, limitando el periodo a un año; los
   listados de los reportes vienen agrupados y no se paginan.
 
@@ -470,7 +470,7 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
   se entregan primero configuración, catálogo, ticket, términos y seguridad, y después los reportes y su
   exportación.
 - Los reportes son exclusivos del administrador; no hay una versión reducida para la recepción (D-10).
-- La exportación es en CSV y no agrega dependencias (D-01); los términos son un texto fijo sin editor en la aplicación
+- La exportación es en Excel con el diseño de Motorix y agrega solo la dependencia `exceljs` (D-01 revisada); los términos son un texto fijo sin editor en la aplicación
   (D-02); la política de contraseñas y la inactividad son las de las aclaraciones (D-03).
 - Los periodos de los reportes son día, semana, mes o rango libre, con corte por la fecha local del servidor y un
   máximo de un año por consulta; «Esta semana» va del lunes a hoy y «Este mes» del día 1 a hoy (D-14).
@@ -501,7 +501,7 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 
 Vienen de la sección 9 del insumo. Todas se resolvieron el 2026-11-21 y están registradas en la sección Aclaraciones:
 
-- **D-01** *(resuelta el 2026-11-21)*: Exportación en CSV, sin dependencias nuevas.
+- **D-01** *(resuelta el 2026-11-21; revisada por la persona responsable el mismo día)*: Exportación en Excel (.xlsx) con el diseño de Motorix, en lugar de CSV. Se agrega la dependencia `exceljs` en el servidor; el cliente no agrega ninguna.
 - **D-02** *(resuelta el 2026-11-21)*: Términos con texto fijo versionado por el equipo, sin editor en la aplicación.
 - **D-03** *(resuelta el 2026-11-21)*: Contraseña de mínimo 10 caracteres con mayúscula, minúscula y número; cierre de
   sesión a los 30 minutos con aviso previo.

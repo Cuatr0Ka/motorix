@@ -106,20 +106,22 @@ justificación y las alternativas descartadas.
 - **Alternativas descartadas**: tablas de resumen precalculadas (duplican datos y se desfasan); calcular en Node con
   todas las filas (lento con 1 000 órdenes).
 
-### R-07. Exportación CSV por el mismo endpoint, sin dependencias
+### R-07. Exportación a Excel por el mismo endpoint (revisada el 2026-11-21: antes CSV)
 
-- **Decisión**: cada reporte acepta `?format=csv` y responde `text/csv; charset=utf-8` con `Content-Disposition`
-  (`reporte-ingresos-2026-11-01_2026-11-30.csv`). Un módulo puro `csv.js` arma el texto: marca de orden de bytes
-  UTF-8, separador coma, comillas dobles escapadas, saltos `\r\n`, importes con punto y dos decimales y fechas
-  `AAAA-MM-DD`. Una celda de texto que empieza con `=`, `+`, `-` o `@` se antepone con una comilla simple para evitar
-  la ejecución de fórmulas al abrirla en una hoja de cálculo.
-- **Justificación**: D-01; el contenido sale de la **misma función** que la pantalla, así que coincide al centavo
+- **Decisión**: cada reporte acepta `?format=xlsx` y responde un libro de Excel
+  (`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`) con `Content-Disposition`
+  (`reporte-income-2026-11-01_2026-11-30.xlsx`). `reportWorkbook.js` lo arma con `exceljs` con la identidad visual de Motorix:
+  el logo, un encabezado sobre el fondo cálido `#F5F2F1`, una franja y los encabezados de tabla en el color primario
+  `#9B4F55` con texto blanco, filas alternadas, bordes `#DDD5D4`, fila de totales, importes como números con formato de moneda,
+  porcentajes con formato propio, encabezado fijo y filtros (si hay una sola tabla) y pie con la fecha. Los textos se escriben como
+  cadenas de Excel, así que una celda que empiece con `=`, `+`, `-` o `@` nunca se ejecuta como fórmula.
+- **Justificación**: D-01 revisada (${NOTE}); el contenido sale de la **misma función** que la pantalla, así que coincide al centavo
   (SC-004). La protección contra fórmulas es una medida de seguridad de la información (FR-029).
-- **Alternativas descartadas**: Excel o PDF (librerías nuevas, prohibidas sin justificar por la constitución).
+- **Alternativas descartadas**: CSV (decisión original: no permite logo, colores ni formatos reales) y PDF (no pedido). `exceljs` es la dependencia nueva, justificada por la persona responsable.
 
-### R-08. Guardar el CSV en el cliente sin dependencias nuevas
+### R-08. Guardar el Excel en el cliente sin dependencias nuevas
 
-- **Decisión**: el cliente descarga el CSV con `ApiClient` y lo escribe con `dart:io` en la carpeta de descargas del
+- **Decisión**: el cliente descarga el Excel con `ApiClient.download` y lo escribe con `dart:io` en la carpeta de descargas del
   usuario (`USERPROFILE\Downloads` en Windows; `HOME/Downloads` en otros), con el nombre que indica el servidor. Muestra
   el mensaje «Archivo guardado en [ruta]» con el botón **Abrir carpeta**, que usa `url_launcher`. Si la carpeta no
   existe o no se puede escribir, muestra el error y no pierde el reporte.
@@ -209,7 +211,7 @@ justificación y las alternativas descartadas.
 
 - **Decisión**: secciones del menú solo para ADMIN: **Configuración** (datos del taller, márgenes y catálogo de tipos de
   servicio, en pestañas), **Reportes** (ingresos, servicios y productividad, refacciones y rotación, con selector de
-  periodo y botón **Exportar CSV**), **Bitácora** y **Términos** (versión vigente y aceptaciones). La pantalla de
+  periodo y botón **Exportar Excel**), **Bitácora** y **Términos** (versión vigente y aceptaciones). La pantalla de
   aceptación de términos aparece tras iniciar sesión (y cuando el servidor lo exige); el formulario de servicio de la
   orden suma un selector opcional de tipo; el formulario de próximo mantenimiento suma «Usar el intervalo del
   servicio»; el ticket muestra «Próximo servicio». Todo sigue `docs/design-system.md`, sin dependencias nuevas

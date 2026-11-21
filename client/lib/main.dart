@@ -15,6 +15,7 @@ import 'providers/payments_provider.dart';
 import 'providers/session_provider.dart';
 import 'providers/sidebar_provider.dart';
 import 'providers/audit_provider.dart';
+import 'providers/reports_provider.dart';
 import 'providers/service_types_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/terms_provider.dart';
@@ -36,6 +37,7 @@ import 'screens/order_detail_screen.dart';
 import 'screens/part_detail_screen.dart';
 import 'screens/payments_list_screen.dart';
 import 'screens/audit_log_screen.dart';
+import 'screens/reports_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/terms_accept_screen.dart';
 import 'screens/terms_admin_screen.dart';
@@ -56,6 +58,8 @@ import 'services/orders_service.dart';
 import 'services/parts_service.dart';
 import 'services/payments_service.dart';
 import 'services/audit_service.dart';
+import 'services/reports_service.dart';
+import 'utils/file_saver.dart';
 import 'services/service_types_service.dart';
 import 'services/settings_service.dart';
 import 'services/terms_service.dart';
@@ -81,6 +85,7 @@ class MotorixApp extends StatelessWidget {
     this.useGoogleFonts = true,
     this.linkOpener = const SystemLinkOpener(),
     this.ticketPrinter = const SystemTicketPrinter(),
+    this.fileSaver = const DownloadsFileSaver(),
   });
 
   final ApiClient apiClient;
@@ -90,6 +95,9 @@ class MotorixApp extends StatelessWidget {
 
   /// Imprime tickets con el diálogo del sistema (se sustituye en las pruebas).
   final TicketPrinter ticketPrinter;
+
+  /// Guarda los archivos descargados, como los reportes de Excel (se sustituye en las pruebas).
+  final FileSaver fileSaver;
   final bool useGoogleFonts;
 
   @override
@@ -99,6 +107,9 @@ class MotorixApp extends StatelessWidget {
       providers: [
         Provider<ApiClient>.value(value: apiClient),
         Provider<AuthService>.value(value: authService),
+        Provider<FileSaver>.value(value: fileSaver),
+        Provider<ReportsService>(create: (_) => ReportsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => ReportsProvider(context.read<ReportsService>(), context.read<FileSaver>())),
         Provider<AuditService>(create: (_) => AuditService(apiClient)),
         ChangeNotifierProvider(create: (context) => AuditProvider(context.read<AuditService>())),
         Provider<TermsService>(create: (_) => TermsService(apiClient)),
@@ -222,6 +233,8 @@ Widget buildSection(BuildContext context, AppSection section) {
       return const TermsAdminScreen();
     case AppSection.auditLog:
       return const AuditLogScreen();
+    case AppSection.reports:
+      return const ReportsScreen();
     case AppSection.changePassword:
       return const ChangePasswordScreen();
   }

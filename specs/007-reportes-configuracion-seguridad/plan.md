@@ -8,20 +8,20 @@
 
 El administrador configura desde la aplicación los datos del taller y los márgenes de «Próximo», mantiene un catálogo de
 tipos de servicio con intervalos (que propone el próximo mantenimiento y lo muestra en el ticket) y consulta y exporta a
-CSV reportes de ingresos, servicios, productividad, refacciones y rotación. Todo usuario acepta los términos y condiciones y
+Excel (con el diseño de Motorix) reportes de ingresos, servicios, productividad, refacciones y rotación. Todo usuario acepta los términos y condiciones y
 el aviso de privacidad al ingresar, y la información queda protegida con una bitácora de solo inserción, contraseñas de al
 menos 10 caracteres, cierre de sesión por inactividad validado en el servidor y pruebas de no exposición de datos y de
 inyección.
 
-Enfoque técnico (detalle en [research.md](./research.md)): se reutilizan la pila y las capas de los sprints anteriores, **sin
-dependencias nuevas**. La migración `007` es aditiva: cinco tablas nuevas (`settings`, `service_types`, `terms_versions`,
+Enfoque técnico (detalle en [research.md](./research.md)): se reutilizan la pila y las capas de los sprints anteriores, con **una sola
+dependencia nueva** (`exceljs`, para el libro de Excel). La migración `007` es aditiva: cinco tablas nuevas (`settings`, `service_types`, `terms_versions`,
 `terms_acceptances` y `audit_log`) y dos columnas nulas (`order_services.service_type_id` y `users.last_activity_at`).
 `settingsService` lee la configuración bajo demanda (guardado → `.env` → predeterminado) y `presentMaintenance` recibe los
-márgenes como parámetro. Las reglas nuevas viven en módulos puros y probados (`reportRules`, `csv`, `serviceIntervals`); los
+márgenes como parámetro. Las reglas nuevas viven en módulos puros y probados (`reportRules`, `serviceIntervals`); los
 reportes son agregados SQL en centavos enteros. `authenticate` valida la aceptación de términos y la inactividad en cada
 petición. La bitácora se escribe con `auditService` después de cada acción sensible. El ticket nuevo lleva `formatVersion: 3`
 con «Próximo servicio»; los anteriores no cambian. El cliente agrega las secciones Reportes, Configuración, Bitácora y
-Términos, la pantalla de aceptación y el guardián de inactividad, y guarda el CSV con `dart:io`.
+Términos, la pantalla de aceptación y el guardián de inactividad, y guarda el Excel con `dart:io`.
 
 ## Contexto técnico
 
@@ -29,7 +29,7 @@ Términos, la pantalla de aceptación y el guardián de inactividad, y guarda el
 MySQL 8.0 (sin cambios respecto a los sprints anteriores)
 
 **Dependencias principales**:
-- Backend: ninguna nueva (`express`, `mysql2`, `jsonwebtoken`, `bcryptjs`, `zod`, `cors`, `helmet`, `dotenv`).
+- Backend: una nueva, `exceljs` (libro de Excel con logo, colores y formatos; decisión de la persona responsable del 2026-11-21). Las demás sin cambio (`express`, `mysql2`, `jsonwebtoken`, `bcryptjs`, `zod`, `cors`, `helmet`, `dotenv`).
 - Frontend: ninguna nueva (`provider`, `http`, `google_fonts`, `data_table_2`, `fl_chart`, `printing`, `url_launcher`).
 - Pruebas: `jest`, `supertest` (backend); `flutter_test` (frontend).
 
@@ -38,7 +38,7 @@ migración `database/migrations/007_sprint7_settings_terms_audit.sql` (incluye l
 `database/seeds/007_settings_service_types.sql`. Sin variables de entorno nuevas; `SHOP_*` y `MAINTENANCE_WARN_*` quedan como
 valor de respaldo.
 
-**Pruebas**: Jest (unitarias de `reportRules`, `csv`, `serviceIntervals` y la política de contraseñas), Jest + supertest
+**Pruebas**: Jest (unitarias de `reportRules`, `serviceIntervals` y la política de contraseñas), Jest + supertest
 (integración y contrato contra `motorix_test`: configuración, catálogo, ticket, términos, bitácora, sesión, reportes,
 exposición de datos e inyección, permisos por rol, concurrencia y rendimiento); `flutter test` (modelos, proveedores y
 pantallas, con tiempo controlado para la inactividad). Línea base: 1 349 pruebas de backend y 373 de frontend del 2026-11-20.
@@ -67,15 +67,15 @@ transversales nuevas, cambios en servicios de la orden, programar mantenimiento,
 | Principio | Evaluación | Cómo se cumple |
 |-----------|------------|----------------|
 | I. Alcance, MVP y fuente de verdad | PASA | Sprint posterior al MVP: lo permite la enmienda 1.1.0 y la aprobación del Sprint 7 quedó registrada el 2026-11-21 (versión 1.1.2, «Decisiones resueltas durante el Sprint 7»). Insumo en `docs/sprints/sprint-7-reportes-configuracion.md`, flujo de Spec Kit y documento de aseguramiento. Sin mensajería al cliente. Se actualiza `docs/project-context.md` (FR-031) |
-| II. Arquitectura separada | PASA | `client/`, `server/`, `database/`; la lógica vive en `services/` y en los módulos puros `reportRules`, `csv` y `serviceIntervals`; controladores delgados; sin integraciones nuevas |
-| III. Stack y base local | PASA | Mismo stack; migración numerada nueva y aditiva; InnoDB, llaves foráneas, `utf8mb4`; seeds idempotentes con datos suficientes. **Sin dependencias nuevas** (CSV con código propio, archivo con `dart:io`) |
-| IV. Seguridad | PASA | Rutas con `authenticate` + `authorize`; validación `zod`; bitácora sin datos reservados; aceptación de términos e inactividad validadas en el servidor; contraseñas con hash y política de 10 caracteres; el precio de compra solo en el reporte de ADMIN; protección contra fórmulas en el CSV; pruebas de no exposición e inyección; ninguna traza al usuario |
+| II. Arquitectura separada | PASA | `client/`, `server/`, `database/`; la lógica vive en `services/` y en los módulos puros `reportRules` y `serviceIntervals` y el generador `reportWorkbook`; controladores delgados; sin integraciones nuevas |
+| III. Stack y base local | PASA | Mismo stack; migración numerada nueva y aditiva; InnoDB, llaves foráneas, `utf8mb4`; seeds idempotentes con datos suficientes. **Una dependencia nueva aprobada por la persona responsable: `exceljs`** (Excel con diseño de Motorix); el cliente guarda el archivo con `dart:io` |
+| IV. Seguridad | PASA | Rutas con `authenticate` + `authorize`; validación `zod`; bitácora sin datos reservados; aceptación de términos e inactividad validadas en el servidor; contraseñas con hash y política de 10 caracteres; el precio de compra solo en el reporte de ADMIN; los textos del Excel se escriben como texto y nunca como fórmulas; pruebas de no exposición e inyección; ninguna traza al usuario |
 | V. Reglas de negocio | PASA | RN-5 (solo autorizados), RN-9 (órdenes entregadas se conservan; los reportes solo leen), RN-10 (los reportes se derivan, no se duplican), RN-11 y RN-12 (los intervalos y márgenes son configurables, sin valores universales), RN-14 y RN-15 (sin datos sensibles y permisos en el servidor) |
-| VI. API consistente | PASA | Misma forma `{ data, meta }` / `{ error }`, códigos HTTP y manejo central; contrato en [contracts/api-rest.md](./contracts/api-rest.md) (la exportación CSV es la única respuesta que no es JSON) |
+| VI. API consistente | PASA | Misma forma `{ data, meta }` / `{ error }`, códigos HTTP y manejo central; contrato en [contracts/api-rest.md](./contracts/api-rest.md) (la exportación a Excel es la única respuesta que no es JSON) |
 | VII. Pruebas | PASA | Unitarias de las reglas puras, integración y contrato contra `motorix_test` (permisos, términos, bitácora, sesión, reportes, exposición, inyección, concurrencia, rendimiento), regresión de los sprints 1 a 6 y `flutter test`; los cambios de contrato declarados (contraseña de 10 caracteres, aceptación de términos) actualizan pruebas y se registran en el aseguramiento |
 | VIII. UX/UI | PASA | Material 3 con el tema propio y tokens; chip ámbar «Sin costo»; confirmación al desactivar un tipo de servicio; estados de carga, vacío y error; diálogo de inactividad accesible; sin dependencias de UI nuevas; se actualiza `docs/design-system.md` |
 
-**Reevaluación tras la Fase 1**: PASA. El diseño no agrega dependencias ni capas nuevas; las tablas y columnas son lo mínimo
+**Reevaluación tras la Fase 1**: PASA. El diseño agrega solo `exceljs` y ninguna capa nueva; las tablas y columnas son lo mínimo
 que el spec obliga a persistir (configuración, catálogo, términos, aceptaciones, bitácora y actividad).
 
 ## Estructura del proyecto
@@ -123,7 +123,7 @@ server/
 │   ├── auditService.js             # nuevo: registra sin datos reservados
 │   ├── reportRules.js              # nuevo (puro): rango, extremos y centavos
 │   ├── reportService.js            # nuevo
-│   ├── csv.js                      # nuevo (puro): texto CSV seguro
+│   ├── reportWorkbook.js           # nuevo: libro de Excel con el diseño de Motorix (assets/logo.png)
 │   ├── maintenancePresenter.js     # recibe los márgenes como parámetro
 │   ├── maintenanceService.js       # márgenes guardados; propuesta
 │   ├── clientNoticeService.js      # márgenes guardados
@@ -140,7 +140,7 @@ server/
 ├── validators/                     # settingsValidators, serviceTypeValidators, reportValidators, termsValidators, auditValidators
 ├── utils/passwordPolicy.js         # mínimo de 10 caracteres
 └── tests/
-    ├── unit/                       # serviceIntervals, reportRules, csv, passwordPolicy
+    ├── unit/                       # serviceIntervals, reportRules, passwordPolicy
     ├── integration/                # settings, serviceTypes, ticket, terms, audit, session, reports, dataExposure, injection, seeds, performance
     ├── contract/                   # settings, serviceTypes, reports, terms, audit
     └── helpers/factories.js        # createUser acepta los términos; resetDatabase conserva terms_versions
@@ -154,7 +154,7 @@ client/
 │   ├── screens/                    # settings_screen, reports_screen, audit_log_screen, terms_admin_screen, terms_accept_screen
 │   ├── widgets/                    # inactivity_guard, period_selector, maintenance_dialog, ticket_view, app_shell
 │   │                               # (el diálogo de líneas está en screens/order_detail_screen.dart)
-│   ├── utils/                      # csv_saver.dart, password_policy.dart, ticket_printer.dart
+│   ├── utils/                      # file_saver.dart, password_policy.dart, ticket_printer.dart
 │   └── main.dart                   # registra los proveedores y la pantalla de aceptación
 └── test/                           # settings, service_types, reports, terms, audit_log, inactivity y los helpers (fake_api)
 
@@ -167,7 +167,7 @@ docs/
 ```
 
 **Decisión de estructura**: se conserva la estructura de los sprints anteriores. Las piezas nuevas de lógica son los módulos
-puros `reportRules`, `csv` y `serviceIntervals` y los servicios de cada tema; no se agregan capas ni dependencias.
+puros `reportRules` y `serviceIntervals`, el generador `reportWorkbook` y los servicios de cada tema; no se agregan capas y la única dependencia nueva es `exceljs`.
 
 ## Cobertura de riesgos
 
@@ -176,8 +176,8 @@ puros `reportRules`, `csv` y `serviceIntervals` y los servicios de cada tema; no
 | R-01 un cambio de configuración altera un ticket emitido | el ticket guarda su instantánea; la configuración solo alimenta tickets nuevos | integración: cambiar el taller y comparar un ticket anterior |
 | R-02 los márgenes no coinciden entre pantallas | los tres consumidores (lista, panel y avisos) leen `settingsService.getMaintenanceMargins()` | integración que compara los tres con un margen nuevo |
 | R-03 los reportes no cuadran con los pagos | agregados en centavos enteros sobre las mismas tablas y comprobación de que las partes suman el total | integración con casos de pagos de todos los estados y métodos |
-| R-04 el CSV difiere de la pantalla | el CSV sale de la misma función que el JSON | integración que compara ambos reporte por reporte |
-| R-05 una celda con fórmula se ejecuta en la hoja de cálculo | `csv.js` antepone una comilla a los textos que empiezan con `=`, `+`, `-` o `@` | unitaria de `csv` |
+| R-04 el Excel difiere de la pantalla | el Excel sale de la misma función que el JSON | integración que compara ambos reporte por reporte |
+| R-05 una celda con fórmula se ejecuta en la hoja de cálculo | los textos se escriben como cadenas de Excel (nunca como fórmulas) | integración `reports.xlsx` con un servicio llamado `=SUMA(1+1)` |
 | R-06 el precio de compra llega a un rol sin permiso | reportes exclusivos de ADMIN y exposición de datos probada por rol | integración `dataExposure` y contrato de reportes |
 | R-07 una ruta nueva olvida exigir la aceptación | la aceptación se valida dentro de `authenticate`, con una lista fija de excepciones | integración con una ruta por router y un usuario sin aceptar |
 | R-08 se evade el cierre por inactividad | validación en el servidor con `last_activity_at` y el cliente solo avisa | integración de sesión con el reloj de la base ajustado |

@@ -1,6 +1,6 @@
 # Contrato de la API REST (Sprint 7: reportes, configuración, términos y seguridad)
 
-**Base**: `/api` | **Formato**: JSON UTF-8 (salvo la exportación CSV) | **Autenticación**: `Authorization: Bearer <token>`
+**Base**: `/api` | **Formato**: JSON UTF-8 (salvo la exportación a Excel) | **Autenticación**: `Authorization: Bearer <token>`
 en todas las rutas. Este contrato **amplía** los de los sprints 1 a 6; las convenciones de respuesta y errores son las
 mismas (`{ data, meta? }` / `{ error: { code, message, details? } }`, mensajes en español y sin trazas).
 
@@ -11,11 +11,12 @@ mismas (`{ data, meta? }` / `{ error: { code, message, details? } }`, mensajes e
 - Fechas de calendario como `AAAA-MM-DD`; fechas con hora en ISO 8601.
 - **Periodo de los reportes**: `from` y `to` (`AAAA-MM-DD`, ambos obligatorios, `to >= from`, máximo 366 días). La
   interfaz arma los presets de día, semana y mes con esos dos parámetros.
-- **Exportación**: cualquier reporte acepta `format=csv` y responde `200` con `Content-Type: text/csv; charset=utf-8` y
-  `Content-Disposition: attachment; filename="reporte-<nombre>-<from>_<to>.csv"`. El archivo empieza con la marca de
-  orden de bytes UTF-8, usa coma como separador, `\r\n` como salto de línea, importes con punto y dos decimales y fechas
-  `AAAA-MM-DD`; los campos con coma, comillas o saltos de línea van entre comillas dobles. Un texto que empieza con
-  `=`, `+`, `-` o `@` se antepone con una comilla simple.
+- **Exportación**: cualquier reporte acepta `format=xlsx` y responde `200` con
+  `Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` y
+  `Content-Disposition: attachment; filename="reporte-<nombre>-<from>_<to>.xlsx"` (`<nombre>` es `income`, `services`,
+  `productivity`, `parts` o `rotation`). Es un libro de Excel con el logo y los colores de Motorix; los importes son números con
+  formato de moneda y las fechas `AAAA-MM-DD`. Un texto nunca se interpreta como fórmula. Un periodo inválido responde `400`
+  igual que en JSON y cualquier otro valor de `format` también.
 - Los rangos inválidos usan `400 VALIDATION_ERROR` con `details[]` por campo.
 
 ### Códigos de error nuevos
@@ -40,7 +41,7 @@ Siguen vigentes `UNAUTHENTICATED` (401), `FORBIDDEN` (403) y `NOT_FOUND` (404).
 | `GET /service-types` y `POST/PATCH /service-types` | ✔ | ✘ | ✘ |
 | `GET /service-types/options` | ✔ | ✘ | ✔ |
 | `GET /orders/:id/maintenance/suggestion` | ✔ | ✘ | ✔ (solo sus órdenes) |
-| `GET /reports/*` (JSON y CSV) | ✔ | ✘ | ✘ |
+| `GET /reports/*` (JSON y Excel) | ✔ | ✘ | ✘ |
 | `GET /audit-log` | ✔ | ✘ | ✘ |
 | `GET /terms/acceptances` | ✔ | ✘ | ✘ |
 | `GET /terms/current` y `POST /terms/accept` | ✔ | ✔ | ✔ |
@@ -131,7 +132,7 @@ respuestas agrega `serviceType: { id, name } | null`. Las líneas existentes lle
 
 ## Reportes (`/api/reports`) — solo ADMIN
 
-Todos reciben `from` y `to` y aceptan `format=csv`.
+Todos reciben `from` y `to` y aceptan `format=xlsx`.
 
 ### `GET /api/reports/income`
 

@@ -7,7 +7,7 @@ Escenarios para comprobar de extremo a extremo que el sprint funciona. Los detal
 ## Requisitos previos
 
 - MySQL 8 local con las bases `motorix` y `motorix_test` y el usuario `motorix_app` (ver `database/README.md`).
-- `server/.env` configurado (sin secretos en el repositorio). El sprint no usa servicios externos ni dependencias nuevas.
+- `server/.env` configurado (sin secretos en el repositorio). El sprint no usa servicios externos ni dependencias nuevas, salvo `exceljs` en el servidor (`npm install`).
 - Dependencias instaladas en `server/` (`npm install`) y en `client/` (`flutter pub get`).
 
 ## 1. Preparar la base
@@ -35,7 +35,7 @@ aseguramiento.
 ## 3. Pruebas del sprint
 
 ```powershell
-cd server; npm test -- tests/unit/serviceIntervals tests/unit/reportRules tests/unit/csv tests/unit/passwordPolicy tests/integration/settings tests/integration/serviceTypes tests/integration/terms tests/integration/audit tests/integration/session tests/integration/reports tests/integration/dataExposure tests/integration/injection tests/integration/seed.settings tests/contract/settings tests/contract/serviceTypes tests/contract/reports tests/contract/terms tests/contract/audit
+cd server; npm test -- tests/unit/serviceIntervals tests/unit/reportRules tests/unit/passwordPolicy tests/integration/settings tests/integration/serviceTypes tests/integration/terms tests/integration/audit tests/integration/session tests/integration/reports tests/integration/dataExposure tests/integration/injection tests/integration/seed.settings tests/contract/settings tests/contract/serviceTypes tests/contract/reports tests/contract/terms tests/contract/audit
 cd ..\client; flutter test test/settings_test.dart test/service_types_test.dart test/reports_test.dart test/terms_test.dart test/audit_log_test.dart test/inactivity_test.dart
 ```
 
@@ -56,8 +56,8 @@ Con la API y el cliente levantados y los datos de ejemplo cargados:
    **Esperado**: se rellenan la fecha y el kilometraje y se pueden corregir. Genera el ticket: muestra «Próximo servicio».
 5. Abre **Reportes**, elige **Este mes** y recorre las tres pestañas. **Esperado**: los ingresos coinciden con los pagos
    pagados del mes; los servicios y mecánicos tienen datos; las refacciones sin precio de compra muestran «Sin costo».
-6. Pulsa **Exportar CSV** en cada pestaña y abre el archivo en una hoja de cálculo. **Esperado**: coincide con la pantalla,
-   las tildes se ven bien y los importes tienen dos decimales.
+6. Pulsa **Exportar Excel** en cada pestaña y abre el archivo en Excel. **Esperado**: coincide con la pantalla, trae el logo y los
+   colores de Motorix, las tildes se ven bien y los importes tienen formato de moneda.
 7. Cambia el rol de un usuario y el precio de una refacción, y abre **Bitácora**. **Esperado**: ambas acciones aparecen con
    quién, cuándo y qué; el filtro por acción las separa; no hay forma de editar ni borrar.
 8. Intenta crear un usuario con la contraseña `Corta1Aa`. **Esperado**: se rechaza por tener menos de 10 caracteres.
@@ -72,7 +72,7 @@ Con la API y el cliente levantados y los datos de ejemplo cargados:
 # Sustituye $token por el de la sesión de prueba (después de aceptar los términos)
 curl -H "Authorization: Bearer $token" http://localhost:3000/api/terms/current
 curl -H "Authorization: Bearer $token" "http://localhost:3000/api/reports/income?from=2026-11-01&to=2026-11-30"
-curl -H "Authorization: Bearer $token" "http://localhost:3000/api/reports/income?from=2026-11-01&to=2026-11-30&format=csv"
+curl -H "Authorization: Bearer $token" "http://localhost:3000/api/reports/income?from=2026-11-01&to=2026-11-30&format=xlsx"
 curl -H "Authorization: Bearer $token" "http://localhost:3000/api/audit-log?action=PART_PRICE_CHANGED"
 ```
 
@@ -93,4 +93,4 @@ reporte responde en menos de 3 segundos (SC-006).
 
 - `docs/project-context.md`, `docs/design-system.md` y `.env.example` actualizados.
 - Documento de aseguramiento de la calidad del sprint con la línea base, la regresión y la matriz final.
-- Verificar que no hay dependencias nuevas en `server/package.json` ni en `client/pubspec.yaml` (la exportación es CSV).
+- Verificar que la única dependencia nueva es `exceljs` en `server/package.json` y que `client/pubspec.yaml` no cambia (solo `exceljs` en `server/package.json`).

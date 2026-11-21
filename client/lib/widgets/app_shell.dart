@@ -54,6 +54,8 @@ IconData iconForSection(AppSection section) {
       return Icons.gavel_outlined;
     case AppSection.auditLog:
       return Icons.history_outlined;
+    case AppSection.reports:
+      return Icons.bar_chart_outlined;
     case AppSection.changePassword:
       return Icons.lock_outline;
   }
@@ -93,6 +95,8 @@ IconData _selectedIconFor(AppSection section) {
       return Icons.gavel;
     case AppSection.auditLog:
       return Icons.history;
+    case AppSection.reports:
+      return Icons.bar_chart;
     case AppSection.changePassword:
       return Icons.lock;
   }

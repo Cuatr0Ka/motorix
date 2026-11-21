@@ -1,7 +1,7 @@
 # Contrato de interfaz (Sprint 7: reportes, configuración, términos y seguridad)
 
 Cambios en el cliente Flutter. Todo sigue `docs/design-system.md` (Material 3, tema propio, tokens de color, espaciado y
-radios; sin valores sueltos) y **no agrega dependencias**: se reutilizan `PageHeader`, `AppDataTable`, `ConfirmDialog`,
+radios; sin valores sueltos) y **no agrega dependencias de interfaz**: se reutilizan `PageHeader`, `AppDataTable`, `ConfirmDialog`,
 `state_views`, `StatusChip`, `fl_chart` y `url_launcher`. Los textos van en español. Las secciones nuevas son solo para
 el administrador; la validación real está en el servidor.
 
@@ -62,7 +62,7 @@ kilometraje (los que existan). Los tickets de versión 1 y 2 se ven e imprimen i
 
 ## Reportes (solo ADMIN)
 
-- Encabezado con título y, a la derecha, **Exportar CSV**.
+- Encabezado con título y, a la derecha, **Exportar Excel**.
 - **Selector de periodo**: botones Hoy, Esta semana (del lunes a hoy), Este mes (del día 1 a hoy) y Rango, con dos selectores de fecha para el rango libre;
   muestra el periodo elegido. Máximo un año: si se pasa, el campo se marca con «El periodo no puede pasar de un año».
 - Pestañas: **Ingresos**, **Servicios y productividad** y **Refacciones y rotación**.
@@ -72,9 +72,9 @@ kilometraje (los que existan). Los tickets de versión 1 y 2 se ven e imprimen i
   - **Refacciones y rotación**: tabla con unidades, ingreso, costo, margen y %; las refacciones sin precio de compra
     muestran el chip ámbar «Sin costo»; debajo, la tabla de rotación (salidas, existencia inicial y final, promedio y
     rotación).
-- **Exportar CSV**: descarga el reporte de la pestaña activa con el periodo elegido y lo guarda en la carpeta de
+- **Exportar Excel**: descarga el reporte de la pestaña activa (en las pestañas con dos reportes, los dos archivos) con el periodo elegido y lo guarda en la carpeta de
   descargas; mensaje «Archivo guardado en [ruta]» con el botón **Abrir carpeta**. Si no se puede guardar, muestra el
-  error. Sin datos exporta solo los encabezados.
+  error. Sin datos exporta el libro con los encabezados y «No hay datos en este periodo».
 - Estados: cargando, vacío («No hay datos en este periodo»), error con **Reintentar**.
 
 ## Bitácora (solo ADMIN)
