@@ -1444,6 +1444,31 @@ Antes de asumirlas como definitivas, el equipo debe decidir:
 - **Identidad de un aviso**: tipo y objeto; un cambio de estado del mismo objeto cuenta como un aviso nuevo (D-05).
 - **Mecánico**: no ve avisos de mantenimiento; solo los de las órdenes que tiene asignadas (D-06).
 
+### Decisión del Sprint 7: reportes, configuración, términos y seguridad
+
+Sprint 7 (Reportes, configuración del taller, términos y condiciones y seguridad de la información). Aclaraciones D-01 a D-12 de
+`specs/007-reportes-configuracion-seguridad/spec.md`:
+
+- **Exportación (D-01, revisada el 2026-11-21)**: Excel (.xlsx) con el diseño de Motorix (logo, colores del sistema de diseño, importes
+  numéricos con formato de moneda, filas alternadas, encabezado fijo y filtros) en lugar de CSV. Es la **única dependencia nueva**
+  del sprint: `exceljs` en el servidor. El cliente no agrega ninguna y guarda el archivo con `dart:io` en la carpeta de descargas.
+- **Términos (D-02)**: texto fijo versionado por el equipo (migración), sin editor en la aplicación; se acepta al ingresar y se valida
+  en `authenticate` (`403 TERMS_NOT_ACCEPTED`, salvo `GET /terms/current`, `POST /terms/accept` y `GET /auth/me`). Al publicar una
+  versión nueva todos deben aceptarla.
+- **Contraseñas e inactividad (D-03)**: mínimo 10 caracteres con mayúscula, minúscula y número (las ya guardadas siguen valiendo) y
+  cierre de sesión a los 30 minutos sin actividad (`401 SESSION_INACTIVE`), con aviso a los 28 minutos en el cliente.
+- **Configuración**: los datos del taller y los márgenes de «Próximo» se guardan en la tabla `settings` (valor guardado → `.env` →
+  predeterminado) y se editan en **Configuración**; el catálogo `service_types` (intervalos en días y kilómetros, sin borrado, solo
+  desactivación) propone el próximo mantenimiento (`GET /orders/:id/maintenance/suggestion`) y las líneas de servicio llevan un tipo opcional.
+- **Ticket versión 3**: trae el bloque «Próximo servicio» si la orden tiene un mantenimiento pendiente propio; los tickets anteriores no cambian.
+- **Reportes** (solo ADMIN): `/api/reports/{income,services,productivity,parts,rotation}` con `from` y `to` (máximo 366 días) y
+  `format=xlsx`; importes en centavos enteros; el costo usa el precio de compra actual y una refacción sin precio de compra es «Sin costo».
+- **Seguridad**: bitácora de solo inserción (`audit_log`, `GET /api/audit-log` solo ADMIN, sin contraseñas, hashes, tokens ni números de
+  tarjeta); pruebas transversales de no exposición de datos y de inyección.
+- **Tablas nuevas** (migración 007): `settings`, `service_types`, `terms_versions`, `terms_acceptances`, `audit_log`; columnas
+  `order_services.service_type_id` y `users.last_activity_at`. **Rutas nuevas**: `/settings`, `/service-types`, `/terms`, `/audit-log`, `/reports`.
+- **Menú del administrador**: se suman Reportes, Configuración, Términos y Bitácora.
+
 CLAUDE puede proponer opciones para estas decisiones, pero no debe
 introducir dependencias grandes sin justificar su necesidad.
 

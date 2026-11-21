@@ -235,7 +235,10 @@ Inventario
 Pagos
 Tickets
 Usuarios
+Reportes
 Configuración
+Términos
+Bitácora
 Cerrar sesión
 ```
 
@@ -346,6 +349,39 @@ El diálogo debe ser breve, claro y en español. Texto sugerido:
   **Sí, avisado**). Al confirmar, la fila sale y se muestra «Cliente marcado como avisado»; si el hecho ya no
   aplica, «Este aviso ya no aplica».
 - Estados: cargando, vacío («No hay clientes por avisar») y error con **Reintentar**.
+
+### 8.5.3 Reportes, configuración, términos y seguridad (Sprint 7)
+
+**Menú (solo ADMIN)**: se suman **Reportes**, **Configuración**, **Términos** y **Bitácora** al final del menú, con el mismo estilo y
+los íconos de las demás secciones.
+
+**Reportes**
+- Encabezado con el título y, a la derecha, el botón **Exportar Excel**. Debajo, el **selector de periodo**: chips Hoy, Esta semana
+  (del lunes a hoy), Este mes (del día 1 a hoy) y Rango (dos campos `AAAA-MM-DD` con selector de fecha y **Aplicar**), y el texto
+  «Periodo: del … al …». Más de un año se marca con «El periodo no puede pasar de un año.».
+- Pestañas **Ingresos**, **Servicios y productividad** y **Refacciones y rotación**. Ingresos: tarjetas con el total y el número de
+  pagos, barras por día en el color primario y tabla por método. Las tablas llevan el encabezado en el color primario con texto blanco y
+  filas alternadas (superficie y fondo cálido).
+- **Chip «Sin costo»**: ámbar, con texto, en la columna de costo de una refacción sin precio de compra.
+- Estados: cargando, vacío («No hay datos en este periodo») y error con **Reintentar**.
+- **Libro de Excel exportado**: lleva el logo y el nombre «MOTORIX» sobre el fondo cálido (`#F5F2F1`), una franja y los encabezados de
+  tabla en el color primario (`#9B4F55`) con texto blanco, filas alternadas, bordes `#DDD5D4`, fila de totales con un tinte del
+  primario, importes con formato de moneda, encabezado fijo y filtros, y un pie con la fecha de generación. Mensaje al guardar:
+  «Archivo guardado en [ruta]» con **Abrir carpeta**.
+
+**Configuración**: pestañas **Taller**, **Mantenimiento** y **Tipos de servicio**. Cada valor muestra un chip con su origen (Guardado,
+Variable de entorno o Predeterminado). **Guardar cambios** se habilita solo si algo cambió. Desactivar un tipo de servicio pide
+confirmación («Las órdenes anteriores conservan el tipo»).
+
+**Términos y aceptación**: pantalla completa tras iniciar sesión con título, versión, texto con desplazamiento, casilla y los botones
+**Rechazar y salir** y **Aceptar y continuar** (deshabilitado hasta marcar la casilla). La sección **Términos** del administrador es de
+solo lectura: versión vigente, tabla de aceptaciones con paginación y «N pendientes de aceptar».
+
+**Bitácora**: lista de solo lectura con fecha, usuario, chip de la acción en español, entidad y resumen; filtros por fecha, usuario y
+acción, **Limpiar filtros**, paginación y los estados cargando, vacío («No hay registros con esos filtros») y error.
+
+**Inactividad**: a los 28 minutos aparece el diálogo «Tu sesión está por cerrarse» con cuenta regresiva y el botón **Seguir
+conectado**; a los 30 se cierra la sesión y el acceso muestra «Tu sesión se cerró por inactividad. Inicia sesión de nuevo.».
 
 ### 8.6 Tarjetas
 
