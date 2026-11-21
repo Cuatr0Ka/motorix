@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import request from 'supertest';
 import { getConfig } from '../../config/env.js';
 import { query } from '../../config/db.js';
 import { signToken } from '../../utils/jwt.js';
@@ -20,6 +21,8 @@ export async function resetDatabase() {
   // líneas de servicio. La tabla terms_versions NO se borra: conserva la versión 1.0 que entrega la migración.
   await query('DELETE FROM audit_log');
   await query('DELETE FROM terms_acceptances');
+  // Las versiones publicadas por las pruebas (2.0, ...) se quitan; la 1.0 de la migración se conserva.
+  await query("DELETE FROM terms_versions WHERE version <> '1.0'");
   await query('DELETE FROM settings');
   await query('DELETE FROM client_notices');
   await query('DELETE FROM notification_reads');
@@ -86,6 +89,21 @@ export async function createServiceType(overrides = {}) {
     [data.name, data.intervalDays, data.intervalKm, data.active],
   );
   return { id: result.insertId, ...data };
+}
+
+/**
+ * Inicia sesión por la API con una cuenta (por ejemplo, una sembrada) y acepta la versión vigente de los términos, como lo
+ * haría la persona en su primer ingreso. Devuelve la respuesta del inicio de sesión (`body.data.token`).
+ */
+export async function loginAndAccept(app, identifier, password) {
+  const login = await request(app).post('/api/auth/login').send({ identifier, password });
+  if (login.status !== 200) return login;
+  const bearer = { Authorization: `Bearer ${login.body.data.token}` };
+  const current = await request(app).get('/api/terms/current').set(bearer);
+  if (current.status === 200 && !current.body.data.accepted) {
+    await request(app).post('/api/terms/accept').set(bearer).send({ versionId: current.body.data.id });
+  }
+  return login;
 }
 
 /** Crea un usuario del rol indicado y devuelve el usuario con su token. */

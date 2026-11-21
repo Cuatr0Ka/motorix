@@ -2,7 +2,7 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { createApp } from '../../app.js';
 import { query } from '../../config/db.js';
-import { auth, createOrder, createUserWithToken, resetDatabase } from '../helpers/factories.js';
+import { auth, createOrder, createUserWithToken, resetDatabase, loginAndAccept } from '../helpers/factories.js';
 import { readStandardPasswords, runSeedFile } from '../helpers/seed.js';
 
 const app = createApp();
@@ -95,7 +95,8 @@ describe('seed del Sprint 2 (FR-026, SC-009)', () => {
     await sembrar();
     const contrasenas = readStandardPasswords();
     const placasDe = async (usuario) => {
-      const login = await request(app).post('/api/auth/login').send({ identifier: usuario, password: contrasenas[usuario] });
+      // Las cuentas sembradas aceptan los términos en su primer ingreso (Sprint 7).
+      const login = await loginAndAccept(app, usuario, contrasenas[usuario]);
       expect(login.status).toBe(200);
       const res = await request(app).get('/api/orders').set(auth(login.body.data.token));
       return res.body.data.map((o) => o.vehicle.licensePlate).sort();
