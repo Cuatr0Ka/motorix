@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import appointmentRoutes from './appointmentRoutes.js';
+import auditLogRoutes from './auditLogRoutes.js';
 import authRoutes from './authRoutes.js';
 import clientNoticeRoutes from './clientNoticeRoutes.js';
 import clientRoutes from './clientRoutes.js';
@@ -41,5 +42,6 @@ router.use('/client-notices', clientNoticeRoutes);
 router.use('/settings', settingsRoutes);
 router.use('/service-types', serviceTypeRoutes);
 router.use('/terms', termsRoutes);
+router.use('/audit-log', auditLogRoutes);
 
 export default router;

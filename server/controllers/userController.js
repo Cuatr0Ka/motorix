@@ -12,9 +12,9 @@ export async function getById(req, res) {
 }
 
 export async function create(req, res) {
-  return created(res, await userService.create(req.body));
+  return created(res, await userService.create(req.body, req.user));
 }
 
 export async function update(req, res) {
-  return ok(res, await userService.update(req.params.id, req.body));
+  return ok(res, await userService.update(req.params.id, req.body, req.user));
 }

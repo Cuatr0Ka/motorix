@@ -34,7 +34,7 @@ export async function list({ from, to, userId, action, page, pageSize }, connect
     params.push(from);
   }
   if (to) {
-    conditions.push('a.created_at < ?');
+    conditions.push('a.created_at < DATE_ADD(?, INTERVAL 1 DAY)'); // `to` (AAAA-MM-DD) incluye todo ese día
     params.push(to);
   }
   if (userId) {

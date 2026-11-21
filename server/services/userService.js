@@ -3,6 +3,7 @@ import { withTransaction } from '../config/db.js';
 import * as userModel from '../models/userModel.js';
 import { AppError } from '../utils/AppError.js';
 import { checkPasswordPolicy } from '../utils/passwordPolicy.js';
+import { ACTIONS, record as recordAudit } from './auditService.js';
 
 const BCRYPT_COST = 10;
 
@@ -51,7 +52,7 @@ export async function getById(id) {
 }
 
 /** Alta de usuario por un administrador: usuario y correo únicos, contraseña con la política mínima. */
-export async function create({ username, name, email, role, password }) {
+export async function create({ username, name, email, role, password }, actor) {
   assertPasswordPolicy(password);
   if (await userModel.findByUsername(username)) throw usernameDuplicate();
   if (await userModel.findByEmail(email)) throw emailDuplicate();
@@ -59,6 +60,13 @@ export async function create({ username, name, email, role, password }) {
   const passwordHash = await bcrypt.hash(password, BCRYPT_COST);
   try {
     const id = await userModel.create({ username, name, email, passwordHash, role });
+    await recordAudit({
+      actor,
+      action: ACTIONS.USER_CREATED,
+      entityType: 'user',
+      entityId: id,
+      summary: `Alta del usuario ${username} con el rol ${role}`,
+    });
     return toApiUser(await userModel.findById(id));
   } catch (error) {
     throw translateDbError(error);
@@ -69,9 +77,10 @@ export async function create({ username, name, email, role, password }) {
  * Edita nombre, correo, rol y estado. Nunca deja el sistema sin un administrador activo: el cambio y la
  * comprobación ocurren en una transacción que bloquea las filas de los administradores activos.
  */
-export async function update(id, fields) {
+export async function update(id, fields, actor) {
+  let before;
   try {
-    return await withTransaction(async (connection) => {
+    const result = await withTransaction(async (connection) => {
       // Primero las filas de administradores (en orden de id) y después la del usuario: sin interbloqueos.
       const activeAdminIds = await userModel.lockActiveAdmins(connection);
       const current = await userModel.findByIdForUpdate(id, connection);
@@ -87,10 +96,32 @@ export async function update(id, fields) {
 
       if (fields.email && (await userModel.findByEmail(fields.email, id))) throw emailDuplicate();
 
+      before = current;
       await userModel.update(id, fields, connection);
       return toApiUser(await userModel.findById(id, connection));
     });
+    await recordUserChanges(before, fields, actor);
+    return result;
   } catch (error) {
     throw translateDbError(error);
+  }
+}
+
+/** Bitácora de los cambios sensibles de un usuario: activación, desactivación y cambio de rol (con el rol anterior y el nuevo). */
+async function recordUserChanges(before, fields, actor) {
+  const base = { actor, entityType: 'user', entityId: before.id };
+  if (fields.active !== undefined && Boolean(fields.active) !== Boolean(before.active)) {
+    await recordAudit({
+      ...base,
+      action: fields.active ? ACTIONS.USER_ACTIVATED : ACTIONS.USER_DEACTIVATED,
+      summary: `${fields.active ? 'Activó' : 'Desactivó'} la cuenta de ${before.username}`,
+    });
+  }
+  if (fields.role !== undefined && fields.role !== before.role) {
+    await recordAudit({
+      ...base,
+      action: ACTIONS.USER_ROLE_CHANGED,
+      summary: `Rol de ${before.username}: ${before.role} → ${fields.role}`,
+    });
   }
 }

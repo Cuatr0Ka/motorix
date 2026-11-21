@@ -3,6 +3,7 @@ import * as inventoryMovementModel from '../models/inventoryMovementModel.js';
 import * as partModel from '../models/partModel.js';
 import { AppError } from '../utils/AppError.js';
 import { registerMovement } from './inventoryService.js';
+import { ACTIONS, record as recordAudit } from './auditService.js';
 
 const partNotFound = () => AppError.notFound('La refacción no existe.');
 const codeTaken = () => AppError.conflict('PART_CODE_TAKEN', 'Ya existe una refacción con ese código.');
@@ -76,7 +77,7 @@ export async function create({ confirmBelowCost, ...data }, actor) {
  * movimientos. La confirmación de venta bajo el costo solo se exige cuando el cuerpo trae un precio: editar otros
  * datos de una refacción que ya está bajo el costo no la pide.
  */
-export async function update(id, { confirmBelowCost, ...fields }) {
+export async function update(id, { confirmBelowCost, ...fields }, actor) {
   const row = await partModel.findById(id);
   if (!row) throw partNotFound();
   if (fields.salePrice !== undefined || fields.purchasePrice !== undefined) {
@@ -87,7 +88,28 @@ export async function update(id, { confirmBelowCost, ...fields }) {
     });
   }
   await partModel.update(id, fields);
+  await recordPriceChange(row, fields, actor);
   return partModel.toPart(await partModel.findById(id));
+}
+
+/** Bitácora del cambio de precio: solo si cambia el precio de compra o el de venta (con el valor anterior y el nuevo). */
+async function recordPriceChange(row, fields, actor) {
+  const money = (value) => Number(value).toFixed(2);
+  const changes = [];
+  if (fields.salePrice !== undefined && money(fields.salePrice) !== money(row.sale_price)) {
+    changes.push(`venta ${money(row.sale_price)} → ${money(fields.salePrice)}`);
+  }
+  if (fields.purchasePrice !== undefined && money(fields.purchasePrice) !== money(row.purchase_price)) {
+    changes.push(`compra ${money(row.purchase_price)} → ${money(fields.purchasePrice)}`);
+  }
+  if (changes.length === 0) return;
+  await recordAudit({
+    actor,
+    action: ACTIONS.PART_PRICE_CHANGED,
+    entityType: 'part',
+    entityId: row.id,
+    summary: `${row.name}: ${changes.join(', ')}`,
+  });
 }
 
 export async function listMovements(partId, { page, pageSize }) {

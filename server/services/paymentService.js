@@ -6,6 +6,7 @@ import * as orderWorkModel from '../models/orderWorkModel.js';
 import * as paymentModel from '../models/paymentModel.js';
 import { AppError } from '../utils/AppError.js';
 import { formatFolio } from '../utils/orderFolio.js';
+import { ACTIONS, record as recordAudit } from './auditService.js';
 import {
   PAYABLE_ORDER_STATUSES,
   PAYMENT_METHODS,
@@ -200,12 +201,21 @@ export async function refresh(id) {
 }
 
 /** Cancela un pago pendiente (el pago se conserva en el historial y la orden queda libre para un nuevo cobro). */
-export async function cancel(id) {
+export async function cancel(id, actor) {
+  let orderId;
   await withTransaction(async (connection) => {
     const locked = await paymentModel.lockById(id, connection);
     if (!locked) throw paymentNotFound();
     assertTransition(locked.status, 'CANCELADO');
     await paymentModel.markClosed(id, 'CANCELADO', connection);
+    orderId = locked.order_id;
+  });
+  await recordAudit({
+    actor,
+    action: ACTIONS.PAYMENT_CANCELLED,
+    entityType: 'payment',
+    entityId: Number(id),
+    summary: `Pago cancelado de la orden ${formatFolio(orderId)}`,
   });
   return paymentModel.findById(id);
 }

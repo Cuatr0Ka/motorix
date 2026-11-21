@@ -16,7 +16,7 @@ export async function create(req, res) {
 }
 
 export async function update(req, res) {
-  return ok(res, await partService.update(req.params.id, req.body));
+  return ok(res, await partService.update(req.params.id, req.body, req.user));
 }
 
 export async function alerts(req, res) {

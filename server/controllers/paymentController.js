@@ -28,5 +28,5 @@ export async function refresh(req, res) {
 }
 
 export async function cancel(req, res) {
-  return ok(res, await paymentService.cancel(req.params.id));
+  return ok(res, await paymentService.cancel(req.params.id, req.user));
 }
