@@ -156,14 +156,14 @@ P1: US1 (datos del taller), US3 (catálogo de tipos de servicio), US8 (próximo 
 
 ### Pruebas de la historia 8 (escribir primero y comprobar que fallan)
 
-- [ ] T033 [P] [US8] Pruebas unitarias en `server/tests/unit/ticketContent.test.js` (ampliar): con `nextService` el contenido lleva `formatVersion: 3` y el bloque `{ dueDate, dueMileage, description }`; sin él conserva `formatVersion: 2` y no trae el campo; solo fecha o solo kilometraje también se aceptan
-- [ ] T034 [P] [US8] Prueba de integración `server/tests/integration/tickets.nextService.test.js`: el ticket de una orden con mantenimiento pendiente propio incluye `nextService`; sin mantenimiento no lo incluye; un ticket de versión 1 o 2 emitido antes se consulta idéntico; corregir el próximo mantenimiento después de emitir el ticket no cambia el ticket emitido; el ticket de la orden con tipo de servicio e intervalo coincide con lo programado
-- [ ] T035 [P] [US8] Pruebas del cliente en `client/test/ticket_next_service_test.dart` y `client/test/ticket_printer_test.dart` (ampliar): la vista del ticket versión 3 muestra el bloque «Próximo servicio» con fecha y kilometraje; los tickets versión 1 y 2 se ven e imprimen igual; sin el bloque no hay línea
+- [X] T033 [P] [US8] Pruebas unitarias en `server/tests/unit/ticketContent.test.js` (ampliar): con `nextService` el contenido lleva `formatVersion: 3` y el bloque `{ dueDate, dueMileage, description }`; sin él conserva `formatVersion: 2` y no trae el campo; solo fecha o solo kilometraje también se aceptan
+- [X] T034 [P] [US8] Prueba de integración `server/tests/integration/tickets.nextService.test.js`: el ticket de una orden con mantenimiento pendiente propio incluye `nextService`; sin mantenimiento no lo incluye; un ticket de versión 1 o 2 emitido antes se consulta idéntico; corregir el próximo mantenimiento después de emitir el ticket no cambia el ticket emitido; el ticket de la orden con tipo de servicio e intervalo coincide con lo programado
+- [X] T035 [P] [US8] Pruebas del cliente en `client/test/ticket_next_service_test.dart` y `client/test/ticket_printer_test.dart` (ampliar): la vista del ticket versión 3 muestra el bloque «Próximo servicio» con fecha y kilometraje; los tickets versión 1 y 2 se ven e imprimen igual; sin el bloque no hay línea
 
 ### Implementación de la historia 8
 
-- [ ] T036 [US8] Ampliar `server/services/ticketContent.js` (`buildTicketContent` recibe `nextService` y, solo si existe, agrega el campo y `formatVersion: 3`), `server/models/maintenanceModel.js` (`findPendingByOrder(orderId, connection)`) y `server/services/ticketService.js` (al generar el ticket busca el mantenimiento pendiente de esa orden y lo pasa al contenido)
-- [ ] T037 [US8] Ampliar `client/lib/models/ticket.dart` (`nextService` y `isV3`), `client/lib/widgets/ticket_view.dart` y `client/lib/utils/ticket_printer.dart` para mostrar y imprimir el bloque «Próximo servicio» cuando existe
+- [X] T036 [US8] Ampliar `server/services/ticketContent.js` (`buildTicketContent` recibe `nextService` y, solo si existe, agrega el campo y `formatVersion: 3`), `server/models/maintenanceModel.js` (`findPendingByOrder(orderId, connection)`) y `server/services/ticketService.js` (al generar el ticket busca el mantenimiento pendiente de esa orden y lo pasa al contenido)
+- [X] T037 [US8] Ampliar `client/lib/models/ticket.dart` (`nextService` y `isV3`), `client/lib/widgets/ticket_view.dart` y `client/lib/utils/ticket_printer.dart` para mostrar y imprimir el bloque «Próximo servicio» cuando existe
 
 **Punto de control**: el ticket nuevo muestra el próximo servicio y los anteriores no cambian
 

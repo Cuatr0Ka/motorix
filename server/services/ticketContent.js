@@ -26,16 +26,18 @@ const iso = (value) => (value ? new Date(value).toISOString() : null);
  * @param {Array<{code:string,name:string,unit:string,quantity:number,unitPrice:string,amount:string}>} datos.parts
  * @param {Array<{description:string,amount:string}>} datos.labor
  * @param {{amount:string,method:string,status:string,paidAt:?(Date|string),reference:?string}} datos.payment
+ * @param {?{dueDate:?string,dueMileage:?number,description:string}} datos.nextService próximo mantenimiento pendiente de la orden
  * @param {Date} datos.now
  */
-export function buildTicketContent({ shop, order, customer, vehicle, services, parts, labor, payment, now }) {
+export function buildTicketContent({ shop, order, customer, vehicle, services, parts, labor, payment, nextService, now }) {
   const line = (item) => ({ description: item.description, amount: formatCents(toCents(item.amount)) });
   const servicesCents = services.reduce((sum, item) => sum + toCents(item.amount), 0);
   const laborCents = labor.reduce((sum, item) => sum + toCents(item.amount), 0);
   const partsCents = parts.reduce((sum, item) => sum + toCents(item.amount ?? 0), 0);
 
   return {
-    formatVersion: 2,
+    // Versión 3 (Sprint 7): solo si la orden tiene un próximo mantenimiento programado; si no, sigue siendo la 2.
+    formatVersion: nextService ? 3 : 2,
     shop: { name: shop.name, address: shop.address, phone: shop.phone },
     customer: { name: customer.name, phone: customer.phone ?? null },
     vehicle: {
@@ -73,6 +75,15 @@ export function buildTicketContent({ shop, order, customer, vehicle, services, p
       paidAt: iso(payment.paidAt),
       reference: payment.reference ?? null,
     },
+    ...(nextService
+      ? {
+          nextService: {
+            dueDate: nextService.dueDate ?? null,
+            dueMileage: nextService.dueMileage ?? null,
+            description: nextService.description,
+          },
+        }
+      : {}),
     generatedAt: iso(now),
   };
 }

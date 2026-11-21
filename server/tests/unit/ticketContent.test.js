@@ -187,3 +187,30 @@ describe('contenido del ticket versión 2 (FR-007, CA-4, CA-7)', () => {
     expect(contenido.vehicle.plate).toBe('ABC-123-A');
   });
 });
+
+describe('próximo servicio en el ticket versión 3 (US8, FR-009)', () => {
+  it('test_con_next_service_el_contenido_es_version_3_y_lleva_el_bloque', () => {
+    const contenido = buildTicketContent({
+      ...base(),
+      nextService: { dueDate: '2027-05-20', dueMileage: 90000, description: 'Cambio de aceite' },
+    });
+
+    expect(contenido.formatVersion).toBe(3);
+    expect(contenido.nextService).toEqual({ dueDate: '2027-05-20', dueMileage: 90000, description: 'Cambio de aceite' });
+  });
+
+  it('test_sin_next_service_conserva_la_version_2_y_no_trae_el_campo', () => {
+    const contenido = buildTicketContent(base());
+
+    expect(contenido.formatVersion).toBe(2);
+    expect(contenido).not.toHaveProperty('nextService');
+  });
+
+  it('test_acepta_solo_fecha_o_solo_kilometraje', () => {
+    const soloFecha = buildTicketContent({ ...base(), nextService: { dueDate: '2027-01-10', dueMileage: null, description: 'Revisión' } });
+    const soloKm = buildTicketContent({ ...base(), nextService: { dueDate: null, dueMileage: 95000, description: 'Revisión' } });
+
+    expect(soloFecha.nextService).toEqual({ dueDate: '2027-01-10', dueMileage: null, description: 'Revisión' });
+    expect(soloKm.nextService).toEqual({ dueDate: null, dueMileage: 95000, description: 'Revisión' });
+  });
+});

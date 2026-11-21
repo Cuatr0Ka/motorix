@@ -105,6 +105,12 @@ pw.Document buildTicketDocument(Ticket ticket, {pw.ThemeData? theme}) {
             if (content.paidAt != null) row('Fecha de pago', formatDateTime(content.paidAt!)),
             if (content.paymentReference != null && content.paymentReference!.isNotEmpty) row('Referencia', content.paymentReference!),
           ]),
+          if (content.isV3 && content.nextService != null)
+            section('Proximo servicio', [
+              pw.Text(content.nextService!.description, style: normal),
+              if (content.nextService!.dueDate != null) row('Fecha', formatDate(content.nextService!.dueDate!)),
+              if (content.nextService!.dueMileage != null) row('Kilometraje', formatMileage(content.nextService!.dueMileage!)),
+            ]),
           pw.SizedBox(height: 8),
           pw.Center(child: pw.Text('Gracias por su preferencia', style: small)),
         ],

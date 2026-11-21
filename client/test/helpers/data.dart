@@ -343,6 +343,7 @@ Map<String, dynamic> ticketJson(
   int? formatVersion,
   String? partsTotal,
   String total = '1250.00',
+  Map<String, dynamic>? nextService,
 }) {
   final base = {
     'id': id,
@@ -373,6 +374,7 @@ Map<String, dynamic> ticketJson(
       ],
       'totals': {'services': '850.00', 'labor': '400.00', 'parts': ?partsTotal, 'total': total},
       'payment': {'method': 'EFECTIVO', 'status': 'PAGADO', 'paidAt': '2030-10-11T15:00:00.000Z', 'reference': 'TERM-48213'},
+      'nextService': ?nextService,
       'generatedAt': '2030-10-11T15:10:00.000Z',
     },
   };

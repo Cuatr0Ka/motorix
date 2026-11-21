@@ -1,4 +1,6 @@
 import { withTransaction } from '../config/db.js';
+import * as maintenanceModel from '../models/maintenanceModel.js';
+import { toDateOnly } from './maintenancePresenter.js';
 import * as settingsService from './settingsService.js';
 import * as orderModel from '../models/orderModel.js';
 import * as orderPartModel from '../models/orderPartModel.js';
@@ -42,6 +44,7 @@ export async function generate(orderId, actor) {
         orderPartModel.listByOrder(orderId, connection),
       ]);
 
+      const pendingMaintenance = await maintenanceModel.findPendingByOrder(orderId, connection);
       const content = buildTicketContent({
         // Sprint 7: los datos del taller salen de la configuración guardada; el ticket guarda su instantánea.
         shop: await settingsService.getShop(),
@@ -51,6 +54,9 @@ export async function generate(orderId, actor) {
         services,
         parts,
         labor,
+        nextService: pendingMaintenance
+          ? { dueDate: toDateOnly(pendingMaintenance.dueDate), dueMileage: pendingMaintenance.dueMileage, description: pendingMaintenance.description }
+          : null,
         // El total del ticket es el importe del pago registrado (FR-007): no se recalcula al generarlo.
         payment: { amount: paid.amount, method: paid.method, status: paid.status, paidAt: paid.paidAt, reference: paid.reference },
         now: new Date(),

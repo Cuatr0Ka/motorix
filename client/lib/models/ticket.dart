@@ -38,6 +38,21 @@ class TicketPart {
   final String? amount;
 }
 
+/// Próximo servicio programado al emitir el ticket (formato versión 3): fecha, kilometraje o ambos.
+class TicketNextService {
+  const TicketNextService({required this.description, this.dueDate, this.dueMileage});
+
+  factory TicketNextService.fromJson(Map<String, dynamic> json) => TicketNextService(
+        description: '${json['description']}',
+        dueDate: json['dueDate'] == null ? null : DateTime.tryParse('${json['dueDate']}'),
+        dueMileage: (json['dueMileage'] as num?)?.toInt(),
+      );
+
+  final String description;
+  final DateTime? dueDate;
+  final int? dueMileage;
+}
+
 /// Instantánea del contenido de un ticket, tal como se generó.
 class TicketContent {
   const TicketContent({
@@ -63,6 +78,7 @@ class TicketContent {
     this.customerPhone,
     this.paidAt,
     this.paymentReference,
+    this.nextService,
   });
 
   factory TicketContent.fromJson(Map<String, dynamic> json) {
@@ -97,6 +113,9 @@ class TicketContent {
       paidAt: payment['paidAt'] == null ? null : DateTime.parse('${payment['paidAt']}'),
       paymentReference: payment['reference'] as String?,
       generatedAt: DateTime.parse('${json['generatedAt']}'),
+      nextService: json['nextService'] is Map
+          ? TicketNextService.fromJson(Map<String, dynamic>.from(json['nextService'] as Map))
+          : null,
     );
   }
 
@@ -128,7 +147,13 @@ class TicketContent {
   final String? paymentReference;
   final DateTime generatedAt;
 
+  /// Próximo servicio programado (solo formato versión 3).
+  final TicketNextService? nextService;
+
   bool get isV2 => formatVersion >= 2;
+
+  /// Formato versión 3 (Sprint 7): puede traer el bloque «Próximo servicio».
+  bool get isV3 => formatVersion >= 3;
 }
 
 /// Ticket de una orden cobrada. En los listados no trae [content] sino cliente, placa y total.
