@@ -2,7 +2,7 @@
 
 Este documento es el registro de calidad del Sprint 7 de Motorix. Reúne las puertas de calidad, las decisiones, los riesgos, la trazabilidad de los criterios de aceptación, los hallazgos, la regresión de los sprints anteriores y el control de calidad final, con sus evidencias.
 
-Resultado general: el sprint se aprobó con observaciones el 2026-11-21. Todas las pruebas automáticas pasan (1 534 del servidor y 449 del cliente) y no hay defectos abiertos. Las observaciones son dos: la dependencia nueva `exceljs`, aprobada por la persona responsable al cambiar la exportación de CSV a Excel (el diseño del libro también quedó aprobado), y el recorrido manual con la interfaz gráfica, que la persona responsable completó el 2026-11-21 (las pantallas cargan en menos de 3 segundos y el flujo de aceptar los términos y entrar toma unos 40 segundos, dentro del límite de 1 minuto de SC-010). Durante el recorrido se corrigió H-07.
+Resultado general: el sprint se aprobó con observaciones el 2026-11-21, con la aprobación expresa de la persona responsable. Todas las pruebas automáticas pasan (1 534 del servidor y 449 del cliente) y no hay defectos abiertos. Las observaciones son dos: la dependencia nueva `exceljs`, aprobada por la persona responsable al cambiar la exportación de CSV a Excel (el diseño del libro también quedó aprobado), y el recorrido manual con la interfaz gráfica, que la persona responsable completó el 2026-11-21 (las pantallas cargan en menos de 3 segundos y el flujo de aceptar los términos y entrar toma unos 40 segundos, dentro del límite de 1 minuto de SC-010). Durante el recorrido se corrigió H-07.
 
 ## 0. Datos del documento
 
@@ -171,5 +171,5 @@ Cinco requisitos funcionales del sprint, elegidos entre los que más pueden fall
 | Criterios de salida cumplidos | 5 de 5 |
 | Defectos abiertos | Ninguno crítico, alto ni medio |
 | Observaciones | Dependencia nueva `exceljs` aprobada (H-03). El aspecto del libro de Excel (logo y colores) fue aprobado por la persona responsable el 2026-11-21. El recorrido manual con la interfaz gráfica lo completó la persona responsable: carga en menos de 3 segundos y flujo de aceptación de unos 40 segundos (SC-010 cumplido). Los cinco libros se generaron sin errores con los datos reales de la base `motorix` (7 pagos y 22 510.00 de ingresos en el último año) |
-| Aprobado por | José Adrián Mendoza Hernández, responsable del proyecto (pendiente de confirmar) |
+| Aprobado por | José Adrián Mendoza Hernández, responsable del proyecto (aprobación confirmada el 2026-11-21) |
 | Fecha | 2026-11-21 |
