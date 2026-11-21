@@ -40,4 +40,19 @@ void main() {
   test('test_sin_carpeta_personal_lanza_un_error_de_archivo', () {
     expect(() => DownloadsFileSaver.downloadsDirectory({}, true), throwsA(isA<FileSystemException>()));
   });
+
+  test('test_las_carpetas_candidatas_son_descargas_documentos_y_temporal_en_ese_orden', () {
+    final lista = DownloadsFileSaver.candidates({'USERPROFILE': r'C:\Users\ana'}, true).map((d) => d.path).toList();
+
+    expect(lista[0], endsWith('Downloads'));
+    expect(lista[1], endsWith('Documents'));
+    expect(lista[2], Directory.systemTemp.path);
+  });
+
+  test('test_el_mensaje_de_un_error_de_archivo_incluye_el_motivo_y_la_ruta', () {
+    const error = FileSystemException('No se pudo escribir', r'C:\Users\ana\Downloads\r.xlsx', OSError('Acceso denegado', 5));
+
+    expect(describeFileError(error), r'Acceso denegado (C:\Users\ana\Downloads\r.xlsx)');
+    expect(describeFileError(const FileSystemException('Sin ruta')), 'Sin ruta');
+  });
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../models/report.dart';
 import '../providers/reports_provider.dart';
 import '../services/api_client.dart';
+import '../utils/file_saver.dart';
 import '../utils/formatters.dart';
 import '../utils/link_opener.dart';
 import '../utils/status_labels.dart';
@@ -59,8 +62,11 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         ));
     } on ApiException catch (e) {
       if (mounted) showFailure(context, e.message);
-    } catch (_) {
-      if (mounted) showFailure(context, 'No se pudo guardar el archivo. Revisa los permisos de la carpeta de descargas.');
+    } on FileSystemException catch (e) {
+      // Se muestra el motivo real del sistema operativo (y la ruta) en lugar de un mensaje genérico.
+      if (mounted) showFailure(context, 'No se pudo guardar el archivo: ${describeFileError(e)}');
+    } catch (e) {
+      if (mounted) showFailure(context, 'No se pudo exportar el reporte: $e');
     }
   }
 

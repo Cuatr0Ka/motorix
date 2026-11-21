@@ -7,24 +7,58 @@ abstract class FileSaver {
   Future<String> save(String filename, List<int> bytes);
 }
 
+/// Texto legible de un error de archivo: el mensaje del sistema operativo y la ruta, para saber qué falló de verdad.
+String describeFileError(Object error) {
+  if (error is FileSystemException) {
+    final detail = error.osError?.message.trim();
+    final reason = (detail != null && detail.isNotEmpty) ? detail : error.message;
+    return error.path == null || error.path!.isEmpty ? reason : '$reason (${error.path})';
+  }
+  return '$error';
+}
+
 /// Guarda en la carpeta de descargas del sistema (`USERPROFILE\Downloads` en Windows y `HOME/Downloads` en los demás) sin
-/// sobrescribir un archivo existente: si ya existe agrega un sufijo « (1)», « (2)»...
+/// sobrescribir un archivo existente: si ya existe agrega un sufijo « (1)», « (2)»... Si la carpeta de descargas no se puede
+/// escribir (permisos, carpeta protegida o redirigida), prueba con Documentos y, al final, con la carpeta temporal, y devuelve
+/// la ruta donde quedó. Si ninguna sirve, lanza un [FileSystemException] con el motivo de cada intento.
 class DownloadsFileSaver extends FileSaver {
   const DownloadsFileSaver();
 
+  static String? _home(Map<String, String> env, bool windows) {
+    final home = windows ? env['USERPROFILE'] : env['HOME'];
+    return (home == null || home.isEmpty) ? null : home;
+  }
+
   static Directory downloadsDirectory([Map<String, String>? environment, bool? windows]) {
+    final home = _home(environment ?? Platform.environment, windows ?? Platform.isWindows);
+    if (home == null) throw const FileSystemException('No se encontró la carpeta personal del usuario.');
+    return Directory('$home${Platform.pathSeparator}Downloads');
+  }
+
+  /// Carpetas donde se intenta guardar, en orden: Descargas, Documentos y la carpeta temporal.
+  static List<Directory> candidates([Map<String, String>? environment, bool? windows]) {
     final env = environment ?? Platform.environment;
     final isWindows = windows ?? Platform.isWindows;
-    final home = isWindows ? env['USERPROFILE'] : env['HOME'];
-    if (home == null || home.isEmpty) throw const FileSystemException('No se encontró la carpeta de descargas.');
-    return Directory('$home${Platform.pathSeparator}Downloads');
+    final home = _home(env, isWindows);
+    return [
+      if (home != null) Directory('$home${Platform.pathSeparator}Downloads'),
+      if (home != null) Directory('$home${Platform.pathSeparator}Documents'),
+      Directory.systemTemp,
+    ];
   }
 
   @override
   Future<String> save(String filename, List<int> bytes) async {
-    final directory = downloadsDirectory();
-    await directory.create(recursive: true);
-    return writeUnique(directory, filename, bytes);
+    final failures = <String>[];
+    for (final directory in candidates()) {
+      try {
+        await directory.create(recursive: true);
+        return await writeUnique(directory, filename, bytes);
+      } on FileSystemException catch (e) {
+        failures.add('${directory.path}: ${describeFileError(e)}');
+      }
+    }
+    throw FileSystemException(failures.join(' | '));
   }
 
   /// Escribe en [directory] sin pisar un archivo que ya exista.
