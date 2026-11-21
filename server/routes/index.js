@@ -5,6 +5,7 @@ import clientRoutes from './clientRoutes.js';
 import dashboardRoutes from './dashboardRoutes.js';
 import maintenanceRoutes from './maintenanceRoutes.js';
 import mechanicRoutes from './mechanicRoutes.js';
+import notificationRoutes from './notificationRoutes.js';
 import orderRoutes from './orderRoutes.js';
 import partRoutes from './partRoutes.js';
 import paymentRoutes from './paymentRoutes.js';
@@ -31,5 +32,6 @@ router.use('/parts', partRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/tickets', ticketRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/notifications', notificationRoutes);
 
 export default router;

@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 
 import '../models/user.dart';
 import '../providers/navigation_provider.dart';
+import '../providers/notifications_provider.dart';
 import '../providers/session_provider.dart';
 import '../providers/sidebar_provider.dart';
 import '../providers/stock_alerts_provider.dart';
 import '../utils/tokens.dart';
 import 'confirm_dialog.dart';
+import 'notification_bell.dart';
 
 /// Construye la pantalla de una sección del menú.
 typedef SectionBuilder = Widget Function(BuildContext context, AppSection section);
@@ -98,10 +100,22 @@ class _AppShellState extends State<AppShell> {
   final GlobalKey<NavigatorState> _contentNavigator = GlobalKey<NavigatorState>();
   late AppSection _shown;
 
+  // Se guarda para detener la actualización periódica al desmontarse (no se puede leer el contexto en dispose).
+  late final NotificationsProvider _notifications;
+
   @override
   void initState() {
     super.initState();
     _shown = context.read<NavigationProvider>().current;
+    _notifications = context.read<NotificationsProvider>();
+    // Los avisos se consultan al iniciar la sesión, al cambiar de sección y cada 60 segundos.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Se limpia antes de empezar para no mostrar avisos de otra persona que usó el equipo antes.
+      _notifications
+        ..clear()
+        ..start();
+    });
     // Solo la administración consulta las alertas de stock bajo (el servidor rechaza a los demás roles).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -112,6 +126,13 @@ class _AppShellState extends State<AppShell> {
         alerts.clear();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    // Al cerrar la sesión (o al desmontar el shell) se detiene la actualización periódica.
+    _notifications.stop();
+    super.dispose();
   }
 
   Route<void> _routeFor(AppSection section) {
@@ -157,6 +178,8 @@ class _AppShellState extends State<AppShell> {
       _shown = navigation.current;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _contentNavigator.currentState?.pushAndRemoveUntil(_routeFor(_shown), (route) => false);
+        // Al cambiar de sección se actualiza el contador de la campana.
+        if (mounted) _notifications.refresh();
       });
     }
 
@@ -345,6 +368,8 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text(title, style: theme.textTheme.titleMedium)),
+          const NotificationBell(),
+          const SizedBox(width: AppSpacing.sm),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
