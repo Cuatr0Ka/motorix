@@ -11,6 +11,7 @@ import notificationRoutes from './notificationRoutes.js';
 import orderRoutes from './orderRoutes.js';
 import partRoutes from './partRoutes.js';
 import paymentRoutes from './paymentRoutes.js';
+import reportRoutes from './reportRoutes.js';
 import serviceTypeRoutes from './serviceTypeRoutes.js';
 import settingsRoutes from './settingsRoutes.js';
 import termsRoutes from './termsRoutes.js';
@@ -43,5 +44,6 @@ router.use('/settings', settingsRoutes);
 router.use('/service-types', serviceTypeRoutes);
 router.use('/terms', termsRoutes);
 router.use('/audit-log', auditLogRoutes);
+router.use('/reports', reportRoutes);
 
 export default router;
