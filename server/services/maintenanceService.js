@@ -5,6 +5,8 @@ import { AppError } from '../utils/AppError.js';
 import { presentFullMaintenance, toDateOnly } from './maintenancePresenter.js';
 import { assertMaintenanceTarget } from './maintenanceStatus.js';
 import { loadOrderForActor } from './orderService.js';
+import * as serviceTypeModel from '../models/serviceTypeModel.js';
+import { suggestNextMaintenance } from './serviceIntervals.js';
 import * as settingsService from './settingsService.js';
 
 const notEditable = () =>
@@ -23,6 +25,22 @@ async function loadForActor(id, actor, connection) {
   if (!maintenance) throw notFound();
   if (actor.role === 'MECHANIC' && maintenance.mechanicId !== actor.id) throw notFound();
   return maintenance;
+}
+
+/**
+ * Propone fecha y kilometraje del próximo mantenimiento con el intervalo más corto de los tipos de servicio de las
+ * líneas de la orden. Devuelve `null` si ninguna línea tiene un tipo con intervalo. Es solo una propuesta.
+ */
+export async function suggest(orderId, actor) {
+  const order = await loadOrderForActor(orderId, actor);
+  const serviceTypes = await serviceTypeModel.listByOrder(orderId);
+  const vehicle = await vehicleModel.findById(order.vehicle.id);
+  return suggestNextMaintenance({
+    serviceTypes,
+    today: new Date(),
+    serviceMileage: order.serviceMileage ?? null,
+    currentMileage: vehicle.currentMileage,
+  });
 }
 
 /**

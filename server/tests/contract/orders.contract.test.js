@@ -125,7 +125,7 @@ describe('GET /api/orders y /api/orders/:id (contrato)', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.diagnosis).toBe('Balatas gastadas');
-    expect(res.body.data.services).toEqual([{ id: expect.any(Number), description: 'Cambio de balatas', amount: '850.00' }]);
+    expect(res.body.data.services).toEqual([{ id: expect.any(Number), description: 'Cambio de balatas', amount: '850.00', serviceType: null }]);
     expect(res.body.data.labor).toEqual([{ id: expect.any(Number), description: 'Mano de obra frenos', amount: '400.50' }]);
     expect(res.body.data.totals).toEqual({ services: '850.00', labor: '400.50', parts: '0.00', total: '1250.50' });
   });

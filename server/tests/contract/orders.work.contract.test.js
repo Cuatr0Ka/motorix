@@ -78,7 +78,7 @@ describe.each(tipos)('líneas de %s (contrato)', (kind) => {
       .send({ description: 'Cambio de balatas', amount: 850 });
 
     expect(res.status).toBe(201);
-    expect(res.body.data.item).toEqual({ id: expect.any(Number), description: 'Cambio de balatas', amount: '850.00' });
+    expect(res.body.data.item).toEqual({ id: expect.any(Number), description: 'Cambio de balatas', amount: '850.00', ...(kind === 'services' ? { serviceType: null } : {}) });
     expect(res.body.data.totals).toEqual({
       services: kind === 'services' ? '850.00' : '0.00',
       labor: kind === 'labor' ? '850.00' : '0.00',

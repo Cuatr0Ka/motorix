@@ -98,19 +98,32 @@ export const updateWorkSchema = z
 const description = requiredText('La descripción', 255);
 
 /** Línea de servicio realizado o de mano de obra: descripción (1 a 255) e importe (0 a 9 999 999.99). */
-export const createLineSchema = z.object({
-  description,
-  amount: money('El importe'),
-});
+export const createLineSchema = z.object({ description, amount: money('El importe') }).strict();
+
+const atLeastOne = (data) => Object.values(data).some((value) => value !== undefined);
+const atLeastOneMessage = { message: 'Envía al menos un campo para actualizar.' };
 
 export const updateLineSchema = z
-  .object({
-    description: description.optional(),
-    amount: money('El importe').optional(),
-  })
-  .refine((data) => Object.values(data).some((value) => value !== undefined), {
-    message: 'Envía al menos un campo para actualizar.',
-  });
+  .object({ description: description.optional(), amount: money('El importe').optional() })
+  .strict()
+  .refine(atLeastOne, atLeastOneMessage);
+
+/** Tipo de servicio opcional de una línea de servicio (Sprint 7): entero positivo o null para quitarlo. */
+const serviceTypeId = z
+  .number({ invalid_type_error: 'El tipo de servicio no es válido.' })
+  .int('El tipo de servicio no es válido.')
+  .positive('El tipo de servicio no es válido.')
+  .nullable();
+
+/** Líneas de SERVICIOS: igual que las de mano de obra, más el tipo de servicio opcional. */
+export const createServiceLineSchema = z
+  .object({ description, amount: money('El importe'), serviceTypeId: serviceTypeId.optional() })
+  .strict();
+
+export const updateServiceLineSchema = z
+  .object({ description: description.optional(), amount: money('El importe').optional(), serviceTypeId: serviceTypeId.optional() })
+  .strict()
+  .refine(atLeastOne, atLeastOneMessage);
 
 /** Parámetros de una línea: orden y línea (servicio o mano de obra). */
 export const lineParams = idParams.extend({

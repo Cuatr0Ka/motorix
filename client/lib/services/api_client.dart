@@ -128,6 +128,9 @@ class ApiClient {
       );
     }
 
+    // 204 Sin contenido (por ejemplo, «no hay propuesta»): respuesta correcta sin datos.
+    if (response.statusCode == 204) return const ApiResponse(null, null);
+
     Map<String, dynamic>? body;
     try {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/maintenance.dart';
+import '../models/service_type.dart';
 import '../models/service_order.dart';
 import '../utils/formatters.dart';
 import '../utils/tokens.dart';
@@ -12,12 +13,15 @@ import 'panel_card.dart';
 /// Acciones de la sección de mantenimiento de la orden. Cada callback devuelve cuando la acción termina.
 class OrderMaintenanceActions {
   const OrderMaintenanceActions({
+    this.onSuggest,
     required this.onSetServiceMileage,
     required this.onSchedule,
     required this.onUpdate,
     required this.onAttend,
   });
 
+  /// Propuesta del próximo mantenimiento según los tipos de servicio de la orden (null si no hay intervalos).
+  final Future<MaintenanceSuggestion?> Function()? onSuggest;
   final Future<void> Function(int mileage) onSetServiceMileage;
   final Future<void> Function(MaintenanceInput input) onSchedule;
   final Future<void> Function(Maintenance maintenance, MaintenanceInput input) onUpdate;
@@ -48,7 +52,7 @@ class OrderMaintenanceSection extends StatelessWidget {
     final input = await showDialog<MaintenanceInput>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => MaintenanceDialog(existing: existing),
+      builder: (_) => MaintenanceDialog(existing: existing, onSuggest: existing == null ? actions!.onSuggest : null),
     );
     if (input == null || !context.mounted) return;
     if (existing == null) {

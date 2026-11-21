@@ -1,16 +1,25 @@
 /// Línea de servicio realizado o de mano de obra de una orden. El importe viaja como cadena decimal.
 class OrderLine {
-  const OrderLine({required this.id, required this.description, required this.amount});
+  const OrderLine({required this.id, required this.description, required this.amount, this.serviceTypeId, this.serviceTypeName});
 
-  factory OrderLine.fromJson(Map<String, dynamic> json) => OrderLine(
-        id: (json['id'] as num).toInt(),
-        description: '${json['description']}',
-        amount: '${json['amount']}',
-      );
+  factory OrderLine.fromJson(Map<String, dynamic> json) {
+    final type = json['serviceType'];
+    return OrderLine(
+      id: (json['id'] as num).toInt(),
+      description: '${json['description']}',
+      amount: '${json['amount']}',
+      serviceTypeId: type is Map ? (type['id'] as num).toInt() : null,
+      serviceTypeName: type is Map ? '${type['name']}' : null,
+    );
+  }
 
   final int id;
   final String description;
   final String amount;
+
+  /// Tipo de servicio de la línea (solo en servicios; null si no tiene).
+  final int? serviceTypeId;
+  final String? serviceTypeName;
 }
 
 /// Totales calculados por el servidor (servicios, mano de obra, refacciones y total). [parts] solo llega a
@@ -35,12 +44,20 @@ class OrderTotals {
 
 /// Datos de una línea (servicio o mano de obra) capturados en el formulario.
 class OrderLineInput {
-  const OrderLineInput({required this.description, required this.amount});
+  const OrderLineInput({required this.description, required this.amount, this.serviceTypeId, this.sendServiceType = false});
 
   final String description;
   final String amount;
 
-  Map<String, dynamic> toJson() => {'description': description, 'amount': amount};
+  /// Tipo de servicio elegido (null = sin tipo). Solo se envía en líneas de servicio ([sendServiceType]).
+  final int? serviceTypeId;
+  final bool sendServiceType;
+
+  Map<String, dynamic> toJson() => {
+        'description': description,
+        'amount': amount,
+        if (sendServiceType) 'serviceTypeId': serviceTypeId,
+      };
 }
 
 /// Resultado de agregar o corregir una línea: la línea y los totales recalculados.

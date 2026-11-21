@@ -48,7 +48,8 @@ async function getBreakdown(orderId, totals, connection) {
     orderPartModel.listByOrder(orderId, connection),
   ]);
   return {
-    services,
+    // El desglose de cobro no lleva el tipo de servicio (es dato de la orden, no del cobro).
+    services: services.map(({ id, description, amount }) => ({ id, description, amount })),
     labor,
     parts: parts.map(({ id, code, name, unit, quantity, unitPrice, amount, legacy }) => ({
       id,

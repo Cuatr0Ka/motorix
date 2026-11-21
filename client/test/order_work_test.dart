@@ -206,7 +206,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final post = api.requests.firstWhere((r) => r.method == 'POST' && r.path == '/orders/1/services');
-      expect(post.body, {'description': 'Cambio de balatas', 'amount': '850'});
+      expect(post.body, {'description': 'Cambio de balatas', 'amount': '850', 'serviceTypeId': null});
       expect(find.text('Cambio de balatas'), findsOneWidget);
       expect(find.text('\$850.00'), findsWidgets);
       expect(find.text('Línea agregada correctamente.'), findsOneWidget);
@@ -249,7 +249,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final patch = api.requests.firstWhere((r) => r.method == 'PATCH' && r.path == '/orders/1/services/5');
-      expect(patch.body, {'description': 'Cambio de balatas', 'amount': '900'});
+      expect(patch.body, {'description': 'Cambio de balatas', 'amount': '900', 'serviceTypeId': null});
       expect(find.text('Línea actualizada correctamente.'), findsOneWidget);
     });
 

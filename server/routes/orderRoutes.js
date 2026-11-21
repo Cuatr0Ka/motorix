@@ -18,12 +18,14 @@ import {
   changeStatusSchema,
   createLineSchema,
   createOrderSchema,
+  createServiceLineSchema,
   lineParams,
   listOrdersQuery,
   orderPartParams,
   serviceMileageSchema,
   updateLineSchema,
   updateOrderPartSchema,
+  updateServiceLineSchema,
   updateWorkSchema,
 } from '../validators/orderValidators.js';
 
@@ -69,6 +71,8 @@ router.put(
   asyncHandler(orderWorkController.setServiceMileage),
 );
 
+router.get('/:id/maintenance/suggestion', worker, validate({ params: idParams }), asyncHandler(maintenanceController.suggest));
+
 router.post(
   '/:id/maintenance',
   worker,
@@ -105,16 +109,17 @@ router.patch(
 );
 router.delete('/:id/parts/:lineId', worker, validate({ params: orderPartParams }), asyncHandler(orderPartController.remove));
 
-for (const [path, kind] of [
-  ['services', 'services'],
-  ['labor', 'labor'],
+// Los servicios aceptan además el tipo de servicio opcional; la mano de obra no.
+for (const [path, kind, createSchema, updateSchema] of [
+  ['services', 'services', createServiceLineSchema, updateServiceLineSchema],
+  ['labor', 'labor', createLineSchema, updateLineSchema],
 ]) {
   const lines = orderWorkController.linesController(kind);
-  router.post(`/:id/${path}`, worker, validate({ params: idParams, body: createLineSchema }), asyncHandler(lines.add));
+  router.post(`/:id/${path}`, worker, validate({ params: idParams, body: createSchema }), asyncHandler(lines.add));
   router.patch(
     `/:id/${path}/:lineId`,
     worker,
-    validate({ params: lineParams, body: updateLineSchema }),
+    validate({ params: lineParams, body: updateSchema }),
     asyncHandler(lines.update),
   );
   router.delete(`/:id/${path}/:lineId`, worker, validate({ params: lineParams }), asyncHandler(lines.remove));

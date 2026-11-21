@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/service_type.dart';
 import '../models/settings.dart';
+import '../providers/service_types_provider.dart';
 import '../providers/settings_provider.dart';
 import '../utils/status_labels.dart';
 import '../utils/tokens.dart';
+import '../widgets/confirm_dialog.dart';
 import '../widgets/page_header.dart';
 import '../widgets/state_views.dart';
 import '../widgets/status_chip.dart';
@@ -25,7 +28,9 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.read<SettingsProvider>().load();
+      if (!mounted) return;
+      context.read<SettingsProvider>().load();
+      context.read<ServiceTypesProvider>().load();
     });
   }
 
@@ -64,7 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
               children: const [
                 _ShopTab(),
                 _MaintenanceTab(),
-                _PendingTab(),
+                _ServiceTypesTab(),
               ],
             ),
           ),
@@ -72,14 +77,6 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
       ),
     );
   }
-}
-
-/// Pestaña todavía sin contenido (se llena en su historia).
-class _PendingTab extends StatelessWidget {
-  const _PendingTab();
-
-  @override
-  Widget build(BuildContext context) => const EmptyView(message: 'Esta sección se habilita en la siguiente entrega.');
 }
 
 /// Tono del chip de origen de un valor.
@@ -440,6 +437,230 @@ class _MaintenanceFormState extends State<_MaintenanceForm> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Formulario de alta o edición de un tipo de servicio. Devuelve (`pop`) los datos o nada si se cancela.
+class _ServiceTypeDialog extends StatefulWidget {
+  const _ServiceTypeDialog({this.existing});
+
+  final ServiceType? existing;
+
+  @override
+  State<_ServiceTypeDialog> createState() => _ServiceTypeDialogState();
+}
+
+class _ServiceTypeDialogState extends State<_ServiceTypeDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final _name = TextEditingController(text: widget.existing?.name);
+  late final _days = TextEditingController(text: widget.existing?.intervalDays?.toString() ?? '');
+  late final _km = TextEditingController(text: widget.existing?.intervalKm?.toString() ?? '');
+  String? _intervalError;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _days.dispose();
+    _km.dispose();
+    super.dispose();
+  }
+
+  String? _validateInterval(String? value, {required int max, required String limit}) {
+    final text = value?.trim() ?? '';
+    if (text.isEmpty) return null;
+    final number = int.tryParse(text);
+    if (number == null) return 'Escribe un número entero.';
+    if (number < 1 || number > max) return 'El valor debe estar entre 1 y $limit.';
+    return null;
+  }
+
+  void _save() {
+    final valid = _formKey.currentState?.validate() ?? false;
+    final hasInterval = _days.text.trim().isNotEmpty || _km.text.trim().isNotEmpty;
+    setState(() => _intervalError = hasInterval ? null : 'Indica al menos un intervalo: en días, en kilómetros o ambos.');
+    if (!valid || !hasInterval) return;
+    Navigator.of(context).pop(
+      ServiceTypeInput(
+        name: _name.text.trim(),
+        intervalDays: int.tryParse(_days.text.trim()),
+        intervalKm: int.tryParse(_km.text.trim()),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.existing == null ? 'Nuevo tipo de servicio' : 'Editar tipo de servicio'),
+      content: SizedBox(
+        width: 460,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                key: const ValueKey('tipo-nombre'),
+                controller: _name,
+                autofocus: true,
+                decoration: const InputDecoration(labelText: 'Nombre *'),
+                validator: (value) {
+                  final text = value?.trim() ?? '';
+                  if (text.isEmpty) return 'El nombre es obligatorio.';
+                  if (text.length > 100) return 'El nombre no puede pasar de 100 caracteres.';
+                  return null;
+                },
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              TextFormField(
+                key: const ValueKey('tipo-dias'),
+                controller: _days,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Intervalo en días', helperText: 'Entre 1 y 3 650'),
+                validator: (value) => _validateInterval(value, max: 3650, limit: '3 650'),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              TextFormField(
+                key: const ValueKey('tipo-km'),
+                controller: _km,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Intervalo en kilómetros', helperText: 'Entre 1 y 1 000 000'),
+                validator: (value) => _validateInterval(value, max: 1000000, limit: '1 000 000'),
+              ),
+              if (_intervalError != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.sm),
+                  child: Text(
+                    _intervalError!,
+                    key: const ValueKey('tipo-intervalo-error'),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.danger),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        OutlinedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancelar')),
+        FilledButton(onPressed: _save, child: const Text('Guardar')),
+      ],
+    );
+  }
+}
+
+class _ServiceTypesTab extends StatelessWidget {
+  const _ServiceTypesTab();
+
+  Future<void> _create(BuildContext context) async {
+    final provider = context.read<ServiceTypesProvider>();
+    final input = await showDialog<ServiceTypeInput>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _ServiceTypeDialog(),
+    );
+    if (input == null || !context.mounted) return;
+    final failure = await provider.create(input);
+    if (!context.mounted) return;
+    failure == null ? showSuccess(context, 'Tipo de servicio creado correctamente.') : showFailure(context, failure);
+  }
+
+  Future<void> _edit(BuildContext context, ServiceType type) async {
+    final provider = context.read<ServiceTypesProvider>();
+    final input = await showDialog<ServiceTypeInput>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _ServiceTypeDialog(existing: type),
+    );
+    if (input == null || !context.mounted) return;
+    final failure = await provider.edit(type.id, input);
+    if (!context.mounted) return;
+    failure == null ? showSuccess(context, 'Tipo de servicio actualizado correctamente.') : showFailure(context, failure);
+  }
+
+  Future<void> _toggle(BuildContext context, ServiceType type) async {
+    final provider = context.read<ServiceTypesProvider>();
+    if (type.active) {
+      final confirmed = await showConfirmDialog(
+        context,
+        title: 'Desactivar tipo de servicio',
+        message: '¿Desactivar "${type.name}"? Ya no se podrá elegir en servicios nuevos. Las órdenes anteriores conservan el tipo.',
+      );
+      if (!confirmed || !context.mounted) return;
+    }
+    final failure = await provider.setActive(type.id, !type.active);
+    if (!context.mounted) return;
+    failure == null
+        ? showSuccess(context, type.active ? 'Tipo de servicio desactivado.' : 'Tipo de servicio reactivado.')
+        : showFailure(context, failure);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ServiceTypesProvider>();
+    final items = provider.items;
+    if (items == null) {
+      if (provider.error != null) return ErrorView(message: provider.error!, onRetry: provider.load);
+      return const LoadingView();
+    }
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Cada servicio de una orden puede llevar un tipo; con su intervalo se propone el próximo mantenimiento.',
+                style: theme.textTheme.bodySmall,
+              ),
+            ),
+            FilledButton.icon(
+              key: const ValueKey('nuevo-tipo-servicio'),
+              onPressed: () => _create(context),
+              icon: const Icon(Icons.add),
+              label: const Text('Nuevo tipo de servicio'),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        Expanded(
+          child: items.isEmpty
+              ? const EmptyView(message: 'Todavía no hay tipos de servicio')
+              : ListView(
+                  children: [
+                    for (final type in items)
+                      Card(
+                        key: ValueKey('tipo-${type.id}'),
+                        child: ListTile(
+                          title: Text(type.name),
+                          subtitle: Text('Días: ${type.intervalDays ?? '—'} · Km: ${type.intervalKm ?? '—'}'
+                              '${type.inUse > 0 ? ' · En ${type.inUse} servicio(s)' : ''}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              StatusChip(label: type.active ? 'Activo' : 'Inactivo', tone: type.active ? StatusTone.success : StatusTone.neutral),
+                              IconButton(
+                                key: ValueKey('editar-tipo-${type.id}'),
+                                tooltip: 'Editar',
+                                onPressed: () => _edit(context, type),
+                                icon: const Icon(Icons.edit_outlined),
+                              ),
+                              IconButton(
+                                key: ValueKey('estado-tipo-${type.id}'),
+                                tooltip: type.active ? 'Desactivar' : 'Reactivar',
+                                onPressed: () => _toggle(context, type),
+                                icon: Icon(type.active ? Icons.block_outlined : Icons.check_circle_outline),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+        ),
+      ],
     );
   }
 }

@@ -14,6 +14,7 @@ import 'providers/parts_provider.dart';
 import 'providers/payments_provider.dart';
 import 'providers/session_provider.dart';
 import 'providers/sidebar_provider.dart';
+import 'providers/service_types_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/stock_alerts_provider.dart';
 import 'providers/tickets_provider.dart';
@@ -49,6 +50,7 @@ import 'services/notifications_service.dart';
 import 'services/orders_service.dart';
 import 'services/parts_service.dart';
 import 'services/payments_service.dart';
+import 'services/service_types_service.dart';
 import 'services/settings_service.dart';
 import 'services/tickets_service.dart';
 import 'services/users_service.dart';
@@ -115,6 +117,8 @@ class MotorixApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => StockAlertsProvider(context.read<PartsService>())),
         Provider<ClientNoticesService>(create: (_) => ClientNoticesService(apiClient)),
         ChangeNotifierProvider(create: (context) => ClientNoticesProvider(context.read<ClientNoticesService>())),
+        Provider<ServiceTypesService>(create: (_) => ServiceTypesService(apiClient)),
+        ChangeNotifierProvider(create: (context) => ServiceTypesProvider(context.read<ServiceTypesService>())),
         Provider<SettingsService>(create: (_) => SettingsService(apiClient)),
         ChangeNotifierProvider(create: (context) => SettingsProvider(context.read<SettingsService>())),
         Provider<NotificationsService>(create: (_) => NotificationsService(apiClient)),
