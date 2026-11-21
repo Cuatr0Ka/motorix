@@ -2,7 +2,7 @@
 
 Este documento es el registro de calidad del Sprint 7 de Motorix. Reúne las puertas de calidad, las decisiones, los riesgos, la trazabilidad de los criterios de aceptación, los hallazgos, la regresión de los sprints anteriores y el control de calidad final, con sus evidencias.
 
-Resultado general: el sprint se aprobó con observaciones el 2026-11-21. Todas las pruebas automáticas pasan (1 534 del servidor y 446 del cliente) y no hay defectos abiertos. Las observaciones son dos: la dependencia nueva `exceljs`, aprobada por la persona responsable al cambiar la exportación de CSV a Excel, y el recorrido manual con la interfaz gráfica (capturas y tiempos de SC-010), que realiza la persona responsable.
+Resultado general: el sprint se aprobó con observaciones el 2026-11-21. Todas las pruebas automáticas pasan (1 534 del servidor y 446 del cliente) y no hay defectos abiertos. Las observaciones son dos: la dependencia nueva `exceljs`, aprobada por la persona responsable al cambiar la exportación de CSV a Excel (el diseño del libro también quedó aprobado), y el recorrido manual con la interfaz gráfica (capturas y tiempos de SC-010), que realiza la persona responsable.
 
 ## 0. Datos del documento
 
@@ -161,7 +161,7 @@ Cinco requisitos funcionales del sprint, elegidos entre los que más pueden fall
 | RF-02 | Spec 007, FR-027: la sesión se cierra a los 30 minutos sin actividad. | `401 SESSION_INACTIVE` tras más de 30 minutos; aviso a los 28 en el cliente. | Jest: `session.inactivity.test.js`, 6 casos; Flutter: `inactivity_test.dart`, 6 casos. | Aprobado | Sin defectos. |
 | RF-03 | Spec 007, FR-023 y FR-025: la bitácora registra las acciones sensibles sin datos reservados. | Las 12 acciones quedan registradas; ninguna fila contiene contraseñas, hashes, tokens ni tarjetas; sin rutas de escritura. | Jest: `audit.flow.test.js`, 11 casos, `audit.contract.test.js`, `auditService.test.js`. | Aprobado | H-06 corregido durante la prueba. |
 | RF-04 | Spec 007, FR-013: los importes de los reportes se calculan en centavos y cuadran con su origen. | El total es igual a la suma por método y por día; solo cuentan los pagos Pagado del rango. | Jest: `reportRules.test.js`, `reports.income.test.js`, `reports.parts.test.js`, `reports.performance.test.js`. | Aprobado | Sin defectos. |
-| RF-05 | Spec 007, FR-014: cada reporte se exporta a Excel con el diseño de Motorix y los mismos datos que la pantalla. | Libro `.xlsx` con logo, colores, importes numéricos, totales y los mismos valores que el JSON. | Jest: `reports.xlsx.test.js`, 11 casos; Flutter: `reports_test.dart`, `file_saver_test.dart`. | Aprobado con observación | Cambio de CSV a Excel (H-03); la revisión visual en Excel la hace la persona responsable. |
+| RF-05 | Spec 007, FR-014: cada reporte se exporta a Excel con el diseño de Motorix y los mismos datos que la pantalla. | Libro `.xlsx` con logo, colores, importes numéricos, totales y los mismos valores que el JSON. | Jest: `reports.xlsx.test.js`, 11 casos; Flutter: `reports_test.dart`, `file_saver_test.dart`. | Aprobado con observación | Cambio de CSV a Excel (H-03); el diseño del libro fue revisado y aprobado por la persona responsable el 2026-11-21. |
 
 ## 10. Cierre
 
@@ -169,6 +169,6 @@ Cinco requisitos funcionales del sprint, elegidos entre los que más pueden fall
 |---|---|
 | Criterios de salida cumplidos | 5 de 5 |
 | Defectos abiertos | Ninguno crítico, alto ni medio |
-| Observaciones | Dependencia nueva `exceljs` aprobada (H-03). Quedan para la persona responsable: el recorrido manual con la interfaz gráfica (capturas y tiempos de SC-010) y abrir un libro exportado en Excel para validar el aspecto visual (logo y colores). Los cinco libros se generaron sin errores con los datos reales de la base `motorix` (7 pagos y 22 510.00 de ingresos en el último año) |
+| Observaciones | Dependencia nueva `exceljs` aprobada (H-03). El aspecto del libro de Excel (logo y colores) fue aprobado por la persona responsable el 2026-11-21. Queda para la persona responsable el recorrido manual con la interfaz gráfica (capturas y tiempos de SC-010). Los cinco libros se generaron sin errores con los datos reales de la base `motorix` (7 pagos y 22 510.00 de ingresos en el último año) |
 | Aprobado por | José Adrián Mendoza Hernández, responsable del proyecto (pendiente de confirmar) |
 | Fecha | 2026-11-21 |
