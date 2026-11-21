@@ -43,3 +43,49 @@ export async function listAppointmentsOn(date, connection) {
   );
   return rows.map(toAppointmentRow);
 }
+
+const toFinishedOrder = (row) => ({
+  id: row.id,
+  finishedAt: row.finished_at ?? row.updated_at ?? row.created_at,
+  client: { id: row.client_id, name: row.client_name, phone: row.client_phone },
+  vehicle: { id: row.vehicle_id, brand: row.brand, model: row.model, licensePlate: row.license_plate },
+});
+
+/**
+ * Órdenes Terminadas que todavía no se entregan (el vehículo está listo), con su cliente y vehículo. La fecha en
+ * que quedaron Terminadas es la del último cambio de estado a TERMINADO del historial (o la de actualización).
+ */
+export async function listFinishedOrders(connection) {
+  const rows = await query(
+    `SELECT o.id, o.created_at, o.updated_at,
+            (SELECT MAX(h.changed_at) FROM order_status_history h WHERE h.order_id = o.id AND h.to_status = 'TERMINADO') AS finished_at,
+            c.id AS client_id, c.name AS client_name, c.phone AS client_phone,
+            v.id AS vehicle_id, v.brand, v.model, v.license_plate
+       FROM service_orders o
+       JOIN clients c ON c.id = o.client_id
+       JOIN vehicles v ON v.id = o.vehicle_id
+      WHERE o.status = 'TERMINADO'
+      ORDER BY o.id ASC`,
+    [],
+    connection,
+  );
+  return rows.map(toFinishedOrder);
+}
+
+/** Orden por identificador (para comprobar el hecho de un aviso al cliente), o null si no existe. */
+export async function findOrderFact(id, connection) {
+  const rows = await query('SELECT id, status, client_id FROM service_orders WHERE id = ?', [id], connection);
+  return rows[0] ? { id: rows[0].id, status: rows[0].status, clientId: rows[0].client_id } : null;
+}
+
+/** Cita por identificador (para comprobar el hecho de un aviso al cliente), o null si no existe. */
+export async function findAppointmentFact(id, connection) {
+  const rows = await query(
+    'SELECT id, status, scheduled_at, client_id FROM appointments WHERE id = ?',
+    [id],
+    connection,
+  );
+  return rows[0]
+    ? { id: rows[0].id, status: rows[0].status, scheduledAt: rows[0].scheduled_at, clientId: rows[0].client_id }
+    : null;
+}

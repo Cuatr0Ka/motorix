@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import appointmentRoutes from './appointmentRoutes.js';
 import authRoutes from './authRoutes.js';
+import clientNoticeRoutes from './clientNoticeRoutes.js';
 import clientRoutes from './clientRoutes.js';
 import dashboardRoutes from './dashboardRoutes.js';
 import maintenanceRoutes from './maintenanceRoutes.js';
@@ -33,5 +34,6 @@ router.use('/payments', paymentRoutes);
 router.use('/tickets', ticketRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/client-notices', clientNoticeRoutes);
 
 export default router;

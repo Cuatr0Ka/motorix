@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'models/notice.dart';
 import 'providers/appointments_provider.dart';
+import 'providers/client_notices_provider.dart';
 import 'providers/clients_provider.dart';
 import 'providers/dashboard_provider.dart';
 import 'providers/maintenance_provider.dart';
@@ -20,6 +21,7 @@ import 'providers/vehicles_provider.dart';
 import 'screens/appointment_detail_screen.dart';
 import 'screens/appointments_list_screen.dart';
 import 'screens/change_password_screen.dart';
+import 'screens/client_notices_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/clients_list_screen.dart';
@@ -37,6 +39,7 @@ import 'screens/vehicles_list_screen.dart';
 import 'services/api_client.dart';
 import 'services/appointments_service.dart';
 import 'services/auth_service.dart';
+import 'services/client_notices_service.dart';
 import 'services/clients_service.dart';
 import 'services/dashboard_service.dart';
 import 'services/maintenance_service.dart';
@@ -107,6 +110,8 @@ class MotorixApp extends StatelessWidget {
         Provider<PartsService>(create: (_) => PartsService(apiClient)),
         ChangeNotifierProvider(create: (context) => PartsProvider(context.read<PartsService>())),
         ChangeNotifierProvider(create: (context) => StockAlertsProvider(context.read<PartsService>())),
+        Provider<ClientNoticesService>(create: (_) => ClientNoticesService(apiClient)),
+        ChangeNotifierProvider(create: (context) => ClientNoticesProvider(context.read<ClientNoticesService>())),
         Provider<NotificationsService>(create: (_) => NotificationsService(apiClient)),
         ChangeNotifierProvider(create: (context) => NotificationsProvider(context.read<NotificationsService>())),
         Provider<UsersService>(create: (_) => UsersService(apiClient)),
@@ -178,6 +183,8 @@ Widget buildSection(BuildContext context, AppSection section) {
       return const TicketsListScreen();
     case AppSection.maintenance:
       return const MaintenanceListScreen();
+    case AppSection.clientNotices:
+      return const ClientNoticesScreen();
     case AppSection.inventory:
       return const InventoryScreen();
     case AppSection.users:

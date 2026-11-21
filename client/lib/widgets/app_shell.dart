@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/notice.dart';
 import '../models/user.dart';
+import '../providers/client_notices_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/notifications_provider.dart';
 import '../providers/session_provider.dart';
@@ -35,6 +36,8 @@ IconData iconForSection(AppSection section) {
       return Icons.build_outlined;
     case AppSection.maintenance:
       return Icons.event_repeat_outlined;
+    case AppSection.clientNotices:
+      return Icons.phone_callback_outlined;
     case AppSection.inventory:
       return Icons.inventory_2_outlined;
     case AppSection.dashboard:
@@ -66,6 +69,8 @@ IconData _selectedIconFor(AppSection section) {
       return Icons.build;
     case AppSection.maintenance:
       return Icons.event_repeat;
+    case AppSection.clientNotices:
+      return Icons.phone_callback;
     case AppSection.inventory:
       return Icons.inventory_2;
     case AppSection.dashboard:
@@ -122,6 +127,8 @@ class _AppShellState extends State<AppShell> {
       _notifications
         ..clear()
         ..start();
+      // La lista de clientes por avisar (con teléfonos) tampoco se conserva de una sesión a otra.
+      context.read<ClientNoticesProvider>().clear();
     });
     // Solo la administración consulta las alertas de stock bajo (el servidor rechaza a los demás roles).
     WidgetsBinding.instance.addPostFrameCallback((_) {

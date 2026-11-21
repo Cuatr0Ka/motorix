@@ -15,6 +15,7 @@ enum AppSection {
   payments('Pagos'),
   tickets('Tickets'),
   maintenance('Mantenimientos'),
+  clientNotices('Clientes por avisar'),
   inventory('Inventario'),
   users('Usuarios'),
   changePassword('Cambiar contraseña');
@@ -42,6 +43,7 @@ class NavigationProvider extends ChangeNotifier {
           AppSection.payments,
           AppSection.tickets,
           AppSection.maintenance,
+          AppSection.clientNotices,
         ],
         if (role == UserRole.mechanic) AppSection.myOrders,
         if (role == UserRole.admin) AppSection.inventory,
