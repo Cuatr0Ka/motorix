@@ -155,9 +155,10 @@ describe('agregar refacciones a una orden (US4, CA-5)', () => {
     for (const user of [admin, recepcion, mecanico]) {
       const res = await request(app).get(`/api/orders/${orden.id}`).set(auth(user.token));
       expect(res.status).toBe(200);
-      expect(res.body.data.parts).toEqual([
-        { id: expect.any(Number), partId: parte.id, code: 'OPA-REF', name: 'Balatas', unit: 'pieza', quantity: 2 },
-      ]);
+      const base = { id: expect.any(Number), partId: parte.id, code: 'OPA-REF', name: 'Balatas', unit: 'pieza', quantity: 2 };
+      // El mecánico no recibe precios; administración y recepción reciben precio unitario, importe y bandera.
+      const esperada = user === mecanico ? base : { ...base, unitPrice: expect.any(String), amount: expect.any(String), legacy: expect.any(Boolean) };
+      expect(res.body.data.parts).toEqual([esperada]);
     }
   });
 });

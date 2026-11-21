@@ -13,6 +13,32 @@ function toUser(row) {
   return user;
 }
 
+/**
+ * Segundos desde la última actividad de la cuenta, calculados por la base (sin zonas horarias de por medio). `null` si
+ * nunca se registró (se trata como activa).
+ */
+export async function getIdleSeconds(id, connection) {
+  const rows = await query('SELECT TIMESTAMPDIFF(SECOND, last_activity_at, NOW()) AS idle FROM users WHERE id = ?', [id], connection);
+  const idle = rows[0]?.idle;
+  return idle === null || idle === undefined ? null : Number(idle);
+}
+
+/**
+ * Renueva la última actividad como máximo una vez por `everySeconds` (así una ráfaga de peticiones no escribe en cada una).
+ * Con `force` la fija siempre (inicio de sesión).
+ */
+export async function touchActivity(id, everySeconds, { force = false } = {}, connection) {
+  if (force) {
+    await query('UPDATE users SET last_activity_at = NOW() WHERE id = ?', [id], connection);
+    return;
+  }
+  await query(
+    'UPDATE users SET last_activity_at = NOW() WHERE id = ? AND (last_activity_at IS NULL OR last_activity_at < NOW() - INTERVAL ? SECOND)',
+    [id, everySeconds],
+    connection,
+  );
+}
+
 export async function findById(id, connection) {
   const rows = await query(`SELECT ${PUBLIC_COLUMNS} FROM users WHERE id = ?`, [id], connection);
   return toUser(rows[0]);

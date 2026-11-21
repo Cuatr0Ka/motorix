@@ -9,21 +9,48 @@ class TicketLine {
   final String amount;
 }
 
-/// Refacción del ticket: se lista con su cantidad y no suma importe.
+/// Refacción del ticket. En el formato versión 2 lleva precio unitario e importe; en los tickets anteriores al Sprint 5
+/// (versión 1) solo trae la cantidad y [unitPrice] y [amount] son nulos.
 class TicketPart {
-  const TicketPart({required this.code, required this.name, required this.unit, required this.quantity});
+  const TicketPart({
+    required this.code,
+    required this.name,
+    required this.unit,
+    required this.quantity,
+    this.unitPrice,
+    this.amount,
+  });
 
   factory TicketPart.fromJson(Map<String, dynamic> json) => TicketPart(
         code: '${json['code']}',
         name: '${json['name']}',
         unit: '${json['unit']}',
         quantity: (json['quantity'] as num).toInt(),
+        unitPrice: json['unitPrice'] == null ? null : '${json['unitPrice']}',
+        amount: json['amount'] == null ? null : '${json['amount']}',
       );
 
   final String code;
   final String name;
   final String unit;
   final int quantity;
+  final String? unitPrice;
+  final String? amount;
+}
+
+/// Próximo servicio programado al emitir el ticket (formato versión 3): fecha, kilometraje o ambos.
+class TicketNextService {
+  const TicketNextService({required this.description, this.dueDate, this.dueMileage});
+
+  factory TicketNextService.fromJson(Map<String, dynamic> json) => TicketNextService(
+        description: '${json['description']}',
+        dueDate: json['dueDate'] == null ? null : DateTime.tryParse('${json['dueDate']}'),
+        dueMileage: (json['dueMileage'] as num?)?.toInt(),
+      );
+
+  final String description;
+  final DateTime? dueDate;
+  final int? dueMileage;
 }
 
 /// Instantánea del contenido de un ticket, tal como se generó.
@@ -46,9 +73,12 @@ class TicketContent {
     required this.paymentMethod,
     required this.paymentStatus,
     required this.generatedAt,
+    this.formatVersion = 1,
+    this.partsTotal,
     this.customerPhone,
     this.paidAt,
     this.paymentReference,
+    this.nextService,
   });
 
   factory TicketContent.fromJson(Map<String, dynamic> json) {
@@ -75,12 +105,17 @@ class TicketContent {
       labor: items('labor', TicketLine.fromJson),
       servicesTotal: '${totals['services']}',
       laborTotal: '${totals['labor']}',
+      partsTotal: totals['parts'] == null ? null : '${totals['parts']}',
+      formatVersion: (json['formatVersion'] as num?)?.toInt() ?? 1,
       total: '${totals['total']}',
       paymentMethod: '${payment['method']}',
       paymentStatus: '${payment['status']}',
       paidAt: payment['paidAt'] == null ? null : DateTime.parse('${payment['paidAt']}'),
       paymentReference: payment['reference'] as String?,
       generatedAt: DateTime.parse('${json['generatedAt']}'),
+      nextService: json['nextService'] is Map
+          ? TicketNextService.fromJson(Map<String, dynamic>.from(json['nextService'] as Map))
+          : null,
     );
   }
 
@@ -98,12 +133,27 @@ class TicketContent {
   final List<TicketLine> labor;
   final String servicesTotal;
   final String laborTotal;
+
+  /// Subtotal de refacciones: solo existe en el formato versión 2.
+  final String? partsTotal;
   final String total;
+
+  /// Formato con que se emitió el ticket: 2 desde el Sprint 5 (refacciones con precio e importe); los anteriores no
+  /// traen el campo y son versión 1. Cada versión se muestra e imprime con su propio diseño.
+  final int formatVersion;
   final String paymentMethod;
   final String paymentStatus;
   final DateTime? paidAt;
   final String? paymentReference;
   final DateTime generatedAt;
+
+  /// Próximo servicio programado (solo formato versión 3).
+  final TicketNextService? nextService;
+
+  bool get isV2 => formatVersion >= 2;
+
+  /// Formato versión 3 (Sprint 7): puede traer el bloque «Próximo servicio».
+  bool get isV3 => formatVersion >= 3;
 }
 
 /// Ticket de una orden cobrada. En los listados no trae [content] sino cliente, placa y total.

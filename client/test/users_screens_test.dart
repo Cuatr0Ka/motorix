@@ -283,7 +283,7 @@ void main() {
       await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: usersHandler()));
       await openForm(tester);
 
-      expect(find.text('Mínimo 8 caracteres, con una mayúscula, una minúscula y un número.'), findsOneWidget);
+      expect(find.text('Mínimo 10 caracteres, con una mayúscula, una minúscula y un número'), findsOneWidget);
     });
 
     testWidgets('test_crea_el_usuario_con_el_rol_elegido_y_vuelve_al_listado', (tester) async {
@@ -370,7 +370,7 @@ void main() {
         await openChangePassword(tester);
 
         expect(find.text('Contraseña actual *'), findsOneWidget);
-        expect(find.text('Mínimo 8 caracteres, con una mayúscula, una minúscula y un número.'), findsOneWidget);
+        expect(find.text('Mínimo 10 caracteres, con una mayúscula, una minúscula y un número'), findsOneWidget);
       });
     }
 
@@ -388,7 +388,7 @@ void main() {
       await fill(tester, next: 'corta1A');
       await tester.tap(find.text('Guardar contraseña'));
       await tester.pump();
-      expect(find.text('La contraseña debe tener al menos 8 caracteres.'), findsOneWidget);
+      expect(find.text('La contraseña debe tener al menos 10 caracteres.'), findsOneWidget);
 
       await fill(tester, current: 'Misma2026a', next: 'Misma2026a');
       await tester.tap(find.text('Guardar contraseña'));

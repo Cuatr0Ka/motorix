@@ -1,11 +1,13 @@
 import { withTransaction } from '../config/db.js';
-import { getMaintenanceConfig } from '../config/env.js';
 import * as maintenanceModel from '../models/maintenanceModel.js';
 import * as vehicleModel from '../models/vehicleModel.js';
 import { AppError } from '../utils/AppError.js';
 import { presentFullMaintenance, toDateOnly } from './maintenancePresenter.js';
 import { assertMaintenanceTarget } from './maintenanceStatus.js';
 import { loadOrderForActor } from './orderService.js';
+import * as serviceTypeModel from '../models/serviceTypeModel.js';
+import { suggestNextMaintenance } from './serviceIntervals.js';
+import * as settingsService from './settingsService.js';
 
 const notEditable = () =>
   AppError.conflict('MAINTENANCE_NOT_EDITABLE', 'El mantenimiento ya fue atendido: no admite cambios.');
@@ -23,6 +25,22 @@ async function loadForActor(id, actor, connection) {
   if (!maintenance) throw notFound();
   if (actor.role === 'MECHANIC' && maintenance.mechanicId !== actor.id) throw notFound();
   return maintenance;
+}
+
+/**
+ * Propone fecha y kilometraje del próximo mantenimiento con el intervalo más corto de los tipos de servicio de las
+ * líneas de la orden. Devuelve `null` si ninguna línea tiene un tipo con intervalo. Es solo una propuesta.
+ */
+export async function suggest(orderId, actor) {
+  const order = await loadOrderForActor(orderId, actor);
+  const serviceTypes = await serviceTypeModel.listByOrder(orderId);
+  const vehicle = await vehicleModel.findById(order.vehicle.id);
+  return suggestNextMaintenance({
+    serviceTypes,
+    today: new Date(),
+    serviceMileage: order.serviceMileage ?? null,
+    currentMileage: vehicle.currentMileage,
+  });
 }
 
 /**
@@ -60,7 +78,7 @@ export async function schedule(orderId, data, actor) {
       connection,
     );
   });
-  return presentFullMaintenance(await maintenanceModel.findById(id), actor);
+  return presentFullMaintenance(await maintenanceModel.findById(id), actor, new Date(), await settingsService.getMaintenanceMargins());
 }
 
 /**
@@ -100,7 +118,7 @@ export async function update(id, data, actor) {
       connection,
     );
   });
-  return presentFullMaintenance(await maintenanceModel.findById(id), actor);
+  return presentFullMaintenance(await maintenanceModel.findById(id), actor, new Date(), await settingsService.getMaintenanceMargins());
 }
 
 /** Marca un mantenimiento pendiente como Atendido (acción explícita y definitiva). */
@@ -111,15 +129,16 @@ export async function attend(id, actor) {
     if (locked.status !== 'PENDIENTE') throw notEditable();
     await maintenanceModel.markAttended(id, connection);
   });
-  return presentFullMaintenance(await maintenanceModel.findById(id), actor);
+  return presentFullMaintenance(await maintenanceModel.findById(id), actor, new Date(), await settingsService.getMaintenanceMargins());
 }
 
 /** Lista general de mantenimientos con cliente y teléfono (ADMIN y RECEPTIONIST). */
 export async function list(filters, actor) {
-  const { warnDays, warnKm } = getMaintenanceConfig();
+  const margins = await settingsService.getMaintenanceMargins();
+  const { warnDays, warnKm } = margins;
   const pad = (n) => String(n).padStart(2, '0');
   const now = new Date();
   const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
   const { items, total } = await maintenanceModel.list({ ...filters, today, warnDays, warnKm });
-  return { items: items.map((item) => presentFullMaintenance(item, actor, now)), total };
+  return { items: items.map((item) => presentFullMaintenance(item, actor, now, margins)), total };
 }

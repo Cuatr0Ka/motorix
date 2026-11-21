@@ -88,7 +88,7 @@ describe.each([
       .patch(`/api/orders/${orden.id}/${kind}/${a.body.data.item.id}`)
       .set(auth(mecanico.token))
       .send({ description: 'Línea A corregida', amount: '1234.56' });
-    expect(corregida.body.data.item).toEqual({ id: a.body.data.item.id, description: 'Línea A corregida', amount: '1234.56' });
+    expect(corregida.body.data.item).toEqual({ id: a.body.data.item.id, description: 'Línea A corregida', amount: '1234.56', ...(kind === 'services' ? { serviceType: null } : {}) });
     expect(corregida.body.data.totals.total).toBe('1234.76');
 
     const baja = await request(app).delete(`/api/orders/${orden.id}/${kind}/${b.body.data.item.id}`).set(auth(mecanico.token));

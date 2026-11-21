@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/part.dart';
 import '../services/api_client.dart';
 import '../services/parts_service.dart';
+import '../utils/formatters.dart';
 import '../utils/tokens.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/page_header.dart';
@@ -29,6 +30,10 @@ class _PartFormScreenState extends State<PartFormScreen> {
   late final _unit = TextEditingController(text: widget.existing?.unit);
   late final _minStock = TextEditingController(text: widget.existing?.minStock.toString() ?? '0');
   final _initialStock = TextEditingController(text: '0');
+  late final _category = TextEditingController(text: widget.existing?.category);
+  late final _brand = TextEditingController(text: widget.existing?.brand);
+  late final _purchasePrice = TextEditingController(text: widget.existing?.purchasePrice);
+  late final _salePrice = TextEditingController(text: widget.existing?.salePrice);
 
   final Map<String, String> _serverErrors = {};
   bool _dirty = false;
@@ -38,7 +43,7 @@ class _PartFormScreenState extends State<PartFormScreen> {
 
   @override
   void dispose() {
-    for (final controller in [_code, _name, _description, _unit, _minStock, _initialStock]) {
+    for (final controller in [_code, _name, _description, _unit, _minStock, _initialStock, _category, _brand, _purchasePrice, _salePrice]) {
       controller.dispose();
     }
     super.dispose();
@@ -90,6 +95,38 @@ class _PartFormScreenState extends State<PartFormScreen> {
     return null;
   }
 
+  String? _validateText(String field, String label, String? value, int max) {
+    if (_serverErrors[field] != null) return _serverErrors[field];
+    if ((value?.trim().length ?? 0) > max) return '$label no puede pasar de $max caracteres.';
+    return null;
+  }
+
+  /// Precio en pesos: opcional salvo [required]; sin negativos, con a lo sumo dos decimales y hasta 9,999,999.99.
+  /// El precio de venta ([positive]) debe ser mayor a cero.
+  String? _validatePrice(String field, String label, String? value, {bool positive = false, bool required = false}) {
+    if (_serverErrors[field] != null) return _serverErrors[field];
+    final text = value?.trim() ?? '';
+    if (text.isEmpty) return required ? '$label es obligatorio.' : null;
+    if (text.startsWith('-')) return '$label no puede ser negativo.';
+    if (!RegExp(r'^\d+(\.\d+)?$').hasMatch(text)) return '$label debe ser un número.';
+    final parts = text.split('.');
+    if (parts.length == 2 && parts[1].length > 2) return '$label puede tener a lo sumo dos decimales.';
+    final cents = int.parse(parts[0]) * 100 + (parts.length == 2 ? int.parse(parts[1].padRight(2, '0')) : 0);
+    if (cents > 999999999) return '$label no puede pasar de 9,999,999.99.';
+    if (positive && cents == 0) return '$label debe ser mayor a cero.';
+    return null;
+  }
+
+  /// Texto de un precio capturado ("180.5" → "180.50"); vacío → null.
+  String? _priceOrNull(TextEditingController controller) {
+    final text = controller.text.trim();
+    if (text.isEmpty) return null;
+    final parts = text.split('.');
+    return '${int.parse(parts[0])}.${(parts.length == 2 ? parts[1] : '').padRight(2, '0')}';
+  }
+
+  String? _textOrNull(TextEditingController controller) => controller.text.trim().isEmpty ? null : controller.text.trim();
+
   Future<void> _save() async {
     if (_saving || !(_formKey.currentState?.validate() ?? false)) return;
     final input = PartInput(
@@ -99,8 +136,17 @@ class _PartFormScreenState extends State<PartFormScreen> {
       unit: _unit.text.trim(),
       minStock: int.parse(_minStock.text.trim()),
       initialStock: _isEdit ? null : int.parse(_initialStock.text.trim()),
+      category: _textOrNull(_category),
+      brand: _textOrNull(_brand),
+      purchasePrice: _priceOrNull(_purchasePrice),
+      salePrice: _priceOrNull(_salePrice),
     );
+    await _submit(input);
+  }
 
+  /// Envía el formulario. Si el servidor avisa de una venta por debajo del costo (`PRICE_BELOW_COST`), pide la
+  /// confirmación explícita y, solo si se acepta, reenvía con la bandera; cancelar no guarda nada.
+  Future<void> _submit(PartInput input) async {
     setState(() => _saving = true);
     try {
       final service = context.read<PartsService>();
@@ -108,7 +154,23 @@ class _PartFormScreenState extends State<PartFormScreen> {
       _dirty = false;
       if (mounted) Navigator.of(context).pop(saved);
     } on ApiException catch (e) {
-      _showServerError(e);
+      if (!mounted) return;
+      if (e.code == 'PRICE_BELOW_COST') {
+        final sale = '${e.detailsMap['salePrice'] ?? input.salePrice}';
+        final purchase = '${e.detailsMap['purchasePrice'] ?? input.purchasePrice}';
+        final accepted = await showConfirmDialog(
+          context,
+          title: 'Venta por debajo del costo',
+          message: 'El precio de venta (${formatMoney(sale)}) es menor al de compra (${formatMoney(purchase)}). ¿Guardar de todos modos?',
+          confirmLabel: 'Guardar de todos modos',
+        );
+        if (accepted && mounted) {
+          await _submit(input.confirmed());
+          return;
+        }
+      } else {
+        _showServerError(e);
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -219,6 +281,73 @@ class _PartFormScreenState extends State<PartFormScreen> {
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(labelText: 'Stock mínimo *'),
                           validator: (v) => _validateCount('minStock', 'El stock mínimo', v),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          key: const ValueKey('refaccion-categoria'),
+                          controller: _category,
+                          enabled: !_saving,
+                          onChanged: (_) => _changed('category'),
+                          decoration: const InputDecoration(labelText: 'Categoría', hintText: 'Frenos, filtros, aceites…'),
+                          validator: (v) => _validateText('category', 'La categoría', v, 60),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.lg),
+                      Expanded(
+                        child: TextFormField(
+                          key: const ValueKey('refaccion-marca'),
+                          controller: _brand,
+                          enabled: !_saving,
+                          onChanged: (_) => _changed('brand'),
+                          decoration: const InputDecoration(labelText: 'Marca'),
+                          validator: (v) => _validateText('brand', 'La marca', v, 60),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          key: const ValueKey('refaccion-precio-compra'),
+                          controller: _purchasePrice,
+                          enabled: !_saving,
+                          onChanged: (_) => _changed('purchasePrice'),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          decoration: const InputDecoration(labelText: 'Precio de compra', prefixText: '\$ '),
+                          validator: (v) => _validatePrice('purchasePrice', 'El precio de compra', v),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.lg),
+                      Expanded(
+                        child: TextFormField(
+                          key: const ValueKey('refaccion-precio-venta'),
+                          controller: _salePrice,
+                          enabled: !_saving,
+                          onChanged: (_) => _changed('salePrice'),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          decoration: InputDecoration(
+                            labelText: 'Precio de venta${widget.existing?.salePrice != null ? ' *' : ''}',
+                            prefixText: '\$ ',
+                            helperText: 'Sin precio de venta no se puede agregar a una orden.',
+                            helperMaxLines: 2,
+                          ),
+                          validator: (v) => _validatePrice(
+                            'salePrice',
+                            'El precio de venta',
+                            v,
+                            positive: true,
+                            required: widget.existing?.salePrice != null,
+                          ),
                         ),
                       ),
                     ],

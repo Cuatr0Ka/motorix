@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/notice.dart';
 import '../models/user.dart';
+import '../providers/client_notices_provider.dart';
 import '../providers/navigation_provider.dart';
+import '../providers/notifications_provider.dart';
 import '../providers/session_provider.dart';
 import '../providers/sidebar_provider.dart';
 import '../providers/stock_alerts_provider.dart';
 import '../utils/tokens.dart';
 import 'confirm_dialog.dart';
+import 'notification_bell.dart';
 
 /// Construye la pantalla de una sección del menú.
 typedef SectionBuilder = Widget Function(BuildContext context, AppSection section);
+
+/// Construye la pantalla de detalle a la que lleva un aviso.
+typedef NoticeTargetBuilder = Widget Function(BuildContext context, NoticeTarget target);
 
 /// Ícono del menú de cada sección (contorno). También lo usa la pantalla de Inicio.
 IconData iconForSection(AppSection section) {
@@ -29,6 +36,8 @@ IconData iconForSection(AppSection section) {
       return Icons.build_outlined;
     case AppSection.maintenance:
       return Icons.event_repeat_outlined;
+    case AppSection.clientNotices:
+      return Icons.phone_callback_outlined;
     case AppSection.inventory:
       return Icons.inventory_2_outlined;
     case AppSection.dashboard:
@@ -39,6 +48,14 @@ IconData iconForSection(AppSection section) {
       return Icons.receipt_long_outlined;
     case AppSection.users:
       return Icons.admin_panel_settings_outlined;
+    case AppSection.settings:
+      return Icons.settings_outlined;
+    case AppSection.terms:
+      return Icons.gavel_outlined;
+    case AppSection.auditLog:
+      return Icons.history_outlined;
+    case AppSection.reports:
+      return Icons.bar_chart_outlined;
     case AppSection.changePassword:
       return Icons.lock_outline;
   }
@@ -60,6 +77,8 @@ IconData _selectedIconFor(AppSection section) {
       return Icons.build;
     case AppSection.maintenance:
       return Icons.event_repeat;
+    case AppSection.clientNotices:
+      return Icons.phone_callback;
     case AppSection.inventory:
       return Icons.inventory_2;
     case AppSection.dashboard:
@@ -70,6 +89,14 @@ IconData _selectedIconFor(AppSection section) {
       return Icons.receipt_long;
     case AppSection.users:
       return Icons.admin_panel_settings;
+    case AppSection.settings:
+      return Icons.settings;
+    case AppSection.terms:
+      return Icons.gavel;
+    case AppSection.auditLog:
+      return Icons.history;
+    case AppSection.reports:
+      return Icons.bar_chart;
     case AppSection.changePassword:
       return Icons.lock;
   }
@@ -86,9 +113,12 @@ Widget _withBadge(BuildContext context, AppSection section, Widget icon) {
 /// Estructura general: sidebar oscuro colapsable, encabezado y contenido con navegación propia.
 /// Los permisos se validan en el servidor; aquí solo se muestran las opciones del rol.
 class AppShell extends StatefulWidget {
-  const AppShell({super.key, required this.sectionBuilder});
+  const AppShell({super.key, required this.sectionBuilder, required this.targetBuilder});
 
   final SectionBuilder sectionBuilder;
+
+  /// Construye la pantalla de detalle a la que lleva un aviso (orden, cita, vehículo o refacción).
+  final NoticeTargetBuilder targetBuilder;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -98,10 +128,24 @@ class _AppShellState extends State<AppShell> {
   final GlobalKey<NavigatorState> _contentNavigator = GlobalKey<NavigatorState>();
   late AppSection _shown;
 
+  // Se guarda para detener la actualización periódica al desmontarse (no se puede leer el contexto en dispose).
+  late final NotificationsProvider _notifications;
+
   @override
   void initState() {
     super.initState();
     _shown = context.read<NavigationProvider>().current;
+    _notifications = context.read<NotificationsProvider>();
+    // Los avisos se consultan al iniciar la sesión, al cambiar de sección y cada 60 segundos.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Se limpia antes de empezar para no mostrar avisos de otra persona que usó el equipo antes.
+      _notifications
+        ..clear()
+        ..start();
+      // La lista de clientes por avisar (con teléfonos) tampoco se conserva de una sesión a otra.
+      context.read<ClientNoticesProvider>().clear();
+    });
     // Solo la administración consulta las alertas de stock bajo (el servidor rechaza a los demás roles).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -112,6 +156,13 @@ class _AppShellState extends State<AppShell> {
         alerts.clear();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    // Al cerrar la sesión (o al desmontar el shell) se detiene la actualización periódica.
+    _notifications.stop();
+    super.dispose();
   }
 
   Route<void> _routeFor(AppSection section) {
@@ -157,6 +208,20 @@ class _AppShellState extends State<AppShell> {
       _shown = navigation.current;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _contentNavigator.currentState?.pushAndRemoveUntil(_routeFor(_shown), (route) => false);
+        // Al cambiar de sección se actualiza el contador de la campana.
+        if (mounted) _notifications.refresh();
+      });
+    }
+
+    // Un aviso pidió abrir un detalle: se abre sobre la sección que ya se mostró (o se está mostrando).
+    if (navigation.pendingTarget != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final target = context.read<NavigationProvider>().takePendingTarget();
+        if (target == null) return;
+        _contentNavigator.currentState?.push(
+          MaterialPageRoute<void>(builder: (routeContext) => widget.targetBuilder(routeContext, target)),
+        );
       });
     }
 
@@ -345,6 +410,8 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text(title, style: theme.textTheme.titleMedium)),
+          const NotificationBell(),
+          const SizedBox(width: AppSpacing.sm),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,

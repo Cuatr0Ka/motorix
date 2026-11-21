@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +8,7 @@ import 'package:http/testing.dart';
 import 'package:motorix_client/main.dart';
 import 'package:motorix_client/services/api_client.dart';
 import 'package:motorix_client/models/ticket.dart';
+import 'package:motorix_client/utils/file_saver.dart';
 import 'package:motorix_client/utils/link_opener.dart';
 import 'package:motorix_client/utils/ticket_printer.dart';
 
@@ -70,6 +72,17 @@ class FakeApi {
       final custom = handler?.call(fake);
       if (custom != null) return custom;
 
+      // Sprint 7: por omisión los términos ya están aceptados, para no bloquear las pruebas anteriores.
+      if (fake.method == 'GET' && fake.path == '/terms/current') {
+        return ok({
+          'id': 1,
+          'version': '1.0',
+          'title': 'Términos y condiciones y aviso de privacidad',
+          'body': 'Texto de los términos.',
+          'publishedAt': '2026-11-21T00:00:00.000Z',
+          'accepted': true,
+        });
+      }
       if (fake.method == 'POST' && fake.path == '/auth/login') {
         if (fake.body['password'] == 'Incorrecta1') {
           return failure(401, 'INVALID_CREDENTIALS', 'Usuario o contraseña incorrectos.');
@@ -103,6 +116,27 @@ class FakeLinkOpener extends LinkOpener {
   }
 }
 
+/// Guardado de archivos simulado: recuerda lo que se guardó y devuelve una ruta ficticia.
+class FakeFileSaver extends FileSaver {
+  FakeFileSaver({this.fails = false, this.browser = false});
+
+  final bool fails;
+
+  /// Simula el guardado del navegador (no hay carpeta que abrir).
+  final bool browser;
+  final List<({String filename, List<int> bytes})> saved = [];
+
+  @override
+  bool get opensFolder => !browser;
+
+  @override
+  Future<String> save(String filename, List<int> bytes) async {
+    if (fails) throw const FileSystemException('sin permiso');
+    saved.add((filename: filename, bytes: bytes));
+    return 'C:\\Descargas\\$filename';
+  }
+}
+
 /// Impresora de tickets simulada: guarda los tickets que se pidió imprimir.
 class FakeTicketPrinter extends TicketPrinter {
   FakeTicketPrinter({this.succeeds = true});
@@ -117,13 +151,14 @@ class FakeTicketPrinter extends TicketPrinter {
   }
 }
 
-Future<void> pumpAppSignedIn(WidgetTester tester, FakeApi api, {LinkOpener? linkOpener, TicketPrinter? ticketPrinter}) async {
+Future<void> pumpAppSignedIn(WidgetTester tester, FakeApi api, {LinkOpener? linkOpener, TicketPrinter? ticketPrinter, FileSaver? fileSaver}) async {
   await tester.pumpWidget(
     MotorixApp(
       apiClient: api.client,
       useGoogleFonts: false,
       linkOpener: linkOpener ?? FakeLinkOpener(),
       ticketPrinter: ticketPrinter ?? FakeTicketPrinter(),
+      fileSaver: fileSaver ?? FakeFileSaver(),
     ),
   );
   await tester.enterText(find.widgetWithText(TextFormField, 'Usuario o correo'), 'usuario');

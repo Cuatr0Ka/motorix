@@ -125,3 +125,79 @@ describe('GET /api/parts/alerts (contrato)', () => {
     expect(res.status).toBe(403);
   });
 });
+
+describe('campos de precio del administrador (Sprint 5, contrato)', () => {
+  const claves = ['category', 'brand', 'purchasePrice', 'salePrice', 'priceMissing'];
+  const dosDecimales = expect.stringMatching(/^\d+\.\d{2}$/);
+
+  beforeEach(async () => {
+    await createPart(admin.id, { code: 'CTR-PRE', name: 'Con precios', category: 'Frenos', brand: 'Brembo', purchasePrice: 300, salePrice: 450.5, stock: 1, minStock: 3 });
+  });
+
+  it('test_el_listado_del_administrador_incluye_categoria_marca_precios_y_priceMissing', async () => {
+    const res = await request(app).get('/api/parts?search=CTR-PRE').set(auth(admin.token));
+
+    expect(res.status).toBe(200);
+    for (const clave of claves) expect(res.body.data[0]).toHaveProperty(clave);
+    expect(res.body.data[0]).toMatchObject({
+      category: 'Frenos',
+      brand: 'Brembo',
+      purchasePrice: dosDecimales,
+      salePrice: '450.50',
+      priceMissing: false,
+    });
+  });
+
+  it('test_una_refaccion_sin_categoria_marca_ni_precio_de_compra_devuelve_null_en_esos_campos', async () => {
+    const res = await request(app).get('/api/parts?search=CTR-001').set(auth(admin.token));
+
+    expect(res.body.data[0]).toMatchObject({ category: null, brand: null, purchasePrice: null });
+  });
+
+  it('test_el_detalle_y_las_alertas_incluyen_los_mismos_campos', async () => {
+    const lista = await request(app).get('/api/parts?search=CTR-PRE').set(auth(admin.token));
+    const id = lista.body.data[0].id;
+
+    const detalle = await request(app).get(`/api/parts/${id}`).set(auth(admin.token));
+    const alertas = await request(app).get('/api/parts/alerts').set(auth(admin.token));
+
+    expect(detalle.status).toBe(200);
+    for (const clave of claves) expect(detalle.body.data).toHaveProperty(clave);
+    expect(detalle.body.data).toHaveProperty('movements');
+    const enAlertas = alertas.body.data.items.find((item) => item.id === id);
+    for (const clave of claves) expect(enAlertas).toHaveProperty(clave);
+  });
+
+  it('test_el_post_responde_201_con_los_campos_de_precio', async () => {
+    const res = await request(app)
+      .post('/api/parts')
+      .set(auth(admin.token))
+      .send({ code: 'CTR-NEW', name: 'Nueva', unit: 'pieza', minStock: 1, initialStock: 0, purchasePrice: 10, salePrice: 20 });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data).toMatchObject({ purchasePrice: '10.00', salePrice: '20.00', priceMissing: false });
+  });
+
+  it('test_el_error_de_venta_bajo_el_costo_tiene_la_forma_del_contrato', async () => {
+    const res = await request(app)
+      .post('/api/parts')
+      .set(auth(admin.token))
+      .send({ code: 'CTR-BAJ', name: 'Baja', unit: 'pieza', minStock: 1, initialStock: 0, purchasePrice: 50, salePrice: 20 });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error).toEqual({
+      code: 'PRICE_BELOW_COST',
+      message: expect.any(String),
+      details: { salePrice: '20.00', purchasePrice: '50.00' },
+    });
+  });
+
+  it('test_el_mecanico_conserva_la_proyeccion_reducida_sin_precios', async () => {
+    const res = await request(app).get('/api/parts').set(auth(mecanico.token));
+
+    expect(res.status).toBe(200);
+    for (const fila of res.body.data) {
+      expect(Object.keys(fila).sort()).toEqual(['code', 'id', 'name', 'stock', 'unit']);
+    }
+  });
+});

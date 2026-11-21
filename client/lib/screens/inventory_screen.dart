@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/part.dart';
+import '../providers/notifications_provider.dart';
 import '../providers/parts_provider.dart';
 import '../providers/stock_alerts_provider.dart';
+import '../utils/formatters.dart';
 import '../utils/status_labels.dart';
 import '../utils/tokens.dart';
 import '../widgets/app_data_table.dart';
 import '../widgets/page_header.dart';
+import '../widgets/status_chip.dart';
 import '../widgets/stock_alerts_banner.dart';
 import '../widgets/state_views.dart';
 import '../widgets/stock_chip.dart';
@@ -34,6 +37,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       provider.setFilters();
       provider.load(search: '', page: 1);
       context.read<StockAlertsProvider>().refresh();
+      context.read<NotificationsProvider>().refresh();
     });
   }
 
@@ -43,6 +47,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       await context.read<PartsProvider>().reload();
       if (!mounted) return;
       context.read<StockAlertsProvider>().refresh();
+      context.read<NotificationsProvider>().refresh();
       showSuccess(context, 'Refacción registrada correctamente.');
     }
   }
@@ -54,6 +59,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       if (!mounted) return;
       context.read<PartsProvider>().reload();
       context.read<StockAlertsProvider>().refresh();
+      context.read<NotificationsProvider>().refresh();
     });
   }
 
@@ -88,7 +94,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 380, minWidth: 280),
                 child: DebouncedSearchField(
-                  hint: 'Buscar por código o nombre',
+                  hint: 'Buscar por código, nombre, categoría o marca',
                   initialValue: provider.search,
                   onChanged: (value) => context.read<PartsProvider>().load(search: value),
                 ),
@@ -175,10 +181,13 @@ class _Body extends StatelessWidget {
       duration: AppDurations.state,
       opacity: provider.status == LoadStatus.loading ? 0.6 : 1,
       child: AppDataTable(
-        minWidth: 820,
+        minWidth: 1200,
         columns: const [
           DataColumn2(label: Text('Código'), size: ColumnSize.S),
           DataColumn2(label: Text('Nombre'), size: ColumnSize.L),
+          DataColumn2(label: Text('Categoría'), size: ColumnSize.S),
+          DataColumn2(label: Text('Marca'), size: ColumnSize.S),
+          DataColumn2(label: Text('Precio de venta'), fixedWidth: 170),
           DataColumn2(label: Text('Unidad'), fixedWidth: 100),
           DataColumn2(label: Text('Stock'), fixedWidth: 90, numeric: true),
           DataColumn2(label: Text('Mínimo'), fixedWidth: 90, numeric: true),
@@ -192,6 +201,13 @@ class _Body extends StatelessWidget {
               cells: [
                 DataCell(Text(part.code)),
                 DataCell(Text(part.name, overflow: TextOverflow.ellipsis)),
+                DataCell(Text(part.category ?? '—', overflow: TextOverflow.ellipsis)),
+                DataCell(Text(part.brand ?? '—', overflow: TextOverflow.ellipsis)),
+                DataCell(
+                  part.priceMissing || part.salePrice == null
+                      ? const StatusChip(label: 'Sin precio de venta', tone: StatusTone.warning)
+                      : Text(formatMoney(part.salePrice!)),
+                ),
                 DataCell(Text(part.unit)),
                 DataCell(Text('${part.stock}')),
                 DataCell(Text('${part.minStock}')),

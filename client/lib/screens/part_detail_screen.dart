@@ -4,14 +4,17 @@ import 'package:provider/provider.dart';
 
 import '../models/part.dart';
 import '../providers/part_detail_provider.dart';
+import '../providers/notifications_provider.dart';
 import '../providers/stock_alerts_provider.dart';
 import '../services/parts_service.dart';
 import '../utils/formatters.dart';
+import '../utils/status_labels.dart';
 import '../utils/tokens.dart';
 import '../widgets/app_data_table.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/page_header.dart';
 import '../widgets/state_views.dart';
+import '../widgets/status_chip.dart';
 import '../widgets/stock_chip.dart';
 import 'part_form_screen.dart';
 
@@ -39,6 +42,7 @@ class _PartDetailView extends StatelessWidget {
     if (failure == null) {
       // Cualquier movimiento puede cambiar las alertas de stock bajo.
       context.read<StockAlertsProvider>().refresh();
+      context.read<NotificationsProvider>().refresh();
       showSuccess(context, success);
     } else {
       showFailure(context, failure);
@@ -215,6 +219,25 @@ class _DataPanel extends StatelessWidget {
           DetailRow(label: 'Descripción', value: part.description),
           const Divider(),
           DetailRow(label: 'Unidad', value: part.unit),
+          const Divider(),
+          DetailRow(label: 'Categoría', value: part.category),
+          const Divider(),
+          DetailRow(label: 'Marca', value: part.brand),
+          const Divider(),
+          DetailRow(label: 'Precio de compra', value: part.purchasePrice == null ? null : formatMoney(part.purchasePrice!)),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            child: Row(
+              children: [
+                SizedBox(width: 140, child: Text('Precio de venta', style: Theme.of(context).textTheme.bodySmall)),
+                if (part.priceMissing || part.salePrice == null)
+                  const StatusChip(label: 'Sin precio de venta', tone: StatusTone.warning)
+                else
+                  Text(formatMoney(part.salePrice!), style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
+          ),
           const Divider(),
           DetailRow(label: 'Stock actual', value: '${part.stock}'),
           const Divider(),

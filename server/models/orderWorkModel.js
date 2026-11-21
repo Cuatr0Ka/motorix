@@ -8,13 +8,18 @@ export const fromCents = (cents) => (cents / 100).toFixed(2);
 
 const toLine = (row) => ({ id: row.id, description: row.description, amount: fromCents(toCents(row.amount)) });
 
+/** Línea de servicio: agrega el tipo de servicio (`{ id, name }`) o null. */
+const toServiceLine = (row) => ({
+  ...toLine(row),
+  serviceType: row.service_type_id == null ? null : { id: row.service_type_id, name: row.service_type_name },
+});
+
+const SERVICE_SELECT = `SELECT s.id, s.description, s.amount, s.service_type_id, t.name AS service_type_name
+    FROM order_services s LEFT JOIN service_types t ON t.id = s.service_type_id`;
+
 export async function listServices(orderId, connection) {
-  const rows = await query(
-    'SELECT id, description, amount FROM order_services WHERE order_id = ? ORDER BY id ASC',
-    [orderId],
-    connection,
-  );
-  return rows.map(toLine);
+  const rows = await query(`${SERVICE_SELECT} WHERE s.order_id = ? ORDER BY s.id ASC`, [orderId], connection);
+  return rows.map(toServiceLine);
 }
 
 export async function listLabor(orderId, connection) {
@@ -26,7 +31,10 @@ export async function listLabor(orderId, connection) {
   return rows.map(toLine);
 }
 
-/** Totales calculados al leer (no se almacenan): servicios, mano de obra y total. */
+/**
+ * Totales calculados al leer (no se almacenan): servicios, mano de obra, refacciones y total. Las refacciones suman
+ * cantidad por el precio guardado en cada línea (las líneas anteriores al Sprint 5 tienen precio 0 y no suman).
+ */
 export async function totals(orderId, connection) {
   const [services] = await query(
     'SELECT COALESCE(SUM(amount), 0) AS total FROM order_services WHERE order_id = ?',
@@ -38,12 +46,19 @@ export async function totals(orderId, connection) {
     [orderId],
     connection,
   );
+  const [parts] = await query(
+    'SELECT COALESCE(SUM(quantity * unit_price), 0) AS total FROM order_parts WHERE order_id = ?',
+    [orderId],
+    connection,
+  );
   const servicesCents = toCents(services.total);
   const laborCents = toCents(labor.total);
+  const partsCents = toCents(parts.total);
   return {
     services: fromCents(servicesCents),
     labor: fromCents(laborCents),
-    total: fromCents(servicesCents + laborCents),
+    parts: fromCents(partsCents),
+    total: fromCents(servicesCents + laborCents + partsCents),
   };
 }
 
@@ -85,6 +100,10 @@ function tableFor(kind) {
 
 /** Línea de la orden (siempre acotada por `order_id` para no tocar líneas de otra orden). */
 export async function findLine(kind, orderId, lineId, connection) {
+  if (kind === 'services') {
+    const found = await query(`${SERVICE_SELECT} WHERE s.id = ? AND s.order_id = ?`, [lineId, orderId], connection);
+    return found[0] ? toServiceLine(found[0]) : null;
+  }
   const rows = await query(
     `SELECT id, description, amount FROM ${tableFor(kind)} WHERE id = ? AND order_id = ?`,
     [lineId, orderId],
@@ -93,7 +112,15 @@ export async function findLine(kind, orderId, lineId, connection) {
   return rows[0] ? toLine(rows[0]) : null;
 }
 
-export async function insertLine(kind, orderId, { description, amount }, connection) {
+export async function insertLine(kind, orderId, { description, amount, serviceTypeId }, connection) {
+  if (kind === 'services') {
+    const inserted = await query(
+      'INSERT INTO order_services (order_id, description, amount, service_type_id) VALUES (?, ?, ?, ?)',
+      [orderId, description, amount, serviceTypeId ?? null],
+      connection,
+    );
+    return inserted.insertId;
+  }
   const result = await query(
     `INSERT INTO ${tableFor(kind)} (order_id, description, amount) VALUES (?, ?, ?)`,
     [orderId, description, amount],
@@ -112,6 +139,10 @@ export async function updateLine(kind, orderId, lineId, fields, connection) {
   if (fields.amount !== undefined) {
     assignments.push('amount = ?');
     params.push(fields.amount);
+  }
+  if (kind === 'services' && fields.serviceTypeId !== undefined) {
+    assignments.push('service_type_id = ?');
+    params.push(fields.serviceTypeId);
   }
   if (assignments.length === 0) return;
   await query(

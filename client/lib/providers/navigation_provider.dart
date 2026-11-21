@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../models/notice.dart';
 import '../models/user.dart';
 
 /// Secciones del menú lateral.
@@ -14,8 +15,13 @@ enum AppSection {
   payments('Pagos'),
   tickets('Tickets'),
   maintenance('Mantenimientos'),
+  clientNotices('Clientes por avisar'),
   inventory('Inventario'),
   users('Usuarios'),
+  settings('Configuración'),
+  terms('Términos'),
+  reports('Reportes'),
+  auditLog('Bitácora'),
   changePassword('Cambiar contraseña');
 
   const AppSection(this.title);
@@ -41,16 +47,58 @@ class NavigationProvider extends ChangeNotifier {
           AppSection.payments,
           AppSection.tickets,
           AppSection.maintenance,
+          AppSection.clientNotices,
         ],
         if (role == UserRole.mechanic) AppSection.myOrders,
         if (role == UserRole.admin) AppSection.inventory,
         if (role == UserRole.admin) AppSection.users,
+        if (role == UserRole.admin) AppSection.settings,
+        if (role == UserRole.admin) AppSection.reports,
+        if (role == UserRole.admin) AppSection.terms,
+        if (role == UserRole.admin) AppSection.auditLog,
       ];
+
+  /// Pantalla de detalle pendiente de abrir (viene de un aviso). La toma el AppShell y la abre.
+  NoticeTarget? _pendingTarget;
+
+  NoticeTarget? get pendingTarget => _pendingTarget;
 
   void goTo(AppSection section) {
     if (section == _current) return;
     _current = section;
     notifyListeners();
+  }
+
+  /// Sección del menú a la que pertenece el destino de un aviso (el mecánico ve sus órdenes en «Mis órdenes»).
+  static AppSection sectionForTarget(String kind, UserRole role) {
+    switch (kind) {
+      case 'order':
+        return role == UserRole.mechanic ? AppSection.myOrders : AppSection.orders;
+      case 'appointment':
+        return AppSection.appointments;
+      case 'vehicle':
+        return AppSection.vehicles;
+      default:
+        return AppSection.inventory;
+    }
+  }
+
+  /// Abre el módulo relacionado con un aviso: cambia a su sección y deja el detalle pendiente de abrir.
+  void openTarget(NoticeTarget target, UserRole role) {
+    _pendingTarget = target;
+    final section = sectionForTarget(target.kind, role);
+    if (section == _current) {
+      notifyListeners();
+    } else {
+      goTo(section);
+    }
+  }
+
+  /// Entrega el destino pendiente una sola vez.
+  NoticeTarget? takePendingTarget() {
+    final target = _pendingTarget;
+    _pendingTarget = null;
+    return target;
   }
 
   void reset() {

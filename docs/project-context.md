@@ -28,8 +28,9 @@ requisitos, reglas de negocio y plan de sprints antes de generar código.
     integraciones externas.
 6.  No almacenar datos sensibles de tarjetas o credenciales de Mercado
     Pago.
-7.  El chatbot de WhatsApp **no forma parte de la interfaz ni del MVP
-    actual**; se considera una integración externa futura.
+7.  El chatbot de WhatsApp **está fuera del alcance del proyecto**: no se
+    implementa, no se prepara en ningún sprint y no forma parte de la
+    interfaz.
 8.  Mantener una UX profesional, sencilla y orientada a personal de
     taller.
 9.  Si existe una decisión técnica no definida aquí, proponer opciones
@@ -137,7 +138,7 @@ En el MVP el cliente es principalmente un **beneficiario externo**, no
 necesariamente un usuario autenticado.
 
 Funciones relacionadas: - Recibir información y tickets de servicios
-realizados. - Recibir recordatorios de próximos mantenimientos.
+realizados. - Recibir recordatorios de próximos mantenimientos, que la recepción le comunica por teléfono o en persona a partir de la lista de clientes por avisar, y con la fecha del próximo servicio impresa en su ticket.
 
 ### Reglas de autenticación del MVP
 
@@ -289,6 +290,11 @@ Datos mínimos sugeridos: - Código o número de parte. - Nombre. -
 Categoría. - Marca. - Stock actual. - Stock mínimo. - Precio de
 compra. - Precio de venta.
 
+> **Sprint 5:** la refacción incluye categoría y marca (texto libre de hasta 60 caracteres),
+> precio de compra (opcional) y precio de venta. Una refacción sin precio de venta no se puede
+> agregar a una orden. Cada línea de la orden guarda el precio de venta vigente al agregarla.
+> El precio de compra solo lo ve el administrador y el mecánico no ve ningún precio.
+
 ### Regla de negocio
 
 Cuando una refacción sea utilizada en una orden, el sistema debe
@@ -311,6 +317,10 @@ Métodos contemplados: - Efectivo. - Tarjeta. - Transferencia. - Mercado
 Pago.
 
 Estados sugeridos: - Pendiente. - Pagado. - Rechazado. - Cancelado.
+
+> **Sprint 5:** el importe del pago es el total de la orden con refacciones (servicios, mano de obra
+> y refacciones), calculado al registrar el pago. Una orden con un pago Pagado no admite cambios
+> en sus refacciones.
 
 ------------------------------------------------------------------------
 
@@ -339,6 +349,10 @@ obra. - Subtotal. - Total. - Método de pago. - Estado del pago. - Fecha.
 Debe contemplarse visualización e impresión. La generación PDF puede
 implementarse conforme avance el MVP.
 
+> **Sprint 5:** el ticket nuevo (formato versión 2) detalla cada refacción con cantidad, precio e
+> importe, y trae subtotales de servicios, mano de obra y refacciones; su total es el importe del
+> pago. Los tickets anteriores se muestran tal como se emitieron.
+
 ------------------------------------------------------------------------
 
 ## 6.11 Dashboard
@@ -357,29 +371,56 @@ duplicar datos solo para estadísticas.
 
 ## 6.12 Notificaciones internas
 
-Debe contemplar avisos relacionados con: - Mantenimientos próximos. -
-Mantenimientos vencidos. - Citas. - Stock bajo. - Órdenes que requieran
-atención.
+Centro de notificaciones en el encabezado (campana con el total de avisos no leídos y un panel con los
+avisos agrupados por tipo) y lista de **clientes por avisar** para la recepción. Se construyó en el
+Sprint 6.
+
+Los avisos **no se guardan**: se calculan al consultar con los mismos cálculos del panel de control, de la
+lista de Mantenimientos y de las alertas de stock, para que los números coincidan entre pantallas. Lo único
+que se guarda es qué avisos leyó cada usuario y a qué clientes ya se avisó.
+
+**Tipos de aviso y quién los recibe:**
+
+| Tipo | Se genera cuando | ADMIN | RECEPTIONIST | MECHANIC |
+|------|------------------|:-----:|:------------:|:--------:|
+| Mantenimiento próximo | Mantenimiento pendiente con indicador Próximo | ✔ | ✔ | ✘ |
+| Mantenimiento vencido | Mantenimiento pendiente con indicador Vencido | ✔ | ✔ | ✘ |
+| Cita del día | Cita de hoy pendiente o confirmada | ✔ | ✔ | ✘ |
+| Stock bajo | Refacción activa en o bajo su mínimo | ✔ | ✘ | ✘ |
+| Stock agotado | Refacción activa con existencia en cero | ✔ | ✘ | ✘ |
+| Orden detenida | Orden abierta (Recibida, Diagnóstico, En reparación o Esperando refacción) con más de 3 días sin cambio de estado | ✔ | ✔ | ✔ (solo sus órdenes asignadas, sin datos del cliente) |
+
+- **Lectura por usuario**: cada aviso tiene una clave estable (`TIPO:id` o `TIPO:id:variante`). Marcarlo como
+  leído se guarda por usuario y persiste entre sesiones. Si el aviso empeora (de mantenimiento próximo a
+  vencido, de stock bajo a agotado) o si una orden vuelve a detenerse, la clave cambia y reaparece sin leer.
+  Si la condición deja de cumplirse, el aviso desaparece.
+- **Orden detenida**: se cuenta desde el último cambio de estado del historial (o la creación de la orden si no
+  tiene historial). El valor de 3 días es fijo; el Sprint 7 puede volverlo configurable.
+- **Actualización del contador**: al iniciar sesión, al cambiar de sección y cada 60 segundos mientras la
+  sesión esté abierta. No hay notificaciones en tiempo real por empuje ni del sistema operativo.
+- **Apertura**: cada aviso abre su pantalla (la orden, la cita, el vehículo o la refacción).
+- **Clientes por avisar** (solo ADMIN y RECEPTIONIST; el mecánico no accede): lista con el cliente, su teléfono,
+  el vehículo y el motivo: vehículo listo (orden Terminada sin entregar), cita de mañana, mantenimiento próximo
+  o mantenimiento vencido. La recepción avisa por teléfono o en persona y marca al cliente como **avisado**; el
+  sistema guarda quién avisó y cuándo, saca la fila de la lista y no vuelve a mostrarla por el mismo hecho. Un
+  hecho nuevo (otra orden u otra cita) vuelve a aparecer. No hay notas ni intentos.
+- **El sistema NO envía mensajes al cliente** por ningún canal (WhatsApp, correo o SMS): solo registra el aviso.
+- **API**: `GET /api/notifications`, `POST /api/notifications/read`, `GET /api/client-notices` y
+  `POST /api/client-notices`. Los permisos se validan en el servidor según el rol vigente en la base.
 
 ------------------------------------------------------------------------
 
 # 7. Funcionalidad fuera del MVP actual
 
-## Chatbot de WhatsApp
+## Chatbot de WhatsApp (fuera del alcance)
 
-Existe como propuesta una integración externa con WhatsApp para
-respuestas iniciales breves, por ejemplo:
+El chatbot de WhatsApp quedó fuera del alcance del proyecto. No se
+implementa, no se recibe ningún mensaje del cliente por ese medio y
+ningún sprint lo incluye ni lo prepara.
 
-> "Gracias por tu preferencia. Revisaremos tu solicitud y te
-> responderemos."
-
-Sin embargo:
-
--   No forma parte de la interfaz principal.
--   No debe bloquear el desarrollo del MVP.
--   No debe implementarse hasta que el núcleo del sistema esté
-    funcional.
--   Su integración futura deberá tratarse como un servicio externo.
+Tampoco hay mensajería automática al cliente (WhatsApp, correo o SMS): el
+cliente sigue siendo un beneficiario externo que no usa el sistema. Ver
+`docs/sprints/propuesta-sprints-post-mvp.md`.
 
 ------------------------------------------------------------------------
 
@@ -587,7 +628,7 @@ definitivos deben validarse durante cada sprint.
 > **Decisión del Sprint 3:** las entidades `Part`, `InventoryMovement` y `Maintenance`
 > usan los campos de la especificación del sprint, no los de la lista inicial de abajo:
 > - `Part` (`parts`): `code` único, `name`, `description`, `unit`, `stock`, `minimumStock`
->   (`min_stock`) y `active`. No incluye categoría, marca ni precios (se difieren a los sprints
+>   (`min_stock`) y `active`. En el Sprint 3 no incluía categoría, marca ni precios (el Sprint 5 los agrega; se habían diferido a los sprints
 >   de pagos y tickets). Las refacciones no se eliminan; se desactivan.
 > - `InventoryMovement` (`inventory_movements`): tabla de solo agregar; `quantity` lleva signo
 >   (entrada +, salida −, ajuste ±), con `reason`, `order_id` opcional y `created_by`. El stock
@@ -775,12 +816,35 @@ generatedAt
 > - `Ticket` (`tickets`): `order_id` único, `payment_id`, `content` (instantánea JSON del
 >   contenido tal como se generó), `generated_by` y `generated_at`. El folio (`TK-000012`) se
 >   deriva del identificador. No se generan archivos PDF: el ticket se visualiza e imprime.
-> - El total de cobro es **servicios más mano de obra**; las refacciones se listan con su
->   cantidad pero no suman importe (los precios de refacciones quedan fuera del MVP).
+> - En el Sprint 4 el total de cobro era **servicios más mano de obra** y las refacciones se listaban con
+>   su cantidad sin sumar importe. **Superado por el Sprint 5**: el total suma también las refacciones (ver abajo).
 > - Mercado Pago se usa en modo de pruebas con un enlace de cobro; el estado se confirma por
 >   consulta bajo demanda (sin avisos automáticos). El token vive solo en `MERCADOPAGO_ACCESS_TOKEN`.
 > - El panel de control es exclusivo del administrador y se calcula con datos reales, sin tablas
 >   de estadísticas.
+
+> **Decisión del Sprint 5:** precios de refacciones y cobro completo.
+> - `Part` (`parts`) agrega `category`, `brand` (texto libre de hasta 60 caracteres), `purchase_price`
+>   (opcional, mayor o igual a cero) y `sale_price` (mayor a cero; `NULL` = sin precio de venta). Las
+>   refacciones existentes quedan sin precio y no se pueden agregar a una orden hasta que el
+>   administrador capture el precio de venta.
+> - La línea de refacción de la orden (`order_parts`) agrega `unit_price`, la instantánea del precio de
+>   venta. Las líneas anteriores al sprint quedan en `0` y no suman al total; el precio de una línea no
+>   se edita (se quita y se vuelve a agregar).
+> - El total de la orden (calculado, no almacenado) es servicios más mano de obra más refacciones,
+>   con un tope de 9 999 999.99 para precios y total. Una orden con solo refacciones es cobrable.
+> - El ticket nuevo lleva `formatVersion: 2`; los anteriores no cambian. Un pago Pagado no se modifica
+>   y bloquea los cambios de refacciones de su orden.
+> - Un pago de Mercado Pago pendiente cuyo importe ya no coincide con el total se señala como
+>   desfasado y la recepción lo cancela con confirmación para generar uno nuevo.
+
+> **Decisión del Sprint 6:** notificaciones internas y clientes por avisar (ver la sección 6.12).
+> - `NotificationRead` (`notification_reads`): `user_id`, `notice_key` (clave del aviso, hasta 60
+>   caracteres) y `read_at`; llave primaria `(user_id, notice_key)`. Es el único estado que se guarda de los
+>   avisos, que se calculan al consultar.
+> - `ClientNotice` (`client_notices`): `client_id`, `reason` (ORDER_READY, APPT_TOMORROW, MAINT_UPCOMING,
+>   MAINT_OVERDUE), `fact_id` (orden, cita o mantenimiento según el motivo), `notified_by` y
+>   `notified_at`; clave única `(reason, fact_id)`. No guarda notas ni el canal.
 
 ------------------------------------------------------------------------
 
@@ -819,7 +883,10 @@ generatedAt
 
 # 14. Plan de desarrollo del MVP
 
-El MVP se construirá mediante cuatro sprints.
+El MVP se construirá mediante cuatro sprints. Los sprints posteriores al MVP se proponen en
+`docs/sprints/propuesta-sprints-post-mvp.md` y se rigen por la enmienda 1.1.0 de la constitución;
+el Sprint 5 (precios de refacciones y cobro completo) es el primero y el Sprint 6 (notificaciones
+internas y clientes por avisar) el segundo.
 
 ## 14.1 Base de datos del MVP (Sprints 1 a 4)
 
@@ -1079,7 +1146,7 @@ La interfaz de Motorix debe verse **profesional, sobria y con identidad propia**
 - **Tokens**: color, tipografía, espaciado (escala de 4 px: 4, 8, 12, 16, 24, 32) y radios (6 px botones/inputs; 8 px paneles, tarjetas, chips y diálogos; 12 px o completo en elementos tipo pill) se definen una sola vez en el tema. Las pantallas no llevan valores sueltos.
 - **Movimiento**: toda transición y cambio de estado DEBE ser suave (150 ms estados, 200 ms aparición de elementos y sidebar, 250 ms navegación), con `Curves.easeInOut` o `Curves.easeOutCubic`. Sin rebotes, zooms ni efectos vistosos, y respetando la preferencia de reducir movimiento.
 - **Layout**: sidebar colapsable (`NavigationRail` extendido, ~260 px expandido / ~72 px colapsado, estado guardado en un `Provider`), header con título, buscador, notificaciones, usuario y rol. Solo se muestran los módulos del sprint actual y del rol del usuario; los permisos se validan también en backend.
-- **Componentes**: dashboard con máximo 4 indicadores y una gráfica principal; tablas densas con filtros, chips de estado y acciones al final; tarjetas solo cuando agrupen contenido que lo necesite.
+- **Componentes**: panel de control con los 10 indicadores definidos en el Sprint 4 y una gráfica principal; tablas densas con filtros, chips de estado y acciones al final; tarjetas solo cuando agrupen contenido que lo necesite.
 - **Estados de la interfaz**: toda pantalla muestra estados vacío, cargando, error (en español, sin trazas internas) y éxito.
 - **Confirmaciones obligatorias**: cerrar sesión, cancelar citas, cancelar/anular/entregar órdenes, eliminar o desactivar registros, registrar pagos y salir de formularios con cambios sin guardar DEBEN pedir confirmación ("Confirmar" / "Cancelar").
 - **Qué evitar**: degradados morados o neón, glassmorphism, todo en tarjetas, emojis como íconos, gráficas decorativas, textos genéricos de marketing y cambios de estado bruscos.
@@ -1354,6 +1421,53 @@ Antes de asumirlas como definitivas, el equipo debe decidir:
   Node.js desde un adaptador aislado; el estado se confirma por consulta bajo demanda de la recepción.
 - **Panel de control**: solo ADMIN; indicadores a 30 días (vehículos atendidos) y 7 días (citas próximas).
 - **Reembolsos**: fuera del sistema; un pago Pagado no se modifica ni se cancela.
+
+### Decisiones resueltas durante el Sprint 5
+
+- **Refacción sin precio de venta**: se bloquea agregarla a una orden hasta que el administrador capture el precio (D-01).
+- **Orden con solo refacciones**: es cobrable si su total es mayor a cero (D-02).
+- **Líneas anteriores al sprint**: cuentan con precio 0 y no suman al total (D-03).
+- **Pago de Mercado Pago pendiente cuando cambia el total**: se señala como desfasado y la recepción lo cancela con confirmación para generar uno nuevo; no es automático (D-04).
+- **Corrección del precio de una línea**: no se edita; se quita y se vuelve a agregar con el precio vigente (D-05).
+- **Categoría y marca**: texto libre de hasta 60 caracteres, sin catálogo (D-06).
+- **Precio de venta menor al de compra**: se permite, con aviso y confirmación (D-07).
+- **Límites**: precio de refacción y total de la orden hasta 9 999 999.99; el redondeo no aplica porque la cantidad es entera (D-08).
+- **Tickets anteriores**: se muestran e imprimen como se emitieron; solo los nuevos llevan precio e importe (D-09).
+- **Visibilidad**: el mecánico no ve ningún precio; el precio de compra solo lo ve el administrador (D-10).
+
+### Decisiones resueltas durante el Sprint 6
+
+- **Orden detenida**: orden abierta con más de 3 días sin cambio de estado; no incluye las Terminadas, que se avisan por la lista de clientes por avisar (D-01).
+- **Aviso al cliente**: solo se registra quién avisó y cuándo, sin nota; el cliente sale de la lista aunque no haya contestado (D-02).
+- **Contador de la campana**: se actualiza al iniciar sesión, al navegar y cada 60 segundos (D-03).
+- **Cita del día**: solo la de hoy; las citas de mañana se avisan por la lista de clientes por avisar (D-04).
+- **Identidad de un aviso**: tipo y objeto; un cambio de estado del mismo objeto cuenta como un aviso nuevo (D-05).
+- **Mecánico**: no ve avisos de mantenimiento; solo los de las órdenes que tiene asignadas (D-06).
+
+### Decisión del Sprint 7: reportes, configuración, términos y seguridad
+
+Sprint 7 (Reportes, configuración del taller, términos y condiciones y seguridad de la información). Aclaraciones D-01 a D-12 de
+`specs/007-reportes-configuracion-seguridad/spec.md`:
+
+- **Exportación (D-01, revisada el 2026-11-21)**: Excel (.xlsx) con el diseño de Motorix (logo, colores del sistema de diseño, importes
+  numéricos con formato de moneda, filas alternadas, encabezado fijo y filtros) en lugar de CSV. Es la **única dependencia nueva**
+  del sprint: `exceljs` en el servidor. El cliente no agrega ninguna y guarda el archivo con `dart:io` en la carpeta de descargas.
+- **Términos (D-02)**: texto fijo versionado por el equipo (migración), sin editor en la aplicación; se acepta al ingresar y se valida
+  en `authenticate` (`403 TERMS_NOT_ACCEPTED`, salvo `GET /terms/current`, `POST /terms/accept` y `GET /auth/me`). Al publicar una
+  versión nueva todos deben aceptarla.
+- **Contraseñas e inactividad (D-03)**: mínimo 10 caracteres con mayúscula, minúscula y número (las ya guardadas siguen valiendo) y
+  cierre de sesión a los 30 minutos sin actividad (`401 SESSION_INACTIVE`), con aviso a los 28 minutos en el cliente.
+- **Configuración**: los datos del taller y los márgenes de «Próximo» se guardan en la tabla `settings` (valor guardado → `.env` →
+  predeterminado) y se editan en **Configuración**; el catálogo `service_types` (intervalos en días y kilómetros, sin borrado, solo
+  desactivación) propone el próximo mantenimiento (`GET /orders/:id/maintenance/suggestion`) y las líneas de servicio llevan un tipo opcional.
+- **Ticket versión 3**: trae el bloque «Próximo servicio» si la orden tiene un mantenimiento pendiente propio; los tickets anteriores no cambian.
+- **Reportes** (solo ADMIN): `/api/reports/{income,services,productivity,parts,rotation}` con `from` y `to` (máximo 366 días) y
+  `format=xlsx`; importes en centavos enteros; el costo usa el precio de compra actual y una refacción sin precio de compra es «Sin costo».
+- **Seguridad**: bitácora de solo inserción (`audit_log`, `GET /api/audit-log` solo ADMIN, sin contraseñas, hashes, tokens ni números de
+  tarjeta); pruebas transversales de no exposición de datos y de inyección.
+- **Tablas nuevas** (migración 007): `settings`, `service_types`, `terms_versions`, `terms_acceptances`, `audit_log`; columnas
+  `order_services.service_type_id` y `users.last_activity_at`. **Rutas nuevas**: `/settings`, `/service-types`, `/terms`, `/audit-log`, `/reports`.
+- **Menú del administrador**: se suman Reportes, Configuración, Términos y Bitácora.
 
 CLAUDE puede proponer opciones para estas decisiones, pero no debe
 introducir dependencias grandes sin justificar su necesidad.

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motorix y la IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #111111;
+    --paper: #fffdf5;
+    --yellow: #ffd93d;
+    --pink: #ff6b9d;
+    --blue: #4d96ff;
+    --green: #6bcb77;
+    --orange: #ff9f45;
+    --purple: #b983ff;
+    --border: 0.22em solid var(--ink);
+    --shadow: 0.35em 0.35em 0 var(--ink);
+    --shadow-sm: 0.2em 0.2em 0 var(--ink);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    /* Todo el tamaño de la presentación escala con la ventana (16:9). */
+    font-size: min(1.55vw, 2.75vh);
+    font-family: 'Space Grotesk', 'Arial Black', system-ui, sans-serif;
+    font-weight: 500;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image: radial-gradient(var(--ink) 0.07em, transparent 0.07em);
+    background-size: 1.6em 1.6em;
+    line-height: 1.3;
+  }
+
+  .mono { font-family: 'Space Mono', ui-monospace, 'Courier New', monospace; }
+
+  /* ---------- Diapositivas ---------- */
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 3.2em 4em 4.4em;
+    display: none;
+    flex-direction: column;
+    gap: 1em;
+  }
+  .slide.active { display: flex; animation: entra 220ms ease-out; }
+
+  @keyframes entra {
+    from { opacity: 0; transform: translateX(1.2em); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .chip {
+    align-self: flex-start;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 0.8em;
+    padding: 0.25em 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: 0.2em 0.2em 0 var(--pink);
+  }
+
+  h1 {
+    font-size: 3.6em;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: 2.3em;
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  h3 { font-size: 1.15em; text-transform: uppercase; }
+
+  .hl {
+    display: inline-block;
+    padding: 0 0.25em;
+    border: var(--border);
+    box-shadow: var(--shadow-sm);
+    transform: rotate(-1deg);
+  }
+  .bg-yellow { background: var(--yellow); }
+  .bg-pink   { background: var(--pink); }
+  .bg-blue   { background: var(--blue); }
+  .bg-green  { background: var(--green); }
+  .bg-orange { background: var(--orange); }
+  .bg-purple { background: var(--purple); }
+  .bg-paper  { background: #fff; }
+
+  .card {
+    border: var(--border);
+    box-shadow: var(--shadow);
+    padding: 0.9em 1em;
+  }
+  .card:not([class*="bg-"]) { background: #fff; }
+  .card h3 { margin-bottom: 0.35em; }
+  .card p, .card li { font-size: 0.85em; }
+  .card ul { padding-left: 1.1em; }
+  .card li + li { margin-top: 0.2em; }
+
+  .grid { display: grid; gap: 1.2em; flex: 1; min-height: 0; align-content: start; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g5 { grid-template-columns: repeat(5, 1fr); }
+
+  .big { font-size: 1.15em; }
+  .slim .num { width: 1.5em; height: 1.5em; }
+  .center { justify-content: center; }
+  .grow { flex: 1; min-height: 0; }
+
+  .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8em; height: 1.8em;
+    border: var(--border);
+    background: var(--yellow);
+    font-weight: 700;
+    margin-right: 0.5em;
+    flex: none;
+  }
+
+  /* ---------- Tabla ---------- */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: var(--border);
+    box-shadow: var(--shadow);
+    background: #fff;
+    font-size: 0.72em;
+  }
+  th, td { padding: 0.45em 0.7em; text-align: left; vertical-align: top; }
+  th {
+    background: var(--ink);
+    color: var(--paper);
+    text-transform: uppercase;
+    font-size: 0.95em;
+  }
+  td { border-top: 0.14em solid var(--ink); }
+  td:first-child { font-weight: 700; white-space: nowrap; background: var(--yellow); border-right: 0.14em solid var(--ink); }
+  td .no { background: var(--pink); padding: 0 0.4em; border: 0.12em solid var(--ink); font-weight: 700; }
+  td .si { background: var(--green); padding: 0 0.4em; border: 0.12em solid var(--ink); font-weight: 700; }
+
+  .stat {
+    border: var(--border);
+    box-shadow: var(--shadow);
+    padding: 0.7em 0.9em;
+    text-align: center;
+  }
+  .stat b { display: block; font-size: 2.1em; line-height: 1; }
+  .stat span { font-size: 0.75em; text-transform: uppercase; }
+
+  .quote {
+    border: var(--border);
+    border-left-width: 0.9em;
+    padding: 0.7em 1em;
+    background: #fff;
+    box-shadow: var(--shadow);
+    font-size: 0.95em;
+  }
+
+  .tag {
+    display: inline-block;
+    border: 0.14em solid var(--ink);
+    padding: 0.05em 0.5em;
+    margin: 0.15em 0.2em 0.15em 0;
+    background: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78em;
+    font-weight: 700;
+  }
+
+  .nota {
+    font-size: 0.7em;
+    border: 0.14em dashed var(--ink);
+    padding: 0.4em 0.8em;
+    background: #fff;
+  }
+
+  /* ---------- Controles ---------- */
+  #progreso {
+    position: fixed; top: 0; left: 0; height: 0.6em; width: 0;
+    background: var(--pink);
+    border-bottom: 0.14em solid var(--ink);
+    z-index: 10;
+    transition: width 200ms ease-out;
+  }
+  #controles {
+    position: fixed; right: 1.5em; bottom: 1.1em;
+    display: flex; gap: 0.6em; align-items: center; z-index: 10;
+  }
+  #controles button {
+    font: inherit; font-weight: 700; font-size: 0.85em;
+    border: var(--border); background: var(--yellow);
+    padding: 0.2em 0.8em; cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  #controles button:hover { transform: translate(-0.08em, -0.08em); box-shadow: 0.28em 0.28em 0 var(--ink); }
+  #controles button:active { transform: translate(0.15em, 0.15em); box-shadow: none; }
+  #controles button:focus-visible { outline: 0.2em solid var(--blue); outline-offset: 0.15em; }
+  #contador {
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.85em;
+    background: #fff; border: var(--border); padding: 0.2em 0.7em;
+  }
+  #pista {
+    position: fixed; left: 1.5em; bottom: 1.3em; z-index: 10;
+    font-family: 'Space Mono', monospace; font-size: 0.65em;
+    background: #fff; border: 0.14em solid var(--ink); padding: 0.2em 0.6em;
+  }
+
+  /* ---------- Impresión: una diapositiva por página ---------- */
+  @media print {
+    /* Página de 1600 x 900 px: misma proporción y mismo tamaño de letra que en pantalla. */
+    @page { size: 1600px 900px; margin: 0; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    html, body { overflow: visible; height: auto; width: 1600px; font-size: 24.75px; }
+    .slide { position: relative; inset: auto; display: flex !important; width: 1600px; height: 900px; page-break-after: always; break-after: page; animation: none; overflow: hidden; }
+    .slide:last-child { page-break-after: auto; break-after: auto; }
+    #controles, #progreso, #pista { display: none !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide.active { animation: none; }
+    #progreso, #controles button { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progreso" aria-hidden="true"></div>
+
+<main id="escenario">
+
+  <!-- 1. Portada -->
+  <section class="slide active center" aria-label="Portada">
+    <span class="chip">Proyecto Motorix · Presentación</span>
+    <h1>Motorix <br>y la <span class="hl bg-yellow">IA</span></h1>
+    <p class="big" style="max-width: 24em;">Cómo dirijo, reviso y hago crecer un proyecto hecho con agentes.</p>
+    <div style="display:flex; gap:1em; flex-wrap:wrap;">
+      <span class="card bg-pink" style="padding:0.4em 0.9em;"><b>Flutter</b></span>
+      <span class="card bg-blue" style="padding:0.4em 0.9em;"><b>Node + Express</b></span>
+      <span class="card bg-green" style="padding:0.4em 0.9em;"><b>MySQL</b></span>
+      <span class="card bg-orange" style="padding:0.4em 0.9em;"><b>Claude Code + Spec Kit</b></span>
+    </div>
+  </section>
+
+  <!-- 2. La idea del video -->
+  <section class="slide" aria-label="La idea del video">
+    <span class="chip">Punto de partida · El video</span>
+    <h2>El software <span class="hl bg-pink">no murió</span>, cambió</h2>
+    <div class="grid g3">
+      <div class="card bg-yellow">
+        <h3>1 · La IA ya hace lo básico</h3>
+        <p>Frontend, backend y base de datos son aplicaciones típicas. Un modelo frontera puede generarlas.</p>
+      </div>
+      <div class="card bg-blue">
+        <h3>2 · Falta criterio</h3>
+        <p>Si vas a ciegas, luego hay que reescribir. Alguien con experiencia debe dirigir y revisar el resultado.</p>
+      </div>
+      <div class="card bg-green">
+        <h3>3 · Alguien responde</h3>
+        <p>Si la IA borra datos, ¿quién lo pidió? La herramienta no se hace responsable; la persona sí.</p>
+      </div>
+    </div>
+    <p class="quote">El programador pasa de escribir cada línea a <b>administrar agentes</b>, como antes delegaba en personas.</p>
+  </section>
+
+  <!-- 3. Mi proyecto -->
+  <section class="slide" aria-label="Mi proyecto">
+    <span class="chip">Mi proyecto</span>
+    <h2>Motorix: <span class="hl bg-green">taller mecánico</span></h2>
+    <div class="grid g2" style="flex:0 0 auto;">
+      <div class="card">
+        <h3>Qué hace</h3>
+        <ul>
+          <li>Clientes, vehículos, citas y órdenes de servicio</li>
+          <li>Historial, mantenimiento e inventario</li>
+          <li>Pagos con Mercado Pago, tickets y panel de control</li>
+          <li>Sprint 5: precios de refacciones y cobro completo</li>
+        </ul>
+      </div>
+      <div class="card bg-yellow">
+        <h3>Cómo se construyó</h3>
+        <ul>
+          <li>Yo: alcance, reglas, sprints y aprobaciones</li>
+          <li>IA (Claude Code): código, pruebas y documentos</li>
+          <li>Spec Kit: especificar, planear, tareas, implementar</li>
+          <li>Constitución del proyecto con reglas que no se rompen</li>
+        </ul>
+      </div>
+    </div>
+    <div class="grid g3" style="flex:0 0 auto;">
+      <div class="stat bg-pink"><b>5</b><span>sprints</span></div>
+      <div class="stat bg-blue"><b>1215</b><span>pruebas backend (README)</span></div>
+      <div class="stat bg-orange"><b>321</b><span>pruebas cliente (README)</span></div>
+    </div>
+  </section>
+
+  <!-- 4. Inventario -->
+  <section class="slide" aria-label="Mi inventario">
+    <span class="chip">Tarea 1 · 25 pts</span>
+    <h2>Mi <span class="hl bg-yellow">inventario</span></h2>
+    <table>
+      <thead><tr><th>Área</th><th>Lo que sé</th><th>Decisión de Motorix donde me sirve para dirigir o revisar a la IA</th></tr></thead>
+      <tbody>
+        <tr><td>Bases de datos</td><td>SQL (<span class="mono">SELECT</span>, <span class="mono">JOIN</span>), normalización y llaves, índices y transacciones.</td><td>Reviso que las tablas tengan llaves foráneas y únicas (un pago vigente por orden), que las consultas con <span class="mono">JOIN</span> usen índices y que el cobro vaya dentro de una transacción.</td></tr>
+        <tr><td>Estructuras de datos</td><td>Arreglos y listas, pilas, colas y mapas (hash), árboles y grafos.</td><td>Sé que un índice funciona como un árbol: por eso sospecho de una búsqueda lenta y reviso las consultas que genera la IA.</td></tr>
+        <tr><td>Redes</td><td>HTTP y códigos de estado, API REST y JSON, TCP/IP, DNS y puertos, HTTPS, tokens y CORS.</td><td>Reviso que la API responda con el código correcto, que los permisos se validen en el servidor con el token y que CORS no quede abierto al publicar.</td></tr>
+        <tr><td>Programación e ingeniería de software</td><td>Programación orientada a objetos, Git y ramas, requisitos y metodologías ágiles.</td><td>Dirijo a la IA con requisitos por sprint (Spec Kit), una rama por funcionalidad y commits pequeños, y reviso que cada requisito esté trazado.</td></tr>
+      </tbody>
+    </table>
+    <div class="card bg-pink" style="padding:0.5em 0.9em;">
+      <p><b>Lo que aún me falta:</b> complejidad (Big O) y pruebas de software. Lo cubro pidiendo a la IA que justifique el costo de las consultas críticas y leyendo las pruebas del proyecto para exigir una por requisito.</p>
+    </div>
+  </section>
+
+  <!-- 5. Responsabilidad y riesgo -->
+  <section class="slide" aria-label="Responsabilidad y riesgo">
+    <span class="chip">Tarea 2 · 20 pts</span>
+    <h2>Responsabilidad <span class="hl bg-pink">y riesgo</span></h2>
+    <div class="grid g3">
+      <div class="card bg-yellow">
+        <h3>① Cobro duplicado o incorrecto</h3>
+        <p><b>Control:</b> índice único, bloqueo en transacción, el servidor calcula el total y rechaza otro importe. Pruebas de concurrencia.</p>
+        <p style="margin-top:.5em;"><b>Respuesta:</b> cancelo el pago (queda en el historial) y genero uno nuevo. Los pagos emitidos no se editan.</p>
+      </div>
+      <div class="card bg-blue">
+        <h3>② Precios que no deben verse</h3>
+        <p><b>Control:</b> filtro por rol en el backend y una prueba de fuga de precios en cada consulta.</p>
+        <p style="margin-top:.5em;"><b>Respuesta:</b> corrijo el endpoint y agrego la prueba que faltó.</p>
+      </div>
+      <div class="card bg-green">
+        <h3>③ Vulnerabilidades o secretos</h3>
+        <p><b>Control:</b> helmet, zod, bloqueo por intentos, <span class="mono">.env</span> ignorado en git.</p>
+        <p style="margin-top:.5em;"><b>Respuesta:</b> antes de publicar, cerrar CORS y agregar un límite de peticiones (hoy faltan).</p>
+      </div>
+    </div>
+    <p class="nota">Me falta: nadie ha revisado la lógica de pagos a mano y el sistema nunca ha manejado cobros reales.</p>
+  </section>
+
+  <!-- 6. Cómo revisar si es seguro -->
+  <section class="slide" aria-label="Revisar la seguridad">
+    <span class="chip">Tarea 2 · Investigar</span>
+    <h2>¿Cómo reviso <span class="hl bg-blue">si es seguro</span>?</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Herramientas por investigar</h3>
+        <p><span class="tag">npm audit</span> dependencias vulnerables del backend</p>
+        <p><span class="tag">gitleaks</span> secretos en el historial de git</p>
+        <p><span class="tag">OWASP ZAP</span> pruebas contra la API en ejecución</p>
+        <p><span class="tag">flutter analyze</span> análisis estático del cliente</p>
+        <p><span class="tag">/security-review</span> revisión con la IA</p>
+      </div>
+      <div class="card bg-yellow">
+        <h3>Lo que no se automatiza</h3>
+        <p>Una persona del equipo revisa a mano <b>pagos y permisos</b>: son las partes donde un error cuesta dinero o expone datos.</p>
+        <p style="margin-top:.6em;">Las pruebas las escribe la misma IA que escribe el código, así que pueden compartir los mismos puntos ciegos.</p>
+      </div>
+    </div>
+    <p class="nota">Estas herramientas todavía no se han usado en el proyecto; son el plan antes de publicar.</p>
+  </section>
+
+  <!-- 7. Crecer sin romperse -->
+  <section class="slide" aria-label="Crecer sin romperse">
+    <span class="chip">Tarea 3 · 20 pts</span>
+    <h2>Crecer <span class="hl bg-orange">sin romperse</span> · de 50 a 5,000 usuarios</h2>
+    <div class="grid slim" style="gap:0.5em;">
+      <div class="card bg-orange" style="display:flex; align-items:center; padding:0.35em 0.8em; font-size:0.88em;"><span class="num">1</span><div><b>SE ROMPE PRIMERO · Búsquedas con <span class="mono">LIKE '%texto%'</span></b> no usan los índices de nombre. → Reviso las consultas y uso búsqueda por prefijo o índice de texto completo. <span class="tag">Mi inventario: índices, árboles, SQL</span></div></div>
+      <div class="card" style="display:flex; align-items:center; padding:0.35em 0.8em; font-size:0.88em;"><span class="num">2</span><div><b>Paginación con <span class="mono">OFFSET</span></b> se vuelve lenta en páginas profundas. → Paginación por cursor en pagos, tickets y movimientos. <span class="tag">Inventario: SQL, índices</span></div></div>
+      <div class="card" style="display:flex; align-items:center; padding:0.35em 0.8em; font-size:0.88em;"><span class="num">3</span><div><b>Pool de 10 conexiones</b> y bloqueos del cobro: las peticiones esperarían. → Prueba de carga, ajustar el pool, transacciones cortas. <span class="tag">Inventario: transacciones, colas</span></div></div>
+      <div class="card" style="display:flex; align-items:center; padding:0.35em 0.8em; font-size:0.88em;"><span class="num">4</span><div><b>Mercado Pago por consulta manual:</b> sin avisos automáticos. → Webhook con verificación de firma. <span class="tag">Inventario: HTTP, REST, tokens</span></div></div>
+      <div class="card" style="display:flex; align-items:center; padding:0.35em 0.8em; font-size:0.88em;"><span class="num">5</span><div><b>Panel de control</b> con datos en vivo. → Medirlo antes de asumir que escala. <span class="tag">Inventario: SQL, JOIN</span></div></div>
+    </div>
+    <p class="nota">Lo que aún no sé: cuánto tardan hoy estas consultas con miles de registros. El primer paso es medir, no adivinar.</p>
+  </section>
+
+  <!-- 8. Recursos con criterio -->
+  <section class="slide" aria-label="Recursos con criterio">
+    <span class="chip">Tarea 4 · 15 pts</span>
+    <h2>Recursos <span class="hl bg-purple">con criterio</span></h2>
+    <div class="grid g3">
+      <div class="card bg-green">
+        <h3>Gratuita · DeepSeek</h3>
+        <ul>
+          <li>Pruebas simples</li>
+          <li><span class="mono">README</span> y comentarios</li>
+          <li>Textos de la interfaz</li>
+          <li>Datos de ejemplo (seeds)</li>
+        </ul>
+      </div>
+      <div class="card bg-pink">
+        <h3>Más capaz · Claude Code</h3>
+        <ul>
+          <li>Revisar el diseño completo</li>
+          <li>Concurrencia de pagos y stock</li>
+          <li>Modelo de datos y permisos</li>
+          <li>Revisión de seguridad</li>
+        </ul>
+      </div>
+      <div class="card bg-yellow">
+        <h3>Cuido mi cuota</h3>
+        <ul>
+          <li>Tareas pequeñas con el spec como contexto</li>
+          <li>Una tarea a la vez con <span class="mono">tasks.md</span></li>
+          <li>No pedir "revisa todo el proyecto"</li>
+          <li>Lo delicado, a Claude Code; lo simple, a DeepSeek</li>
+        </ul>
+      </div>
+    </div>
+    <p class="quote">Como dice el video: para trabajo real, un modelo frontera (Claude Code); para aprender o tareas simples, uno gratuito (DeepSeek).</p>
+  </section>
+
+  <!-- 9. Siguiente paso: MCP -->
+  <section class="slide" aria-label="Mi siguiente paso">
+    <span class="chip">Tarea 5 · 20 pts</span>
+    <h2>Mi siguiente paso: <span class="hl bg-blue">MCP</span></h2>
+    <div class="grid g2">
+      <div class="card bg-yellow">
+        <h3>Con mis palabras</h3>
+        <p>Un MCP es un servidor pequeño que le da a un agente una lista de consultas o acciones permitidas. En lugar de dejarlo entrar libre a mi base de datos o a mi API, yo decido qué puede pedir.</p>
+        <p style="margin-top:.6em;"><b>Es darle una ventanilla con tres servicios, no la llave de todo el taller.</b></p>
+      </div>
+      <div class="card">
+        <h3>Cómo lo aplico en Motorix</h3>
+        <p>Un servidor MCP <b>de solo lectura</b> para preguntarle al agente: «¿qué refacciones están bajas?» o «¿qué órdenes siguen abiertas?».</p>
+        <h3 style="margin-top:.7em;">Mi práctica</h3>
+        <ul>
+          <li>Crear 2 o 3 consultas de solo lectura</li>
+          <li>Conectarlo con una cuenta de rol limitado</li>
+          <li>Comprobar que no devuelve datos de más</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Permisos MCP -->
+  <section class="slide" aria-label="Permisos del MCP">
+    <span class="chip">Tarea 5 · Permisos</span>
+    <h2>Qué permisos le doy <span class="hl bg-pink">y por qué</span></h2>
+    <table>
+      <thead><tr><th>Permiso</th><th>Decisión</th><th>Motivo</th></tr></thead>
+      <tbody>
+        <tr><td>Leer alertas de stock y estado de órdenes</td><td><span class="si">SÍ</span></td><td>Es información operativa que la recepción ya consulta.</td></tr>
+        <tr><td>Ver el precio de compra</td><td><span class="no">NO</span></td><td>Regla del Sprint 5: solo la administración lo ve.</td></tr>
+        <tr><td>Crear, editar o cancelar pagos</td><td><span class="no">NO</span></td><td>Una acción sobre dinero necesita una persona.</td></tr>
+        <tr><td>Ver credenciales o el token de Mercado Pago</td><td><span class="no">NO</span></td><td>Los secretos nunca salen de <span class="mono">.env</span>.</td></tr>
+        <tr><td>Escribir en la base de datos</td><td><span class="no">NO</span></td><td>El agente solo lee; los cambios pasan por la API y sus validaciones.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 11. Punto 1 -->
+  <section class="slide" aria-label="Punto 1">
+    <span class="chip">Los tres puntos · 1</span>
+    <h2>Qué hago, qué hace <span class="hl bg-yellow">la IA</span> y cómo se implementó</h2>
+    <div class="grid g2">
+      <div class="card bg-blue">
+        <h3>Yo dirijo</h3>
+        <p>Defino el alcance, las reglas y los sprints, y apruebo las decisiones. Hago de gestor que delega en un agente, como describe el video.</p>
+      </div>
+      <div class="card bg-green">
+        <h3>La IA ejecuta</h3>
+        <p>Claude Code genera Flutter, Node/Express y MySQL: justo lo que el video dice que el vibe coding ya cubre.</p>
+      </div>
+    </div>
+    <p class="quote"><b>No es a ciegas:</b> Spec Kit ordena el trabajo, cada sprint tiene pruebas, decisiones registradas y documentos de calidad. Los procesos de siempre siguen vigentes, ahora con un agente.</p>
+  </section>
+
+  <!-- 12. Punto 2 -->
+  <section class="slide" aria-label="Punto 2">
+    <span class="chip">Los tres puntos · 2</span>
+    <h2>Qué <span class="hl bg-orange">todavía no</span> se ha hecho</h2>
+    <div class="grid g3" style="gap:0.9em;">
+      <div class="card bg-yellow"><h3>Revisión humana</h3><p>Una persona con criterio revisa a fondo el código de la IA.</p></div>
+      <div class="card bg-pink"><h3>Usuarios reales</h3><p>Solo se probó en local. Un proyecto nunca termina: llegan errores y cambios.</p></div>
+      <div class="card bg-blue"><h3>Despliegue y escala</h3><p>Sin hosting, sin nube y sin prueba de carga.</p></div>
+      <div class="card bg-green"><h3>Integraciones difíciles</h3><p>Mercado Pago solo en modo de pruebas.</p></div>
+      <div class="card bg-purple"><h3>Tecnología nueva</h3><p>MCP, protocolos entre agentes y bases vectoriales: no se usan aún.</p></div>
+      <div class="card bg-orange"><h3>Lo formal</h3><p>Sprints 6 al 10 y ratificar la constitución del proyecto.</p></div>
+    </div>
+  </section>
+
+  <!-- 13. Punto 3 -->
+  <section class="slide" aria-label="Punto 3">
+    <span class="chip">Los tres puntos · 3</span>
+    <h2>Qué <span class="hl bg-pink">me preocuparía</span></h2>
+    <div class="grid g3" style="gap:0.9em;">
+      <div class="card"><h3>Ir a ciegas</h3><p>Que pase las pruebas, pero nadie entienda el código para mantenerlo.</p></div>
+      <div class="card bg-yellow"><h3>La responsabilidad</h3><p>Si la IA falla en pagos o permisos, responde el equipo.</p></div>
+      <div class="card"><h3>Ser una app básica</h3><p>Su valor está en la organización y la calidad, no en la complejidad.</p></div>
+      <div class="card bg-yellow"><h3>Que crezca</h3><p>Consultas lentas, costos y migraciones: donde el vibe coding se queda corto.</p></div>
+      <div class="card"><h3>Depender de un modelo de paga</h3><p>El flujo de trabajo se complica sin ese acceso.</p></div>
+      <div class="card bg-yellow"><h3>El FOMO</h3><p>Aprender con calma lo que necesito, no todo lo nuevo.</p></div>
+    </div>
+  </section>
+
+  <!-- 14. Conclusión -->
+  <section class="slide" aria-label="Conclusión">
+    <span class="chip">Conclusión</span>
+    <h2>Qué <span class="hl bg-green">aprendí</span></h2>
+    <div class="grid g3">
+      <div class="card bg-yellow">
+        <h3>La IA escribe, yo respondo</h3>
+        <p>Lo valioso de Motorix no fue el código generado, sino el trabajo humano: alcance, reglas claras, pruebas y decidir qué automatizar.</p>
+      </div>
+      <div class="card bg-blue">
+        <h3>Mi base sí sirve</h3>
+        <p>Bases de datos, estructuras, redes y seguridad me permiten detectar un cobro duplicado, una búsqueda que no escala o un precio que se filtra.</p>
+      </div>
+      <div class="card bg-pink">
+        <h3>Terminar la app no es terminar el proyecto</h3>
+        <p>Faltan revisión humana, usuarios reales, despliegue y crecimiento. Mi siguiente paso: un MCP con permiso mínimo.</p>
+      </div>
+    </div>
+    <div class="card bg-green" style="flex:0 0 auto; padding:0.8em 1.1em;">
+      <h3>Conclusión general</h3>
+      <p style="font-size:0.95em;">La IA acelera el trabajo, pero no reemplaza el criterio: al construir Motorix aprendí que mi papel es <b>dirigir, revisar y responder</b>. Lo que me permite hacerlo es entender lo que está debajo (bases de datos, redes, estructuras y seguridad) y saber en qué me falta reforzarme. Usar la IA con método, con pruebas y con permisos mínimos, y no a ciegas, es lo que hace confiable el resultado.</p>
+    </div>
+  </section>
+
+  <!-- 15. Cierre -->
+  <section class="slide center" aria-label="Cierre">
+    <span class="chip">Fin</span>
+    <h1><span class="hl bg-yellow">Gracias</span></h1>
+    <p class="big">¿Preguntas?</p>
+    <p class="mono" style="font-size:.8em;">Motorix · Sistema de Gestión para Taller Mecánico</p>
+  </section>
+
+</main>
+
+<div id="pista" aria-hidden="true">← → para moverte · F pantalla completa</div>
+<nav id="controles" aria-label="Controles de la presentación">
+  <button id="anterior" type="button" aria-label="Diapositiva anterior">←</button>
+  <span id="contador" aria-live="polite">1 / 15</span>
+  <button id="siguiente" type="button" aria-label="Diapositiva siguiente">→</button>
+</nav>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var barra = document.getElementById('progreso');
+    var contador = document.getElementById('contador');
+    var actual = 0;
+
+    function mostrar(n) {
+      actual = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === actual); });
+      contador.textContent = (actual + 1) + ' / ' + slides.length;
+      barra.style.width = ((actual + 1) / slides.length * 100) + '%';
+      try { history.replaceState(null, '', '#' + (actual + 1)); } catch (e) {}
+    }
+
+    function desdeHash() {
+      var n = parseInt(location.hash.slice(1), 10);
+      return isNaN(n) ? 0 : n - 1;
+    }
+
+    document.getElementById('anterior').addEventListener('click', function () { mostrar(actual - 1); });
+    document.getElementById('siguiente').addEventListener('click', function () { mostrar(actual + 1); });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); mostrar(actual + 1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); mostrar(actual - 1); }
+      else if (e.key === 'Home') mostrar(0);
+      else if (e.key === 'End') mostrar(slides.length - 1);
+      else if (e.key === 'f' || e.key === 'F') {
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+      }
+    });
+
+    var inicioX = null;
+    document.addEventListener('touchstart', function (e) { inicioX = e.touches[0].clientX; }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+      if (inicioX === null) return;
+      var dx = e.changedTouches[0].clientX - inicioX;
+      if (Math.abs(dx) > 50) mostrar(actual + (dx < 0 ? 1 : -1));
+      inicioX = null;
+    });
+
+    window.addEventListener('hashchange', function () { mostrar(desdeHash()); });
+    mostrar(desdeHash());
+  })();
+</script>
+</body>
+</html>

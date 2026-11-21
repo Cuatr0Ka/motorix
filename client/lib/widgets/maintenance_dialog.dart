@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../models/maintenance.dart';
+import '../models/service_type.dart';
+import '../services/api_client.dart';
 import '../utils/tokens.dart';
 
 /// Diálogo para programar o editar un mantenimiento. Exige al menos fecha o kilometraje.
 class MaintenanceDialog extends StatefulWidget {
-  const MaintenanceDialog({super.key, this.existing});
+  const MaintenanceDialog({super.key, this.existing, this.onSuggest});
 
   final Maintenance? existing;
+
+  /// Si llega, el diálogo ofrece «Usar el intervalo del servicio» (rellena fecha y kilometraje; se pueden corregir).
+  final Future<MaintenanceSuggestion?> Function()? onSuggest;
 
   @override
   State<MaintenanceDialog> createState() => _MaintenanceDialogState();
@@ -19,6 +24,8 @@ class _MaintenanceDialogState extends State<MaintenanceDialog> {
   late final _date = TextEditingController(text: widget.existing?.dueDate == null ? '' : _iso(widget.existing!.dueDate!));
   late final _mileage = TextEditingController(text: widget.existing?.dueMileage?.toString() ?? '');
   String? _targetError;
+  String? _suggestionMessage;
+  bool _suggesting = false;
 
   static String _iso(DateTime value) =>
       '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
@@ -67,6 +74,33 @@ class _MaintenanceDialogState extends State<MaintenanceDialog> {
     return null;
   }
 
+  Future<void> _useSuggestion() async {
+    setState(() {
+      _suggesting = true;
+      _suggestionMessage = null;
+    });
+    String? message;
+    try {
+      final suggestion = await widget.onSuggest!();
+      if (suggestion == null) {
+        message = 'Ningún servicio de la orden tiene un intervalo.';
+      } else {
+        if (suggestion.dueDate != null) _date.text = _iso(suggestion.dueDate!);
+        if (suggestion.dueMileage != null) _mileage.text = '${suggestion.dueMileage}';
+        message = 'Propuesta basada en: ${suggestion.basedOn.join(', ')}. Puedes corregirla antes de guardar.';
+      }
+    } on ApiException catch (e) {
+      message = e.message;
+    } catch (_) {
+      message = 'No se pudo calcular la propuesta.';
+    }
+    if (!mounted) return;
+    setState(() {
+      _suggesting = false;
+      _suggestionMessage = message;
+    });
+  }
+
   void _save() {
     final valid = _formKey.currentState?.validate() ?? false;
     final hasDate = _date.text.trim().isNotEmpty;
@@ -106,6 +140,23 @@ class _MaintenanceDialogState extends State<MaintenanceDialog> {
                   return null;
                 },
               ),
+              if (widget.onSuggest != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: OutlinedButton.icon(
+                    key: const ValueKey('usar-intervalo'),
+                    onPressed: _suggesting ? null : _useSuggestion,
+                    icon: const Icon(Icons.auto_fix_high_outlined, size: 18),
+                    label: const Text('Usar el intervalo del servicio'),
+                  ),
+                ),
+                if (_suggestionMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.xs),
+                    child: Text(_suggestionMessage!, key: const ValueKey('usar-intervalo-mensaje'), style: Theme.of(context).textTheme.bodySmall),
+                  ),
+              ],
               const SizedBox(height: AppSpacing.lg),
               TextFormField(
                 key: const ValueKey('mantenimiento-fecha'),

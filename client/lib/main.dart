@@ -1,42 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'models/notice.dart';
 import 'providers/appointments_provider.dart';
+import 'providers/client_notices_provider.dart';
 import 'providers/clients_provider.dart';
 import 'providers/dashboard_provider.dart';
 import 'providers/maintenance_provider.dart';
 import 'providers/navigation_provider.dart';
+import 'providers/notifications_provider.dart';
 import 'providers/orders_provider.dart';
 import 'providers/parts_provider.dart';
 import 'providers/payments_provider.dart';
 import 'providers/session_provider.dart';
 import 'providers/sidebar_provider.dart';
+import 'providers/audit_provider.dart';
+import 'providers/reports_provider.dart';
+import 'providers/service_types_provider.dart';
+import 'providers/settings_provider.dart';
+import 'providers/terms_provider.dart';
 import 'providers/stock_alerts_provider.dart';
 import 'providers/tickets_provider.dart';
 import 'providers/users_provider.dart';
 import 'providers/vehicles_provider.dart';
+import 'screens/appointment_detail_screen.dart';
 import 'screens/appointments_list_screen.dart';
 import 'screens/change_password_screen.dart';
+import 'screens/client_notices_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/clients_list_screen.dart';
 import 'screens/inventory_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/maintenance_list_screen.dart';
+import 'screens/order_detail_screen.dart';
+import 'screens/part_detail_screen.dart';
 import 'screens/payments_list_screen.dart';
+import 'screens/audit_log_screen.dart';
+import 'screens/reports_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/terms_accept_screen.dart';
+import 'screens/terms_admin_screen.dart';
 import 'screens/tickets_list_screen.dart';
 import 'screens/orders_list_screen.dart';
 import 'screens/users_screen.dart';
+import 'screens/vehicle_detail_screen.dart';
 import 'screens/vehicles_list_screen.dart';
 import 'services/api_client.dart';
 import 'services/appointments_service.dart';
 import 'services/auth_service.dart';
+import 'services/client_notices_service.dart';
 import 'services/clients_service.dart';
 import 'services/dashboard_service.dart';
 import 'services/maintenance_service.dart';
+import 'services/notifications_service.dart';
 import 'services/orders_service.dart';
 import 'services/parts_service.dart';
 import 'services/payments_service.dart';
+import 'services/audit_service.dart';
+import 'services/reports_service.dart';
+import 'utils/file_saver.dart';
+import 'utils/file_saver_default.dart';
+import 'services/service_types_service.dart';
+import 'services/settings_service.dart';
+import 'services/terms_service.dart';
 import 'services/tickets_service.dart';
 import 'services/users_service.dart';
 import 'services/vehicles_service.dart';
@@ -45,6 +72,7 @@ import 'utils/link_opener.dart';
 import 'utils/ticket_printer.dart';
 import 'utils/tokens.dart';
 import 'widgets/app_shell.dart';
+import 'widgets/inactivity_guard.dart';
 
 void main() {
   runApp(MotorixApp(apiClient: ApiClient()));
@@ -58,6 +86,7 @@ class MotorixApp extends StatelessWidget {
     this.useGoogleFonts = true,
     this.linkOpener = const SystemLinkOpener(),
     this.ticketPrinter = const SystemTicketPrinter(),
+    this.fileSaver,
   });
 
   final ApiClient apiClient;
@@ -67,6 +96,9 @@ class MotorixApp extends StatelessWidget {
 
   /// Imprime tickets con el diálogo del sistema (se sustituye en las pruebas).
   final TicketPrinter ticketPrinter;
+
+  /// Guarda los archivos descargados, como los reportes de Excel (se sustituye en las pruebas).
+  final FileSaver? fileSaver;
   final bool useGoogleFonts;
 
   @override
@@ -76,7 +108,14 @@ class MotorixApp extends StatelessWidget {
       providers: [
         Provider<ApiClient>.value(value: apiClient),
         Provider<AuthService>.value(value: authService),
-        ChangeNotifierProvider(create: (_) => SessionProvider(apiClient, authService)),
+        Provider<FileSaver>.value(value: fileSaver ?? createDefaultFileSaver()),
+        Provider<ReportsService>(create: (_) => ReportsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => ReportsProvider(context.read<ReportsService>(), context.read<FileSaver>())),
+        Provider<AuditService>(create: (_) => AuditService(apiClient)),
+        ChangeNotifierProvider(create: (context) => AuditProvider(context.read<AuditService>())),
+        Provider<TermsService>(create: (_) => TermsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => SessionProvider(apiClient, authService, context.read<TermsService>())),
+        ChangeNotifierProvider(create: (context) => TermsProvider(context.read<TermsService>())),
         ChangeNotifierProvider(create: (_) => SidebarProvider()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         Provider<ClientsService>(create: (_) => ClientsService(apiClient)),
@@ -100,6 +139,14 @@ class MotorixApp extends StatelessWidget {
         Provider<PartsService>(create: (_) => PartsService(apiClient)),
         ChangeNotifierProvider(create: (context) => PartsProvider(context.read<PartsService>())),
         ChangeNotifierProvider(create: (context) => StockAlertsProvider(context.read<PartsService>())),
+        Provider<ClientNoticesService>(create: (_) => ClientNoticesService(apiClient)),
+        ChangeNotifierProvider(create: (context) => ClientNoticesProvider(context.read<ClientNoticesService>())),
+        Provider<ServiceTypesService>(create: (_) => ServiceTypesService(apiClient)),
+        ChangeNotifierProvider(create: (context) => ServiceTypesProvider(context.read<ServiceTypesService>())),
+        Provider<SettingsService>(create: (_) => SettingsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => SettingsProvider(context.read<SettingsService>())),
+        Provider<NotificationsService>(create: (_) => NotificationsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => NotificationsProvider(context.read<NotificationsService>())),
         Provider<UsersService>(create: (_) => UsersService(apiClient)),
         ChangeNotifierProvider(create: (context) => UsersProvider(context.read<UsersService>())),
       ],
@@ -120,19 +167,39 @@ class _AuthGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final signedIn = context.select<SessionProvider, bool>((s) => s.isSignedIn);
+    final termsPending = context.select<SessionProvider, bool>((s) => s.termsPending);
     // Respeta la preferencia del sistema de reducir el movimiento.
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     return AnimatedSwitcher(
       duration: reduceMotion ? Duration.zero : AppDurations.navigation,
       switchInCurve: AppCurves.enter,
       child: signedIn
-          ? const AppShell(key: ValueKey('app'), sectionBuilder: buildSection)
+          ? (termsPending
+              ? const TermsAcceptScreen(key: ValueKey('terms'))
+              : const InactivityGuard(
+                  key: ValueKey('app'),
+                  child: AppShell(sectionBuilder: buildSection, targetBuilder: buildNoticeTarget),
+                ))
           : const LoginScreen(key: ValueKey('login')),
     );
   }
 }
 
 /// Pantalla de cada sección del menú.
+/// Pantalla de detalle a la que lleva un aviso del centro de notificaciones.
+Widget buildNoticeTarget(BuildContext context, NoticeTarget target) {
+  switch (target.kind) {
+    case 'order':
+      return OrderDetailScreen(orderId: target.id);
+    case 'appointment':
+      return AppointmentDetailScreen(appointmentId: target.id);
+    case 'vehicle':
+      return VehicleDetailScreen(vehicleId: target.id);
+    default:
+      return PartDetailScreen(partId: target.id);
+  }
+}
+
 Widget buildSection(BuildContext context, AppSection section) {
   switch (section) {
     case AppSection.home:
@@ -155,10 +222,20 @@ Widget buildSection(BuildContext context, AppSection section) {
       return const TicketsListScreen();
     case AppSection.maintenance:
       return const MaintenanceListScreen();
+    case AppSection.clientNotices:
+      return const ClientNoticesScreen();
     case AppSection.inventory:
       return const InventoryScreen();
     case AppSection.users:
       return const UsersScreen();
+    case AppSection.settings:
+      return const SettingsScreen();
+    case AppSection.terms:
+      return const TermsAdminScreen();
+    case AppSection.auditLog:
+      return const AuditLogScreen();
+    case AppSection.reports:
+      return const ReportsScreen();
     case AppSection.changePassword:
       return const ChangePasswordScreen();
   }

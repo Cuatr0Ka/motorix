@@ -1,13 +1,25 @@
 import { withTransaction } from '../config/db.js';
 import * as orderModel from '../models/orderModel.js';
 import * as orderWorkModel from '../models/orderWorkModel.js';
+import * as serviceTypeModel from '../models/serviceTypeModel.js';
 import { AppError } from '../utils/AppError.js';
 import { assertServiceMileage } from './mileageRule.js';
 import { buildDetail, loadOrderForActor } from './orderService.js';
+import { presentTotals } from './orderTotals.js';
 
 const readOnly = () =>
   AppError.conflict('ORDER_READ_ONLY', 'La orden está entregada: es de solo lectura y no admite cambios.');
 const lineNotFound = () => AppError.notFound('La línea no existe en esta orden.');
+
+/** El tipo de servicio de una línea debe existir (404) y estar activo (422 SERVICE_TYPE_INACTIVE). */
+async function assertServiceType(serviceTypeId, connection) {
+  if (serviceTypeId == null) return;
+  const type = await serviceTypeModel.findById(serviceTypeId, connection);
+  if (!type) throw AppError.notFound('El tipo de servicio no existe.');
+  if (!type.active) {
+    throw AppError.unprocessable('SERVICE_TYPE_INACTIVE', 'El tipo de servicio está desactivado. Elige uno activo.');
+  }
+}
 
 /**
  * Carga la orden para quien actúa (el mecánico solo las suyas; una ajena responde 404) y rechaza las
@@ -37,10 +49,11 @@ export async function addLine(kind, orderId, data, actor) {
     await loadEditableOrder(orderId, actor, connection);
     const locked = await orderModel.lockById(orderId, connection);
     if (locked.status === 'ENTREGADO') throw readOnly();
+    await assertServiceType(data.serviceTypeId, connection);
     const lineId = await orderWorkModel.insertLine(kind, orderId, data, connection);
     return {
       item: await orderWorkModel.findLine(kind, orderId, lineId, connection),
-      totals: await orderWorkModel.totals(orderId, connection),
+      totals: presentTotals(await orderWorkModel.totals(orderId, connection), actor.role),
     };
   });
 }
@@ -52,10 +65,11 @@ export async function updateLine(kind, orderId, lineId, data, actor) {
     const locked = await orderModel.lockById(orderId, connection);
     if (locked.status === 'ENTREGADO') throw readOnly();
     if (!(await orderWorkModel.findLine(kind, orderId, lineId, connection))) throw lineNotFound();
+    await assertServiceType(data.serviceTypeId, connection);
     await orderWorkModel.updateLine(kind, orderId, lineId, data, connection);
     return {
       item: await orderWorkModel.findLine(kind, orderId, lineId, connection),
-      totals: await orderWorkModel.totals(orderId, connection),
+      totals: presentTotals(await orderWorkModel.totals(orderId, connection), actor.role),
     };
   });
 }
@@ -68,7 +82,7 @@ export async function removeLine(kind, orderId, lineId, actor) {
     if (locked.status === 'ENTREGADO') throw readOnly();
     if (!(await orderWorkModel.findLine(kind, orderId, lineId, connection))) throw lineNotFound();
     await orderWorkModel.deleteLine(kind, orderId, lineId, connection);
-    return { deleted: true, totals: await orderWorkModel.totals(orderId, connection) };
+    return { deleted: true, totals: presentTotals(await orderWorkModel.totals(orderId, connection), actor.role) };
   });
 }
 

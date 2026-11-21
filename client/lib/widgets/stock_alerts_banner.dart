@@ -54,8 +54,10 @@ class _StockAlertsBannerState extends State<StockAlertsBanner> {
           children: [
             const Icon(Icons.check_circle_outline, color: AppColors.success, size: 20),
             const SizedBox(width: AppSpacing.md),
-            Text('El inventario está en orden: no hay refacciones con stock bajo.',
-                key: const ValueKey('inventario-en-orden'), style: theme.textTheme.bodyMedium),
+            Expanded(
+              child: Text('El inventario está en orden: no hay refacciones con stock bajo.',
+                  key: const ValueKey('inventario-en-orden'), style: theme.textTheme.bodyMedium),
+            ),
           ],
         ),
       );

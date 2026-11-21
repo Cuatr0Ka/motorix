@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../models/order_work.dart';
+import '../utils/formatters.dart';
+import '../utils/status_labels.dart';
 import '../utils/tokens.dart';
 import 'confirm_dialog.dart';
 import 'panel_card.dart';
+import 'status_chip.dart';
 
 /// Acciones de la sección de refacciones de la orden. [onAdd] abre el selector; [onUpdate] y [onRemove]
 /// devuelven el mensaje de error del servidor (o null si salió bien).
@@ -18,11 +21,14 @@ class OrderPartsActions {
 /// Tarjeta «Refacciones utilizadas» del detalle de la orden. [actions] llega solo si el rol puede
 /// modificarlas (mecánico asignado y administración, con la orden no entregada); sin él, es de consulta.
 class OrderPartsSection extends StatelessWidget {
-  const OrderPartsSection({super.key, required this.parts, this.actions, this.busy = false});
+  const OrderPartsSection({super.key, required this.parts, this.actions, this.busy = false, this.locked = false});
 
   final List<OrderPart> parts;
   final OrderPartsActions? actions;
   final bool busy;
+
+  /// Verdadero si la orden ya tiene un pago Pagado: agregar, quitar y cambiar cantidades quedan deshabilitados.
+  final bool locked;
 
   Future<void> _edit(BuildContext context, OrderPart line) async {
     await showDialog<bool>(
@@ -44,23 +50,55 @@ class OrderPartsSection extends StatelessWidget {
     await actions!.onRemove(line);
   }
 
+  /// Suma de los importes de las líneas con precio, en centavos enteros (null si ninguna lo trae: mecánico).
+  String? _subtotal() {
+    final priced = parts.where((line) => line.amount != null).toList();
+    if (priced.isEmpty) return null;
+    final cents = priced.fold<int>(0, (sum, line) => sum + (double.parse(line.amount!) * 100).round());
+    return (cents / 100).toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final subtotal = _subtotal();
     return PanelCard(
       title: 'Refacciones utilizadas',
       trailing: actions == null
           ? null
           : TextButton.icon(
               key: const ValueKey('agregar-refaccion'),
-              onPressed: busy ? null : () => actions!.onAdd(),
+              onPressed: busy || locked ? null : () => actions!.onAdd(),
               icon: const Icon(Icons.add, size: 16),
               label: const Text('Agregar refacción'),
             ),
       child: parts.isEmpty
-          ? Text('Sin refacciones registradas.', style: theme.textTheme.bodyMedium)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Sin refacciones registradas.', style: theme.textTheme.bodyMedium),
+                if (locked)
+                  Text(
+                    'La orden ya está cobrada: no se pueden modificar las refacciones.',
+                    key: const ValueKey('refacciones-bloqueadas'),
+                    style: theme.textTheme.bodySmall?.copyWith(color: AppColors.warning),
+                  ),
+              ],
+            )
           : Column(
               children: [
+                if (locked)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'La orden ya está cobrada: no se pueden modificar las refacciones.',
+                        key: const ValueKey('refacciones-bloqueadas'),
+                        style: theme.textTheme.bodySmall?.copyWith(color: AppColors.warning),
+                      ),
+                    ),
+                  ),
                 for (final line in parts)
                   Padding(
                     key: ValueKey('refaccion-orden-${line.id}'),
@@ -69,25 +107,55 @@ class OrderPartsSection extends StatelessWidget {
                       children: [
                         Expanded(child: Text('${line.code} · ${line.name}', overflow: TextOverflow.ellipsis)),
                         Text('${line.quantity} ${line.unit}', key: ValueKey('cantidad-orden-${line.id}')),
+                        if (line.hasPrice) ...[
+                          const SizedBox(width: AppSpacing.lg),
+                          if (line.legacy)
+                            const StatusChip(label: 'Anterior a los precios', tone: StatusTone.neutral)
+                          else
+                            Text('× ${formatMoney(line.unitPrice!)}', key: ValueKey('precio-orden-${line.id}')),
+                          const SizedBox(width: AppSpacing.lg),
+                          SizedBox(
+                            width: 96,
+                            child: Text(
+                              formatMoney(line.amount ?? '0.00'),
+                              key: ValueKey('importe-orden-${line.id}'),
+                              textAlign: TextAlign.right,
+                              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
                         if (actions != null) ...[
                           IconButton(
                             key: ValueKey('editar-refaccion-orden-${line.id}'),
                             tooltip: 'Corregir cantidad',
                             visualDensity: VisualDensity.compact,
-                            onPressed: busy ? null : () => _edit(context, line),
+                            onPressed: busy || locked ? null : () => _edit(context, line),
                             icon: const Icon(Icons.edit_outlined, size: 18),
                           ),
                           IconButton(
                             key: ValueKey('quitar-refaccion-orden-${line.id}'),
                             tooltip: 'Quitar',
                             visualDensity: VisualDensity.compact,
-                            onPressed: busy ? null : () => _remove(context, line),
+                            onPressed: busy || locked ? null : () => _remove(context, line),
                             icon: const Icon(Icons.delete_outline, size: 18),
                           ),
                         ],
                       ],
                     ),
                   ),
+                if (subtotal != null) ...[
+                  const Divider(),
+                  Row(
+                    children: [
+                      Expanded(child: Text('Subtotal de refacciones', style: theme.textTheme.bodyMedium)),
+                      Text(
+                        formatMoney(subtotal),
+                        key: const ValueKey('subtotal-refacciones'),
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
     );

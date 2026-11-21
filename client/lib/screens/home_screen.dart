@@ -25,6 +25,7 @@ class HomeScreen extends StatelessWidget {
     AppSection.orders: 'Crear y dar seguimiento a las órdenes de servicio',
     AppSection.myOrders: 'Consultar y trabajar las órdenes que tienes asignadas',
     AppSection.payments: 'Cobros de las órdenes y estado de Mercado Pago',
+    AppSection.clientNotices: 'Clientes a quienes hay que avisar por teléfono o en persona',
     AppSection.inventory: 'Existencias de refacciones y alertas de stock bajo',
   };
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import '../models/report.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -82,6 +83,12 @@ class ApiClient {
   /// Se invoca cuando el servidor rechaza el token (sesión vencida o cuenta desactivada).
   void Function()? onSessionExpired;
 
+  /// Se invoca cuando el servidor responde 403 TERMS_NOT_ACCEPTED (hay una versión nueva de los términos por aceptar).
+  void Function()? onTermsRequired;
+
+  /// Se invoca cuando el servidor responde 401 SESSION_INACTIVE (más de 30 minutos sin actividad).
+  void Function()? onSessionInactive;
+
   Uri _uri(String path, [Map<String, dynamic>? query]) {
     final params = <String, String>{};
     query?.forEach((key, value) {
@@ -98,6 +105,41 @@ class ApiClient {
 
   Future<ApiResponse> get(String path, {Map<String, dynamic>? query}) =>
       _send(() => _http.get(_uri(path, query), headers: _headers));
+
+  /// Descarga un archivo (por ejemplo, un libro de Excel). El nombre sale del encabezado `Content-Disposition`; un error del
+  /// servidor llega como [ApiException] igual que en el resto de las consultas.
+  Future<DownloadedFile> download(String path, {Map<String, dynamic>? query}) async {
+    final http.Response response;
+    try {
+      response = await _http
+          .get(_uri(path, query), headers: {'Accept': '*/*', if (token != null) 'Authorization': 'Bearer $token'})
+          .timeout(const Duration(seconds: 60));
+    } on TimeoutException {
+      throw const ApiException(status: 0, code: 'TIMEOUT', message: 'El servidor tardó demasiado en responder. Inténtalo de nuevo.');
+    } catch (_) {
+      throw const ApiException(status: 0, code: 'NETWORK_ERROR', message: 'No se pudo conectar con el servidor. Revisa tu conexión.');
+    }
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final disposition = response.headers['content-disposition'] ?? '';
+      final name = RegExp(r'filename="?([^";]+)"?').firstMatch(disposition)?.group(1);
+      return DownloadedFile(filename: name ?? 'reporte.xlsx', bytes: response.bodyBytes);
+    }
+    Object? error;
+    try {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      if (decoded is Map<String, dynamic>) error = decoded['error'];
+    } catch (_) {
+      error = null;
+    }
+    if (response.statusCode == 401 && error is Map && error['code'] == 'SESSION_INACTIVE' && token != null) onSessionInactive?.call();
+    if (response.statusCode == 401 && error is Map && error['code'] == 'UNAUTHENTICATED' && token != null) onSessionExpired?.call();
+    throw ApiException(
+      status: response.statusCode,
+      code: error is Map ? '${error['code'] ?? 'ERROR'}' : 'ERROR',
+      message: error is Map && error['message'] != null ? '${error['message']}' : 'Ocurrió un error inesperado. Inténtalo de nuevo.',
+      details: error is Map ? error['details'] : null,
+    );
+  }
 
   Future<ApiResponse> post(String path, {Object? body}) =>
       _send(() => _http.post(_uri(path), headers: _headers, body: jsonEncode(body ?? {})));
@@ -128,6 +170,9 @@ class ApiClient {
       );
     }
 
+    // 204 Sin contenido (por ejemplo, «no hay propuesta»): respuesta correcta sin datos.
+    if (response.statusCode == 204) return const ApiResponse(null, null);
+
     Map<String, dynamic>? body;
     try {
       final decoded = jsonDecode(utf8.decode(response.bodyBytes));
@@ -150,6 +195,13 @@ class ApiClient {
     // Un 401 con token activo significa sesión vencida o cuenta desactivada.
     if (response.statusCode == 401 && code == 'UNAUTHENTICATED' && token != null) {
       onSessionExpired?.call();
+    }
+
+    if (response.statusCode == 401 && code == 'SESSION_INACTIVE' && token != null) {
+      onSessionInactive?.call();
+    }
+    if (response.statusCode == 403 && code == 'TERMS_NOT_ACCEPTED' && token != null) {
+      onTermsRequired?.call();
     }
 
     throw ApiException(

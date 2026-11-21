@@ -20,6 +20,7 @@ const objetoTicket = {
 };
 
 const contenido = {
+  formatVersion: 2,
   shop: { name: expect.any(String), address: expect.any(String), phone: expect.any(String) },
   customer: { name: expect.any(String), phone: expect.anything() },
   vehicle: { plate: expect.any(String), brand: expect.any(String), model: expect.any(String), year: expect.any(Number), mileage: expect.any(Number) },
@@ -27,7 +28,12 @@ const contenido = {
   services: expect.any(Array),
   parts: expect.any(Array),
   labor: expect.any(Array),
-  totals: { services: expect.stringMatching(/^\d+\.\d{2}$/), labor: expect.stringMatching(/^\d+\.\d{2}$/), total: expect.stringMatching(/^\d+\.\d{2}$/) },
+  totals: {
+    services: expect.stringMatching(/^\d+\.\d{2}$/),
+    labor: expect.stringMatching(/^\d+\.\d{2}$/),
+    parts: expect.stringMatching(/^\d+\.\d{2}$/),
+    total: expect.stringMatching(/^\d+\.\d{2}$/),
+  },
   payment: { method: expect.any(String), status: 'PAGADO', paidAt: expect.any(String), reference: null },
   generatedAt: expect.any(String),
 };

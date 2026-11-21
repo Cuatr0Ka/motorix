@@ -66,6 +66,19 @@ export async function findLatestByOrder(orderId, connection) {
   };
 }
 
+/** Mantenimiento pendiente programado desde una orden (el «propio» de esa orden), si lo hay. */
+export async function findPendingByOrder(orderId, connection) {
+  const rows = await query(
+    `SELECT id, description, due_date, due_mileage FROM maintenance
+      WHERE order_id = ? AND status = 'PENDIENTE' ORDER BY id DESC LIMIT 1`,
+    [orderId],
+    connection,
+  );
+  return rows[0]
+    ? { id: rows[0].id, description: rows[0].description, dueDate: rows[0].due_date, dueMileage: rows[0].due_mileage }
+    : null;
+}
+
 /** Mantenimiento pendiente (vigente) del vehículo, si lo hay. */
 export async function findPendingByVehicle(vehicleId, connection) {
   const rows = await query(

@@ -104,3 +104,50 @@ describe('ninguna respuesta de la API expone hashes ni contraseñas', () => {
     expect(fila.password_hash).not.toContain('Clave2026x');
   });
 });
+
+describe('contraseña de 10 caracteres (US10, FR-013)', () => {
+  it('test_el_alta_de_usuario_rechaza_una_contrasena_de_9_caracteres', async () => {
+    const admin = await createUserWithToken('ADMIN');
+
+    const res = await request(app)
+      .post('/api/users')
+      .set(auth(admin.token))
+      .send({ username: 'nuevo.usuario', name: 'Nuevo Usuario', email: 'nuevo@prueba.local', role: 'MECHANIC', password: 'Abcdefg12' });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.code).toBe('PASSWORD_POLICY');
+    expect(res.body.error.message).toContain('10 caracteres');
+  });
+
+  it('test_el_alta_de_usuario_acepta_una_contrasena_de_10_caracteres', async () => {
+    const admin = await createUserWithToken('ADMIN');
+
+    const res = await request(app)
+      .post('/api/users')
+      .set(auth(admin.token))
+      .send({ username: 'nuevo.usuario', name: 'Nuevo Usuario', email: 'nuevo@prueba.local', role: 'MECHANIC', password: 'Abcdefgh12' });
+
+    expect(res.status).toBe(201);
+  });
+
+  it('test_el_cambio_propio_rechaza_9_caracteres_con_password_policy', async () => {
+    const usuario = await createUserWithToken('RECEPTIONIST');
+
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set(auth(usuario.token))
+      .send({ currentPassword: usuario.password, newPassword: 'Abcdefg12' });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error.code).toBe('PASSWORD_POLICY');
+  });
+
+  it('test_las_contrasenas_ya_guardadas_de_8_o_9_caracteres_siguen_valiendo_para_iniciar_sesion', async () => {
+    const hash = await bcrypt.hash('Abcdefg1', 4);
+    await query("INSERT INTO users (username, name, email, password_hash, role, active) VALUES ('antiguo', 'Antiguo', 'antiguo@prueba.local', ?, 'RECEPTIONIST', 1)", [hash]);
+
+    const res = await request(app).post('/api/auth/login').send({ identifier: 'antiguo', password: 'Abcdefg1' });
+
+    expect(res.status).toBe(200);
+  });
+});

@@ -6,7 +6,9 @@ import '../utils/status_labels.dart';
 import '../utils/tokens.dart';
 
 /// Vista de un ticket con formato de comprobante: datos del taller, cliente, vehículo, conceptos, totales y pago.
-/// Muestra solo la instantánea guardada; las refacciones aparecen con su cantidad y sin importe.
+/// Muestra solo la instantánea guardada, con el diseño de su formato: en la versión 2 (Sprint 5) cada refacción lleva
+/// cantidad, precio unitario e importe y hay tres subtotales; los tickets anteriores (versión 1) se muestran exactamente
+/// como se emitieron, con las refacciones solo con su cantidad.
 class TicketView extends StatelessWidget {
   const TicketView({super.key, required this.ticket});
 
@@ -73,13 +75,26 @@ class TicketView extends StatelessWidget {
           if (content.services.isNotEmpty)
             section('Servicios realizados', [for (final line in content.services) row(line.description, formatMoney(line.amount))]),
           if (content.parts.isNotEmpty)
-            section('Refacciones utilizadas', [for (final part in content.parts) row('${part.name} (${part.code})', '${part.quantity} ${part.unit}')]),
+            section('Refacciones utilizadas', [
+              for (final part in content.parts)
+                if (content.isV2 && part.amount != null) ...[
+                  row('${part.name} (${part.code})', formatMoney(part.amount!), key: ValueKey('ticket-importe-${part.code}')),
+                  Text(
+                    '${part.quantity} ${part.unit} × ${formatMoney(part.unitPrice ?? '0.00')}',
+                    key: ValueKey('ticket-detalle-${part.code}'),
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ] else
+                  row('${part.name} (${part.code})', '${part.quantity} ${part.unit}'),
+            ]),
           if (content.labor.isNotEmpty)
             section('Mano de obra', [for (final line in content.labor) row(line.description, formatMoney(line.amount))]),
           const SizedBox(height: AppSpacing.md),
           const Divider(height: AppSpacing.md),
           row('Subtotal de servicios', formatMoney(content.servicesTotal)),
           row('Subtotal de mano de obra', formatMoney(content.laborTotal)),
+          if (content.isV2 && content.partsTotal != null)
+            row('Subtotal de refacciones', formatMoney(content.partsTotal!), key: const ValueKey('ticket-subtotal-refacciones')),
           row('Total', formatMoney(content.total), style: theme.textTheme.titleMedium, key: const ValueKey('ticket-total')),
           section('Pago', [
             row('Método de pago', PaymentMethod.fromApi(content.paymentMethod).label),
@@ -87,6 +102,15 @@ class TicketView extends StatelessWidget {
             if (content.paidAt != null) row('Fecha de pago', formatDateTime(content.paidAt!)),
             if (content.paymentReference != null && content.paymentReference!.isNotEmpty) row('Referencia', content.paymentReference!),
           ]),
+          if (content.isV3 && content.nextService != null)
+            KeyedSubtree(
+              key: const ValueKey('ticket-proximo-servicio'),
+              child: section('Próximo servicio', [
+                Text(content.nextService!.description, style: theme.textTheme.bodyMedium),
+                if (content.nextService!.dueDate != null) row('Fecha', formatDate(content.nextService!.dueDate!)),
+                if (content.nextService!.dueMileage != null) row('Kilometraje', formatMileage(content.nextService!.dueMileage!)),
+              ]),
+            ),
         ],
       ),
     );

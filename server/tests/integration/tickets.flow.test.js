@@ -73,7 +73,8 @@ describe('generar el ticket (US3, CA-4)', () => {
     });
     expect(ticket.content.payment.paidAt).toEqual(expect.any(String));
     expect(ticket.content.generatedAt).toEqual(expect.any(String));
-    expect(ticket.content.parts[0]).not.toHaveProperty('amount');
+    // La línea se creó directo en la base sin precio (anterior al Sprint 5): aparece en cero y no suma.
+    expect(ticket.content.parts[0]).toMatchObject({ unitPrice: '0.00', amount: '0.00' });
   });
 
   it('test_usa_los_datos_del_taller_configurados_por_entorno', async () => {

@@ -68,6 +68,86 @@ class TicketRef {
   final String folio;
 }
 
+/// Línea de servicio o de mano de obra del desglose del cobro.
+class BillingLine {
+  const BillingLine({required this.id, required this.description, required this.amount});
+
+  factory BillingLine.fromJson(Map<String, dynamic> json) =>
+      BillingLine(id: (json['id'] as num).toInt(), description: '${json['description']}', amount: '${json['amount']}');
+
+  final int id;
+  final String description;
+  final String amount;
+}
+
+/// Refacción del desglose del cobro: cantidad, precio guardado al agregarla e importe. [legacy] marca las líneas
+/// anteriores a los precios (precio 0), que no suman al total.
+class BillingPart {
+  const BillingPart({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.unit,
+    required this.quantity,
+    required this.unitPrice,
+    required this.amount,
+    required this.legacy,
+  });
+
+  factory BillingPart.fromJson(Map<String, dynamic> json) => BillingPart(
+        id: (json['id'] as num).toInt(),
+        code: '${json['code']}',
+        name: '${json['name']}',
+        unit: '${json['unit']}',
+        quantity: (json['quantity'] as num).toInt(),
+        unitPrice: '${json['unitPrice']}',
+        amount: '${json['amount']}',
+        legacy: json['legacy'] as bool? ?? false,
+      );
+
+  final int id;
+  final String code;
+  final String name;
+  final String unit;
+  final int quantity;
+  final String unitPrice;
+  final String amount;
+  final bool legacy;
+}
+
+/// Desglose del total que la recepción revisa antes de cobrar: servicios, mano de obra y refacciones con sus subtotales.
+class BillingBreakdown {
+  const BillingBreakdown({
+    required this.services,
+    required this.labor,
+    required this.parts,
+    required this.servicesSubtotal,
+    required this.laborSubtotal,
+    required this.partsSubtotal,
+  });
+
+  factory BillingBreakdown.fromJson(Map<String, dynamic> json) {
+    List<T> items<T>(String key, T Function(Map<String, dynamic>) build) =>
+        ((json[key] as List?) ?? const []).map((e) => build(Map<String, dynamic>.from(e as Map))).toList();
+    final subtotals = Map<String, dynamic>.from((json['subtotals'] as Map?) ?? const {});
+    return BillingBreakdown(
+      services: items('services', BillingLine.fromJson),
+      labor: items('labor', BillingLine.fromJson),
+      parts: items('parts', BillingPart.fromJson),
+      servicesSubtotal: '${subtotals['services'] ?? '0.00'}',
+      laborSubtotal: '${subtotals['labor'] ?? '0.00'}',
+      partsSubtotal: '${subtotals['parts'] ?? '0.00'}',
+    );
+  }
+
+  final List<BillingLine> services;
+  final List<BillingLine> labor;
+  final List<BillingPart> parts;
+  final String servicesSubtotal;
+  final String laborSubtotal;
+  final String partsSubtotal;
+}
+
 /// Bloque de cobro del detalle de una orden (solo lo reciben administración y recepción).
 class Billing {
   const Billing({
@@ -77,6 +157,8 @@ class Billing {
     required this.amountOutdated,
     required this.canCharge,
     required this.payments,
+    this.amountDifference = '0.00',
+    this.breakdown,
     this.ticket,
   });
 
@@ -86,6 +168,8 @@ class Billing {
         collectionStatus: CollectionStatus.fromApi(json['collectionStatus'] as String?),
         amountOutdated: json['amountOutdated'] as bool? ?? false,
         canCharge: json['canCharge'] as bool? ?? false,
+        amountDifference: '${json['amountDifference'] ?? '0.00'}',
+        breakdown: json['breakdown'] == null ? null : BillingBreakdown.fromJson(Map<String, dynamic>.from(json['breakdown'] as Map)),
         payments: (json['payments'] as List? ?? const []).map((e) => Payment.fromJson(Map<String, dynamic>.from(e as Map))).toList(),
         ticket: json['ticket'] == null ? null : TicketRef.fromJson(Map<String, dynamic>.from(json['ticket'] as Map)),
       );
@@ -98,7 +182,16 @@ class Billing {
   final List<Payment> payments;
   final TicketRef? ticket;
 
+  /// Total vigente menos el pago Pagado cuando difieren (por ejemplo, tras una aprobación tardía de Mercado Pago).
+  /// Positiva si falta por cobrar; no se cobra sola.
+  final String amountDifference;
+
+  /// Desglose del total (servicios, mano de obra y refacciones).
+  final BillingBreakdown? breakdown;
+
   bool get isPaid => collectionStatus == CollectionStatus.paid;
+
+  bool get hasDifference => (double.tryParse(amountDifference) ?? 0) != 0;
 }
 
 /// Método de pago y si está disponible (Mercado Pago necesita sus credenciales de pruebas).

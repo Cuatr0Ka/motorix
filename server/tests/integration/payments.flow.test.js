@@ -125,7 +125,7 @@ describe('registrar el pago de una orden (US1, CA-1, CA-2)', () => {
 
     expect(segundo.status).toBe(409);
     expect(segundo.body.error.code).toBe('PAYMENT_ALREADY_EXISTS');
-    expect(segundo.body.error.details).toEqual({ paymentId: primero.body.data.id, status: 'PAGADO' });
+    expect(segundo.body.error.details).toEqual({ paymentId: primero.body.data.id, status: 'PAGADO', outdated: false });
     expect(await pagosEnBase()).toHaveLength(1);
   });
 
@@ -206,7 +206,14 @@ describe('bloque de cobro en el detalle de la orden (FR-001)', () => {
       paidAmount: '0.00',
       collectionStatus: 'SIN_COBRAR',
       amountOutdated: false,
+      amountDifference: '0.00',
       canCharge: true,
+      breakdown: {
+        services: [{ id: expect.any(Number), description: 'Cambio de balatas', amount: '850.00' }],
+        labor: [{ id: expect.any(Number), description: 'Mano de obra frenos', amount: '400.00' }],
+        parts: [],
+        subtotals: { services: '850.00', labor: '400.00', parts: '0.00' },
+      },
       payments: [],
       ticket: null,
     });

@@ -230,11 +230,15 @@ Vehículos
 Citas
 Órdenes de servicio
 Mantenimientos
+Clientes por avisar
 Inventario
 Pagos
 Tickets
 Usuarios
+Reportes
 Configuración
+Términos
+Bitácora
 Cerrar sesión
 ```
 
@@ -243,11 +247,16 @@ Cerrar sesión
 - Mostrar solo los módulos implementados en el sprint actual.
 - Mostrar solo los módulos permitidos para el rol del usuario.
 - En el Sprint 1 el menú era: **Inicio** (bienvenida con accesos directos, sin indicadores), Clientes, Vehículos y, solo para ADMIN, Usuarios. En el Sprint 4 "Inicio" se mantiene como bienvenida ligera (saludo, rol, fecha y accesos rápidos según el rol, sin indicadores) y, para ADMIN, suma un acceso destacado al **Panel de control**, que es la pantalla de los indicadores y gráficas.
+- **Clientes por avisar** (Sprint 6) solo aparece para ADMIN y RECEPTIONIST, debajo de Mantenimientos.
 - Ocultar un botón **no es seguridad**: los permisos se validan también en backend.
 
 ### Header
 
-Nombre de sección, buscador cuando sea útil, notificaciones, usuario actual y rol.
+Nombre de sección, buscador cuando sea útil, **campana de notificaciones**, usuario actual y rol.
+
+- La campana va entre el título y el usuario. Su insignia muestra el total de avisos **no leídos**: sin número con
+  cero avisos y «99+» si pasa de 99. Es ámbar y roja solo si hay avisos críticos (vencidos o stock agotado) sin
+  leer. Etiqueta de accesibilidad: «Notificaciones, N sin leer». Ver la sección 8.5.2.
 
 ---
 
@@ -255,7 +264,7 @@ Nombre de sección, buscador cuando sea útil, notificaciones, usuario actual y 
 
 ### 8.1 Dashboard
 
-- Fila de indicadores arriba (**máximo 4**): órdenes en reparación, citas de hoy, mantenimientos vencidos, refacciones con stock bajo. Número grande y, si aplica, indicador de cambio.
+- Fila de tarjetas de indicadores arriba (**máximo 4 tarjetas** destacadas, por ejemplo órdenes en reparación, citas próximas, mantenimientos vencidos y refacciones con stock bajo) y un resumen operativo con el resto de los **10 indicadores** definidos en el Sprint 4 (vehículos atendidos en 30 días, órdenes pendientes, terminadas por entregar, mantenimientos próximos, terminadas por cobrar y pagos de Mercado Pago pendientes). Número grande y, si aplica, indicador de cambio.
 - Al menos una gráfica principal (por ejemplo, dona de órdenes por estado). Puede acompañarse de una o dos gráficas secundarias sencillas (por ejemplo, barras de servicios por mes, línea de ingresos), siempre que aporten información real.
 - Una lista o tabla de actividad reciente (últimas órdenes, últimas citas).
 - Los datos vienen de los módulos reales; no duplicar información solo para estadísticas.
@@ -300,6 +309,79 @@ Antes de ejecutar cualquiera de las siguientes acciones, el sistema **DEBE** mos
 El diálogo debe ser breve, claro y en español. Texto sugerido:
 
 > "¿Seguro que quieres [acción]? Esta acción no se puede deshacer." *(cuando aplique)*
+
+### 8.5.1 Elementos de precios y cobro (Sprint 5)
+
+- **Chip «Sin precio de venta»**: ámbar (advertencia), en el listado y el detalle del inventario del administrador.
+- **Columnas de precio** en el inventario: Categoría, Marca y Precio de venta; el precio de compra solo aparece en el detalle y el formulario del administrador. El mecánico no ve ninguna columna de precio.
+- **Diálogo de venta bajo el costo**: «El precio de venta ($X) es menor al de compra ($Y). ¿Guardar de todos modos?» con **Cancelar** y **Guardar de todos modos**.
+- **Desglose del cobro**: servicios, mano de obra y refacciones (cantidad, precio e importe) con tres subtotales y el total; las líneas anteriores a los precios muestran 0.00 y «Anterior a los precios».
+- **Aviso de importe desfasado** (ámbar) con el botón «Cancelar pago y generar uno nuevo», que pide confirmación.
+- **Aviso de diferencia por cobrar** (ámbar), sin botón de cobro: «El total de la orden supera el pago registrado por $X. La diferencia se cobra fuera del sistema.»
+
+### 8.5.2 Notificaciones y avisos a clientes (Sprint 6)
+
+**Panel de notificaciones**
+
+- Panel anclado a la esquina superior derecha, bajo la campana (no pantalla completa), de 420 px de ancho y
+  hasta el 75 % de la altura de la ventana, con desplazamiento vertical y botón de cierre.
+- Encabezado con «Notificaciones» y «N sin leer». Debajo, una sección por tipo con su nombre, su total y sus
+  avisos, en este orden: **Mantenimientos vencidos**, **Stock agotado**, **Órdenes detenidas**, **Citas de hoy**,
+  **Mantenimientos próximos** y **Stock bajo**. Solo aparecen las secciones con avisos.
+- Colores por tipo (siempre acompañados de texto): rojo para vencido y agotado, ámbar para próximo, bajo y orden
+  detenida, neutro para la cita del día.
+- Cada aviso muestra título y detalle; los no leídos llevan un punto del color del tipo y texto en negrita, y los
+  leídos se atenúan. Pulsar un aviso lo marca como leído, cierra el panel y abre la pantalla relacionada; el botón
+  «Marcar como leído» solo lo marca. No pide confirmación porque no es una acción destructiva.
+- Si un tipo tiene más avisos de los listados (50), la sección dice «Mostrando 50 de N».
+- **Estados**: cargando (indicador centrado, solo la primera vez; después se conserva el contenido), vacío
+  («No hay avisos pendientes» y «Cuando haya algo que atender aparecerá aquí») y error («No se pudieron consultar
+  los avisos» con **Reintentar**; si había datos previos se conservan y el error se muestra arriba).
+
+**Clientes por avisar**
+
+- Pantalla con el título «Clientes por avisar» y el texto «Llama o avisa en persona y marca al cliente como
+  avisado. El sistema no envía mensajes.». Tabla con Cliente, Teléfono, Vehículo, Motivo, Fecha y Acción.
+- Chip de motivo: verde «Vehículo listo», ámbar «Cita de mañana» y «Mantenimiento próximo», rojo «Mantenimiento
+  vencido».
+- Un teléfono vacío se muestra como «Sin teléfono registrado» en texto atenuado.
+- El botón **Avisado** abre una confirmación («¿Ya avisaste a [cliente] por [motivo]?» con **Cancelar** y
+  **Sí, avisado**). Al confirmar, la fila sale y se muestra «Cliente marcado como avisado»; si el hecho ya no
+  aplica, «Este aviso ya no aplica».
+- Estados: cargando, vacío («No hay clientes por avisar») y error con **Reintentar**.
+
+### 8.5.3 Reportes, configuración, términos y seguridad (Sprint 7)
+
+**Menú (solo ADMIN)**: se suman **Reportes**, **Configuración**, **Términos** y **Bitácora** al final del menú, con el mismo estilo y
+los íconos de las demás secciones.
+
+**Reportes**
+- Encabezado con el título y, a la derecha, el botón **Exportar Excel**. Debajo, el **selector de periodo**: chips Hoy, Esta semana
+  (del lunes a hoy), Este mes (del día 1 a hoy) y Rango (dos campos `AAAA-MM-DD` con selector de fecha y **Aplicar**), y el texto
+  «Periodo: del … al …». Más de un año se marca con «El periodo no puede pasar de un año.».
+- Pestañas **Ingresos**, **Servicios y productividad** y **Refacciones y rotación**. Ingresos: tarjetas con el total y el número de
+  pagos, barras por día en el color primario y tabla por método. Las tablas llevan el encabezado en el color primario con texto blanco y
+  filas alternadas (superficie y fondo cálido).
+- **Chip «Sin costo»**: ámbar, con texto, en la columna de costo de una refacción sin precio de compra.
+- Estados: cargando, vacío («No hay datos en este periodo») y error con **Reintentar**.
+- **Libro de Excel exportado**: lleva el logo y el nombre «MOTORIX» sobre el fondo cálido (`#F5F2F1`), una franja y los encabezados de
+  tabla en el color primario (`#9B4F55`) con texto blanco, filas alternadas, bordes `#DDD5D4`, fila de totales con un tinte del
+  primario, importes con formato de moneda, encabezado fijo y filtros, y un pie con la fecha de generación. Mensaje al guardar:
+  «Archivo guardado en [ruta]» con **Abrir carpeta**.
+
+**Configuración**: pestañas **Taller**, **Mantenimiento** y **Tipos de servicio**. Cada valor muestra un chip con su origen (Guardado,
+Variable de entorno o Predeterminado). **Guardar cambios** se habilita solo si algo cambió. Desactivar un tipo de servicio pide
+confirmación («Las órdenes anteriores conservan el tipo»).
+
+**Términos y aceptación**: pantalla completa tras iniciar sesión con título, versión, texto con desplazamiento, casilla y los botones
+**Rechazar y salir** y **Aceptar y continuar** (deshabilitado hasta marcar la casilla). La sección **Términos** del administrador es de
+solo lectura: versión vigente, tabla de aceptaciones con paginación y «N pendientes de aceptar».
+
+**Bitácora**: lista de solo lectura con fecha, usuario, chip de la acción en español, entidad y resumen; filtros por fecha, usuario y
+acción, **Limpiar filtros**, paginación y los estados cargando, vacío («No hay registros con esos filtros») y error.
+
+**Inactividad**: a los 28 minutos aparece el diálogo «Tu sesión está por cerrarse» con cuenta regresiva y el botón **Seguir
+conectado**; a los 30 se cierra la sesión y el acceso muestra «Tu sesión se cerró por inactividad. Inicia sesión de nuevo.».
 
 ### 8.6 Tarjetas
 

@@ -5,6 +5,7 @@ import '../models/order_work.dart';
 import '../models/service_order.dart';
 import '../models/user.dart';
 import '../providers/order_detail_provider.dart';
+import '../providers/service_types_provider.dart';
 import '../providers/session_provider.dart';
 import '../services/maintenance_service.dart';
 import '../services/orders_service.dart';
@@ -153,6 +154,7 @@ class _OrderDetailView extends StatelessWidget {
   OrderMaintenanceActions _maintenanceActions(BuildContext context) {
     final provider = context.read<OrderDetailProvider>();
     return OrderMaintenanceActions(
+      onSuggest: () => context.read<ServiceTypesProvider>().suggestion(provider.orderId),
       onSetServiceMileage: (mileage) async {
         final failure = await provider.setServiceMileage(mileage);
         if (!context.mounted) return;
@@ -246,6 +248,8 @@ class _OrderDetailView extends StatelessWidget {
                                   parts: order.parts,
                                   busy: provider.busy,
                                   actions: canEditWork ? _partsActions(context) : null,
+                                  // Con un pago Pagado las refacciones no se pueden modificar (el servidor lo rechaza igualmente).
+                                  locked: order.billing?.isPaid ?? false,
                                 ),
                                 if (order.isFinishedOrDelivered)
                                   OrderMaintenanceSection(
@@ -582,6 +586,15 @@ class _Lines extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(child: Text(line.description)),
+                if (line.serviceTypeName != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.sm),
+                    child: Chip(
+                      key: ValueKey('tipo-servicio-${line.id}'),
+                      label: Text(line.serviceTypeName!),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
                 Text(formatMoney(line.amount)),
                 if (editing != null) ...[
                   IconButton(
@@ -717,6 +730,18 @@ class _LineDialogState extends State<_LineDialog> {
   final _formKey = GlobalKey<FormState>();
   late final _description = TextEditingController(text: widget.existing?.description);
   late final _amount = TextEditingController(text: widget.existing?.amount);
+  late int? _serviceTypeId = widget.existing?.serviceTypeId;
+
+  @override
+  void initState() {
+    super.initState();
+    // El tipo de servicio es opcional y solo existe en los servicios: se cargan las opciones activas al abrir.
+    if (widget.kind == OrderLineKind.services) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.read<ServiceTypesProvider>().loadOptions();
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -737,7 +762,12 @@ class _LineDialogState extends State<_LineDialog> {
 
   void _save() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    Navigator.of(context).pop(OrderLineInput(description: _description.text.trim(), amount: _amount.text.trim()));
+    Navigator.of(context).pop(OrderLineInput(
+      description: _description.text.trim(),
+      amount: _amount.text.trim(),
+      serviceTypeId: _serviceTypeId,
+      sendServiceType: widget.kind == OrderLineKind.services,
+    ));
   }
 
   @override
@@ -773,6 +803,10 @@ class _LineDialogState extends State<_LineDialog> {
                 decoration: const InputDecoration(labelText: 'Importe *', prefixText: '\$ '),
                 validator: _validateAmount,
               ),
+              if (isService) ...[
+                const SizedBox(height: AppSpacing.lg),
+                _serviceTypeField(context),
+              ],
             ],
           ),
         ),
@@ -781,6 +815,26 @@ class _LineDialogState extends State<_LineDialog> {
         OutlinedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancelar')),
         FilledButton(onPressed: _save, child: const Text('Guardar')),
       ],
+    );
+  }
+
+  /// Selector opcional del tipo de servicio (con «Sin tipo»). Si el tipo actual ya está desactivado se conserva visible.
+  Widget _serviceTypeField(BuildContext context) {
+    final options = context.watch<ServiceTypesProvider>().options;
+    final existing = widget.existing;
+    final items = <DropdownMenuItem<int?>>[
+      const DropdownMenuItem<int?>(value: null, child: Text('Sin tipo')),
+      for (final type in options) DropdownMenuItem<int?>(value: type.id, child: Text(type.name)),
+      if (existing?.serviceTypeId != null && !options.any((type) => type.id == existing!.serviceTypeId))
+        DropdownMenuItem<int?>(value: existing!.serviceTypeId, child: Text('\${existing.serviceTypeName} (desactivado)')),
+    ];
+    return DropdownButtonFormField<int?>(
+      key: const ValueKey('linea-tipo-servicio'),
+      initialValue: _serviceTypeId,
+      isExpanded: true,
+      decoration: const InputDecoration(labelText: 'Tipo de servicio (opcional)'),
+      items: items,
+      onChanged: (value) => setState(() => _serviceTypeId = value),
     );
   }
 }

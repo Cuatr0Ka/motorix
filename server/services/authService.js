@@ -3,6 +3,7 @@ import { getJwtConfig } from '../config/env.js';
 import * as userModel from '../models/userModel.js';
 import { AppError } from '../utils/AppError.js';
 import { signToken } from '../utils/jwt.js';
+import { ACTIONS, record as recordAudit } from './auditService.js';
 import { assertPasswordPolicy } from './userService.js';
 
 export const MAX_FAILED_ATTEMPTS = 5;
@@ -46,11 +47,31 @@ export async function login(identifier, password) {
   const matches = await bcrypt.compare(password, record.passwordHash);
   if (!matches) {
     const result = await userModel.registerFailedAttempt(record.user.id, MAX_FAILED_ATTEMPTS, LOCK_MINUTES);
-    if (result.locked) throw accountLocked(result.lockSecondsLeft);
+    // Bitácora: solo de cuentas que existen, atribuido a esa cuenta y SIN guardar lo tecleado (los intentos con cuentas
+    // inexistentes no se registran).
+    await recordAudit({
+      actor: record.user,
+      action: ACTIONS.LOGIN_FAILED,
+      entityType: 'user',
+      entityId: record.user.id,
+      summary: 'Intento de inicio de sesión fallido',
+    });
+    if (result.locked) {
+      await recordAudit({
+        actor: record.user,
+        action: ACTIONS.ACCOUNT_LOCKED,
+        entityType: 'user',
+        entityId: record.user.id,
+        summary: `Cuenta bloqueada ${LOCK_MINUTES} minutos por ${MAX_FAILED_ATTEMPTS} intentos fallidos`,
+      });
+      throw accountLocked(result.lockSecondsLeft);
+    }
     throw AppError.invalidCredentials();
   }
 
   if (record.failedLoginAttempts > 0) await userModel.resetFailures(record.user.id);
+  // El inicio de sesión fija la última actividad (una cuenta inactiva por tiempo puede volver a entrar).
+  await userModel.touchActivity(record.user.id, 0, { force: true });
 
   return {
     token: signToken(record.user.id),
@@ -73,6 +94,13 @@ export async function changePassword(userId, currentPassword, newPassword) {
   assertPasswordPolicy(newPassword);
 
   await userModel.updatePassword(userId, await bcrypt.hash(newPassword, 10));
+  await recordAudit({
+    actor: { id: userId },
+    action: ACTIONS.PASSWORD_CHANGED,
+    entityType: 'user',
+    entityId: userId,
+    summary: 'Cambió su propia contraseña',
+  });
   return { changed: true };
 }
 

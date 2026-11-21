@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import request from 'supertest';
 import { getConfig } from '../../config/env.js';
 import { query } from '../../config/db.js';
 import { signToken } from '../../utils/jwt.js';
@@ -16,6 +17,15 @@ export async function resetDatabase() {
   if (!db.database.endsWith('_test')) {
     throw new Error(`Se canceló el reinicio: "${db.database}" no es una base de pruebas.`);
   }
+  // Sprint 7: la bitácora, las aceptaciones y la configuración dependen de los usuarios; los tipos de servicio, de las
+  // líneas de servicio. La tabla terms_versions NO se borra: conserva la versión 1.0 que entrega la migración.
+  await query('DELETE FROM audit_log');
+  await query('DELETE FROM terms_acceptances');
+  // Las versiones publicadas por las pruebas (2.0, ...) se quitan; la 1.0 de la migración se conserva.
+  await query("DELETE FROM terms_versions WHERE version <> '1.0'");
+  await query('DELETE FROM settings');
+  await query('DELETE FROM client_notices');
+  await query('DELETE FROM notification_reads');
   await query('DELETE FROM tickets');
   await query('DELETE FROM payments');
   await query('DELETE FROM inventory_movements');
@@ -25,6 +35,7 @@ export async function resetDatabase() {
   await query('DELETE FROM order_status_history');
   await query('DELETE FROM order_labor');
   await query('DELETE FROM order_services');
+  await query('DELETE FROM service_types');
   await query('DELETE FROM service_orders');
   await query('DELETE FROM appointments');
   await query('DELETE FROM vehicles');
@@ -49,7 +60,50 @@ export async function createUser(overrides = {}) {
     'INSERT INTO users (username, name, email, password_hash, role, active) VALUES (?, ?, ?, ?, ?, ?)',
     [data.username, data.name, data.email, hash, data.role, data.active],
   );
+  // Sprint 7: el usuario de prueba ya aceptó la versión vigente de los términos (salvo que la prueba pida lo contrario),
+  // para que las pruebas anteriores no reciban TERMS_NOT_ACCEPTED.
+  if (data.acceptTerms !== false) await acceptTerms(result.insertId);
   return { id: result.insertId, ...data };
+}
+
+/** Registra la aceptación de la versión vigente de los términos para un usuario (idempotente). */
+export async function acceptTerms(userId) {
+  const [version] = await query('SELECT id FROM terms_versions ORDER BY published_at DESC, id DESC LIMIT 1');
+  if (!version) return;
+  await query('INSERT IGNORE INTO terms_acceptances (user_id, terms_version_id) VALUES (?, ?)', [userId, version.id]);
+}
+
+/** Tipo de servicio de prueba (activo, con intervalo de 180 días y 5 000 km por omisión). */
+let serviceTypeCounter = 0;
+export async function createServiceType(overrides = {}) {
+  serviceTypeCounter += 1;
+  const data = {
+    name: `Tipo de servicio ${serviceTypeCounter}`,
+    intervalDays: 180,
+    intervalKm: 5000,
+    active: 1,
+    ...overrides,
+  };
+  const result = await query(
+    'INSERT INTO service_types (name, interval_days, interval_km, active) VALUES (?, ?, ?, ?)',
+    [data.name, data.intervalDays, data.intervalKm, data.active],
+  );
+  return { id: result.insertId, ...data };
+}
+
+/**
+ * Inicia sesión por la API con una cuenta (por ejemplo, una sembrada) y acepta la versión vigente de los términos, como lo
+ * haría la persona en su primer ingreso. Devuelve la respuesta del inicio de sesión (`body.data.token`).
+ */
+export async function loginAndAccept(app, identifier, password) {
+  const login = await request(app).post('/api/auth/login').send({ identifier, password });
+  if (login.status !== 200) return login;
+  const bearer = { Authorization: `Bearer ${login.body.data.token}` };
+  const current = await request(app).get('/api/terms/current').set(bearer);
+  if (current.status === 200 && !current.body.data.accepted) {
+    await request(app).post('/api/terms/accept').set(bearer).send({ versionId: current.body.data.id });
+  }
+  return login;
 }
 
 /** Crea un usuario del rol indicado y devuelve el usuario con su token. */
@@ -198,11 +252,30 @@ export async function createPart(createdBy, overrides = {}) {
     stock: 10,
     minStock: 3,
     active: 1,
+    // Sprint 5: por omisión la refacción tiene precio de venta, para que las pruebas que la agregan a una orden no
+    // choquen con PART_PRICE_MISSING. Las pruebas de «sin precio» pasan `salePrice: null` de forma explícita.
+    category: null,
+    brand: null,
+    purchasePrice: null,
+    salePrice: 100,
     ...overrides,
   };
   const result = await query(
-    'INSERT INTO parts (code, name, description, unit, stock, min_stock, active) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [data.code, data.name, data.description, data.unit, data.stock, data.minStock, data.active],
+    `INSERT INTO parts (code, name, description, unit, stock, min_stock, active, category, brand, purchase_price, sale_price)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      data.code,
+      data.name,
+      data.description,
+      data.unit,
+      data.stock,
+      data.minStock,
+      data.active,
+      data.category,
+      data.brand,
+      data.purchasePrice,
+      data.salePrice,
+    ],
   );
   if (data.stock > 0) {
     await query(
@@ -223,15 +296,17 @@ export async function createMovement(partId, createdBy, overrides = {}) {
   return { id: result.insertId, partId, ...data };
 }
 
-/** Línea de refacción de una orden directo en la base (no genera movimiento ni cambia el stock). */
-export async function createOrderPart(orderId, partId, createdBy, quantity = 1) {
-  const result = await query('INSERT INTO order_parts (order_id, part_id, quantity, created_by) VALUES (?, ?, ?, ?)', [
-    orderId,
-    partId,
-    quantity,
-    createdBy,
-  ]);
-  return { id: result.insertId, orderId, partId, quantity };
+/**
+ * Línea de refacción de una orden directo en la base (no genera movimiento ni cambia el stock). `unitPrice` es la
+ * instantánea del precio de venta; por omisión es 0 (línea anterior a los precios), para no alterar las pruebas
+ * que no hablan de precios.
+ */
+export async function createOrderPart(orderId, partId, createdBy, quantity = 1, unitPrice = 0) {
+  const result = await query(
+    'INSERT INTO order_parts (order_id, part_id, quantity, unit_price, created_by) VALUES (?, ?, ?, ?, ?)',
+    [orderId, partId, quantity, unitPrice, createdBy],
+  );
+  return { id: result.insertId, orderId, partId, quantity, unitPrice };
 }
 
 /** Mantenimiento de prueba (PENDIENTE por defecto, con fecha objetivo dentro de 6 meses). */
