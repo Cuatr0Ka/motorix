@@ -19,7 +19,7 @@ Cada sprint está marcado según su origen: **Deuda** (el contexto maestro lo de
 | Sprint | Tema | Origen | Insumo | Estado |
 |---|---|---|---|---|
 | 5 | Precios de refacciones y cobro completo | Deuda | `sprint-5-precios-refacciones-cobro.md` | Implementado |
-| 6 | Notificaciones internas | Deuda | `sprint-6-notificaciones-internas.md` | Borrador |
+| 6 | Notificaciones internas | Deuda | `sprint-6-notificaciones-internas.md` | Implementado |
 | 7 | Reportes, configuración, términos y seguridad | Deuda y propuesta | `sprint-7-reportes-configuracion.md` | Borrador |
 
 ## Alcance de cada sprint

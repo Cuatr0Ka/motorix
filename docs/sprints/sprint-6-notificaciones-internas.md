@@ -73,20 +73,20 @@ Que cada usuario vea en el encabezado un centro de notificaciones con los avisos
 
 ## 7. Criterios de aceptación
 
-- [ ] CA-1: El encabezado muestra una campana con el total de avisos no leídos del usuario y abre un panel con los avisos agrupados por tipo.
-- [ ] CA-2: Los avisos se calculan al consultar con datos reales y no se copian a otra tabla; solo se guarda la lectura.
-- [ ] CA-3: Los tipos incluidos son mantenimientos próximos, mantenimientos vencidos, citas del día, stock bajo o agotado y órdenes detenidas.
-- [ ] CA-4: El backend devuelve a cada rol únicamente sus avisos: ADMIN todos; RECEPTIONIST mantenimientos, citas y órdenes detenidas; MECHANIC solo avisos de órdenes asignadas a él. El stock no se devuelve a RECEPTIONIST ni a MECHANIC.
-- [ ] CA-5: Los avisos usan el mismo cálculo que el dashboard, la lista de Mantenimientos y las alertas de stock, y los números coinciden entre pantallas.
-- [ ] CA-6: Marcar un aviso como leído persiste por usuario; si la condición deja de cumplirse el aviso desaparece, y si reaparece con otro estado vuelve a mostrarse como no leído.
-- [ ] CA-7: Cada aviso abre la pantalla relacionada (orden, cita, vehículo o inventario).
-- [ ] CA-8: La insignia actual de Inventario y el aviso de la pantalla de inicio siguen funcionando y no se contradicen con el centro de notificaciones.
-- [ ] CA-9: El centro maneja estados de carga, vacío y error según `docs/design-system.md`.
-- [ ] CA-10: RECEPTIONIST y ADMIN ven la lista de clientes por avisar con cliente, teléfono, vehículo y motivo (orden terminada sin entregar, cita de mañana, mantenimiento próximo o vencido); MECHANIC no accede, validado en backend.
-- [ ] CA-11: Marcar a un cliente como avisado guarda quién y cuándo, lo saca de la lista y no vuelve a aparecer por el mismo hecho; si surge un hecho nuevo (otra orden, otra cita), aparece de nuevo.
-- [ ] CA-12: Los seeds incluyen al menos un caso de cada tipo de aviso y son idempotentes.
-- [ ] CA-13: Existen y pasan pruebas de cálculo de cada aviso, permisos por rol, lectura por usuario y rendimiento de la consulta.
-- [ ] CA-14: `docs/project-context.md` (sección 6.12) y `docs/design-system.md` se actualizan en el mismo sprint.
+- [x] CA-1: El encabezado muestra una campana con el total de avisos no leídos del usuario y abre un panel con los avisos agrupados por tipo.
+- [x] CA-2: Los avisos se calculan al consultar con datos reales y no se copian a otra tabla; solo se guarda la lectura.
+- [x] CA-3: Los tipos incluidos son mantenimientos próximos, mantenimientos vencidos, citas del día, stock bajo o agotado y órdenes detenidas.
+- [x] CA-4: El backend devuelve a cada rol únicamente sus avisos: ADMIN todos; RECEPTIONIST mantenimientos, citas y órdenes detenidas; MECHANIC solo avisos de órdenes asignadas a él. El stock no se devuelve a RECEPTIONIST ni a MECHANIC.
+- [x] CA-5: Los avisos usan el mismo cálculo que el dashboard, la lista de Mantenimientos y las alertas de stock, y los números coinciden entre pantallas.
+- [x] CA-6: Marcar un aviso como leído persiste por usuario; si la condición deja de cumplirse el aviso desaparece, y si reaparece con otro estado vuelve a mostrarse como no leído.
+- [x] CA-7: Cada aviso abre la pantalla relacionada (orden, cita, vehículo o inventario).
+- [x] CA-8: La insignia actual de Inventario y el aviso de la pantalla de inicio siguen funcionando y no se contradicen con el centro de notificaciones.
+- [x] CA-9: El centro maneja estados de carga, vacío y error según `docs/design-system.md`.
+- [x] CA-10: RECEPTIONIST y ADMIN ven la lista de clientes por avisar con cliente, teléfono, vehículo y motivo (orden terminada sin entregar, cita de mañana, mantenimiento próximo o vencido); MECHANIC no accede, validado en backend.
+- [x] CA-11: Marcar a un cliente como avisado guarda quién y cuándo, lo saca de la lista y no vuelve a aparecer por el mismo hecho; si surge un hecho nuevo (otra orden, otra cita), aparece de nuevo.
+- [x] CA-12: Los seeds incluyen al menos un caso de cada tipo de aviso y son idempotentes.
+- [x] CA-13: Existen y pasan pruebas de cálculo de cada aviso, permisos por rol, lectura por usuario y rendimiento de la consulta.
+- [x] CA-14: `docs/project-context.md` (sección 6.12) y `docs/design-system.md` se actualizan en el mismo sprint.
 
 ## 8. Fuera de alcance de este sprint
 
