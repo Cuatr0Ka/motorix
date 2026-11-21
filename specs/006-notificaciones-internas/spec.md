@@ -221,7 +221,8 @@ al cliente con su teléfono, lo marca como avisado y el cliente sale de la lista
 
 - **FR-001**: El sistema DEBE mostrar en el encabezado de toda pantalla, para todo usuario autenticado, una
   campana con el total de avisos no leídos de ese usuario y un panel que los lista agrupados por tipo.
-- **FR-002**: Los tipos de aviso DEBEN ser cinco: mantenimiento próximo, mantenimiento vencido, cita del día,
+- **FR-002**: Los tipos de aviso DEBEN ser cinco (el de stock se muestra en dos niveles, bajo y agotado, cada
+  uno con su propia sección): mantenimiento próximo, mantenimiento vencido, cita del día,
   stock bajo o agotado y orden detenida.
 - **FR-003**: Los avisos DEBEN calcularse al consultar, con los datos reales del taller; el sistema NO DEBE
   copiarlos a otro almacén. Lo único que se guarda es qué avisos leyó cada usuario.
@@ -292,8 +293,6 @@ al cliente con su teléfono, lo marca como avisado y el cliente sale de la lista
 
 - **SC-001** (FR-001, FR-002, FR-006): El administrador ve el total de avisos y abre uno en menos de 30
   segundos desde que inicia sesión, cronometrado en el entorno de demostración.
-- **SC-009** (FR-020): Un aviso nuevo aparece en la campana en un máximo de 60 segundos sin que el usuario
-  haga nada, cronometrado en el entorno de demostración.
 - **SC-002** (FR-004, FR-015): En el 100 % de las pruebas por rol, cada rol recibe únicamente los avisos que le
   corresponden; el mecánico nunca recibe avisos de órdenes ajenas, de stock ni teléfonos de clientes.
 - **SC-003** (FR-005): En el 100 % de las comparaciones de prueba, los números del centro coinciden con los del
@@ -308,6 +307,8 @@ al cliente con su teléfono, lo marca como avisado y el cliente sale de la lista
 - **SC-008** (FR-009, FR-025): Toda prueba de los sprints 1 a 5 sigue pasando al cierre del sprint, salvo las
   que deban actualizarse por cambios declarados en esta especificación, y cada actualización se registra en el
   documento de aseguramiento.
+- **SC-009** (FR-020): Un aviso nuevo aparece en la campana en un máximo de 60 segundos sin que el usuario
+  haga nada, cronometrado en el entorno de demostración.
 
 ## Suposiciones
 

@@ -64,7 +64,7 @@ movimientos de inventario
 
 | Principio | Evaluación | Cómo se cumple |
 |-----------|------------|----------------|
-| I. Alcance, MVP y fuente de verdad | PASA | Sprint posterior al MVP: lo permite la enmienda 1.1.0 (insumo en `docs/sprints/sprint-6-notificaciones-internas.md`, flujo de Spec Kit y documento de aseguramiento). El chatbot y la mensajería quedan fuera (FR-019). Se actualiza `docs/project-context.md` (FR-024) |
+| I. Alcance, MVP y fuente de verdad | PASA, con una puerta | Sprint posterior al MVP: lo permite la enmienda 1.1.0 (insumo en `docs/sprints/sprint-6-notificaciones-internas.md`, flujo de Spec Kit y documento de aseguramiento). El principio exige además la aprobación registrada del responsable del proyecto para cada sprint: la tarea T002 la registra en la constitución (versión 1.1.1) y bloquea el inicio de los fundamentos. El chatbot y la mensajería quedan fuera (FR-019). Se actualiza `docs/project-context.md` (FR-024) |
 | II. Arquitectura separada | PASA | `client/`, `server/`, `database/`; la lógica vive en `services/` y en el módulo puro `noticeRules`; controladores delgados; sin integraciones nuevas |
 | III. Stack y base local | PASA | Mismo stack; migración numerada nueva y aditiva; InnoDB, llaves foráneas, `utf8mb4`; seeds idempotentes con datos suficientes. Sin dependencias nuevas |
 | IV. Seguridad | PASA | Rutas con `authenticate` + `authorize`; el filtrado por rol ocurre en el servicio; validación `zod` de claves, motivos e identificadores; el teléfono solo en `/client-notices` para ADMIN y RECEPTIONIST; ninguna traza al usuario; sin secretos |
@@ -139,7 +139,10 @@ client/
 
 docs/
 ├── project-context.md          # sección 6.12 y las rutas, tablas y roles que cambian
-└── design-system.md            # header (sección 7) y nueva sección de notificaciones
+├── design-system.md            # header (sección 7) y nueva sección de notificaciones
+└── aseguramiento-calidad-sprint-6.md  # nuevo: línea base, regresión, matriz final y aprobación
+
+.specify/memory/constitution.md    # registro de la aprobación del Sprint 6 (versión 1.1.1, tarea T002)
 ```
 
 **Decisión de estructura**: se conserva la estructura de los sprints anteriores. Las únicas piezas nuevas de

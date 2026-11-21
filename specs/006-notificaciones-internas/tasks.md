@@ -43,9 +43,10 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ## Fase 1: Preparación (infraestructura compartida)
 
-**Propósito**: verificar la base y abrir el documento de aseguramiento
+**Propósito**: verificar la base, registrar la condición de la constitución y abrir el documento de aseguramiento
 
 - [ ] T001 Verificar la línea base en la rama `006-notificaciones-internas`: MySQL local en ejecución, migraciones 001 a 005 aplicadas en `motorix` y `motorix_test`, `npm test` (en `server/`) y `flutter test` (en `client/`) en verde; anotar el número de suites y de pruebas de cada uno (la última cifra documentada es 1 215 de backend y 321 de frontend) y abrir `docs/aseguramiento-calidad-sprint-6.md` a partir de `docs/aseguramiento-calidad/plantilla-aseguramiento-calidad.md` con esa línea base
+- [X] T002 ⚠️ PUERTA (aprobada y registrada el 2026-11-20, versión 1.1.1): registrar en `.specify/memory/constitution.md`, en una sección nueva «Decisiones resueltas durante el Sprint 6», la aprobación del responsable del proyecto para construir el Sprint 6 (principio I: los sprints posteriores al MVP exigen insumo en `docs/sprints/`, aprobación registrada y flujo de Spec Kit), con la fecha 2026-11-20 y el insumo `docs/sprints/sprint-6-notificaciones-internas.md`; incrementar la versión PATCH (1.1.0 → 1.1.1) y actualizar el reporte de impacto del encabezado y la fecha de última enmienda. No se inicia la fase 2 sin esta aprobación
 
 ---
 
@@ -53,30 +54,30 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 **Propósito**: esquema, reglas puras, validadores, modelos de lectura y de avisos, y los modelos del cliente que DEBEN existir antes de cualquier historia
 
-**⚠️ CRÍTICO**: ninguna historia puede empezar hasta terminar esta fase
+**⚠️ CRÍTICO**: esta fase no empieza hasta que la aprobación de la constitución (T002) esté registrada, y ninguna historia puede empezar hasta terminarla
 
 ### Base de datos
 
-- [ ] T002 Crear `database/migrations/006_sprint6_notices.sql` (InnoDB, `utf8mb4`, aditiva, sin editar migraciones anteriores ni tocar datos existentes; encabezado en español). Según data-model.md:
+- [ ] T003 Crear `database/migrations/006_sprint6_notices.sql` (InnoDB, `utf8mb4`, aditiva, sin editar migraciones anteriores ni tocar datos existentes; encabezado en español). Según data-model.md:
   - `notification_reads`: `user_id INT UNSIGNED NOT NULL`, `notice_key VARCHAR(60) NOT NULL`, `read_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP`; `PRIMARY KEY (user_id, notice_key)`; `CONSTRAINT fk_notification_reads_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE`
   - `client_notices`: `id INT UNSIGNED NOT NULL AUTO_INCREMENT` (llave primaria), `client_id INT UNSIGNED NOT NULL`, `reason ENUM('ORDER_READY','APPT_TOMORROW','MAINT_UPCOMING','MAINT_OVERDUE') NOT NULL`, `fact_id INT UNSIGNED NOT NULL`, `notified_by INT UNSIGNED NOT NULL`, `notified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP`; `UNIQUE KEY uq_client_notices_fact (reason, fact_id)`; `KEY idx_client_notices_client (client_id)`; llaves foráneas a `clients(id)` y `users(id)` con `ON DELETE RESTRICT`; sin columna de nota ni de canal (D-02)
-- [ ] T003 Aplicar la migración 006 en `motorix` y `motorix_test` con `database/scripts/aplicar-migraciones.ps1` (repetirla debe terminar sin error) y actualizar `database/README.md` con la migración 006
-- [ ] T004 Actualizar `resetDatabase()` en `server/tests/helpers/factories.js`: borrar `client_notices` y `notification_reads` antes de `users` y `clients` (respetando las llaves foráneas)
+- [ ] T004 Aplicar la migración 006 en `motorix` y `motorix_test` con `database/scripts/aplicar-migraciones.ps1` (repetirla debe terminar sin error), comprobar que el número de filas de `clients`, `vehicles`, `appointments`, `service_orders`, `maintenance`, `payments` y `tickets` es el mismo antes y después de aplicarla (FR-025) y actualizar `database/README.md` con la migración 006
+- [ ] T005 Actualizar `resetDatabase()` en `server/tests/helpers/factories.js`: borrar `client_notices` y `notification_reads` antes de `users` y `clients` (respetando las llaves foráneas)
 
 ### Backend base
 
-- [ ] T005 [P] Crear `server/services/noticeRules.js` (módulo puro, sin acceso a la base): constantes `STALLED_DAYS = 3`, `NOTICE_TYPES` (`MAINT_UPCOMING`, `MAINT_OVERDUE`, `APPT_TODAY`, `STOCK_LOW`, `STOCK_OUT`, `STALLED`), `CLIENT_NOTICE_REASONS` (`ORDER_READY`, `APPT_TOMORROW`, `MAINT_UPCOMING`, `MAINT_OVERDUE`) y `GROUP_ORDER` (orden de los grupos de api-rest.md); `isStalledOrder({ status, lastChangeAt, today })` (solo `RECIBIDO`, `DIAGNOSTICO`, `EN_REPARACION` y `ESPERANDO_REFACCION`, más de 3 días calendario); `buildNoticeKey(type, id, variant)` y `isValidNoticeKey(text)` (clave de hasta 60 caracteres con las formas de data-model.md); `typesForRole(role)` (ADMIN todos; RECEPTIONIST todos menos `STOCK_LOW` y `STOCK_OUT`; MECHANIC solo `STALLED`)
-- [ ] T006 [P] Pruebas unitarias de las reglas en `server/tests/unit/noticeRules.test.js`: 3 días exactos no es detenida y 4 días sí; los estados `TERMINADO` y `ENTREGADO` nunca; claves válidas e inválidas (vacía, con más de 60 caracteres, tipo desconocido); `typesForRole` para los tres roles
-- [ ] T007 [P] Crear `server/validators/noticeValidators.js` (zod): `readNoticesSchema` (`keys`: arreglo de 1 a 50 claves de hasta 60 caracteres que pasen `isValidNoticeKey`) y `createClientNoticeSchema` estricto (`reason` entre los motivos y `factId` entero positivo; rechaza campos desconocidos como una nota, D-02)
-- [ ] T008 [P] Pruebas unitarias de los validadores en `server/tests/unit/noticeValidators.test.js`: arreglo vacío, 51 claves, clave mal formada, motivo desconocido, `factId` no entero o negativo y campo extra `note` se rechazan; entradas válidas pasan
-- [ ] T009 [P] Crear `server/models/notificationReadModel.js`: `listReadKeys(userId, connection)` (claves leídas del usuario) e `insertIgnore(userId, keys, connection)` con `INSERT IGNORE` (repetir o ejecutar en paralelo no falla ni duplica filas)
-- [ ] T010 [P] Crear `server/models/clientNoticeModel.js`: `findByFact(reason, factId, connection)`, `insertIgnore({ clientId, reason, factId, notifiedBy }, connection)` con `INSERT IGNORE` sobre `uq_client_notices_fact` y `listNoticedFacts(connection)` (pares `(reason, fact_id)` ya avisados)
+- [ ] T006 [P] Crear `server/services/noticeRules.js` (módulo puro, sin acceso a la base): constantes `STALLED_DAYS = 3`, `NOTICE_TYPES` (`MAINT_UPCOMING`, `MAINT_OVERDUE`, `APPT_TODAY`, `STOCK_LOW`, `STOCK_OUT`, `STALLED`), `CLIENT_NOTICE_REASONS` (`ORDER_READY`, `APPT_TOMORROW`, `MAINT_UPCOMING`, `MAINT_OVERDUE`) y `GROUP_ORDER` (orden de los grupos de api-rest.md); `isStalledOrder({ status, lastChangeAt, today })` (solo `RECIBIDO`, `DIAGNOSTICO`, `EN_REPARACION` y `ESPERANDO_REFACCION`, más de 3 días calendario); `buildNoticeKey(type, id, variant)` y `isValidNoticeKey(text)` (clave de hasta 60 caracteres con las formas de data-model.md); `typesForRole(role)` (ADMIN todos; RECEPTIONIST todos menos `STOCK_LOW` y `STOCK_OUT`; MECHANIC solo `STALLED`)
+- [ ] T007 [P] Pruebas unitarias de las reglas en `server/tests/unit/noticeRules.test.js`: 3 días exactos no es detenida y 4 días sí; los estados `TERMINADO` y `ENTREGADO` nunca; claves válidas e inválidas (vacía, con más de 60 caracteres, tipo desconocido); `typesForRole` para los tres roles
+- [ ] T008 [P] Crear `server/validators/noticeValidators.js` (zod): `readNoticesSchema` (`keys`: arreglo de 1 a 50 claves de hasta 60 caracteres que pasen `isValidNoticeKey`) y `createClientNoticeSchema` estricto (`reason` entre los motivos y `factId` entero positivo; rechaza campos desconocidos como una nota, D-02)
+- [ ] T009 [P] Pruebas unitarias de los validadores en `server/tests/unit/noticeValidators.test.js`: arreglo vacío, 51 claves, clave mal formada, motivo desconocido, `factId` no entero o negativo y campo extra `note` se rechazan; entradas válidas pasan
+- [ ] T010 [P] Crear `server/models/notificationReadModel.js`: `listReadKeys(userId, connection)` (claves leídas del usuario) e `insertIgnore(userId, keys, connection)` con `INSERT IGNORE` (repetir o ejecutar en paralelo no falla ni duplica filas)
+- [ ] T011 [P] Crear `server/models/clientNoticeModel.js`: `findByFact(reason, factId, connection)`, `insertIgnore({ clientId, reason, factId, notifiedBy }, connection)` con `INSERT IGNORE` sobre `uq_client_notices_fact` y `listNoticedFacts(connection)` (pares `(reason, fact_id)` ya avisados)
 
 ### Cliente base
 
-- [ ] T011 [P] Crear `client/lib/models/notice.dart`: tipo `NoticeType` (con `apiValue` y etiqueta en español por tipo), `AppNotice` (`key`, `type`, `read`, `title`, `detail`, `target` con `kind` e `id`, campos opcionales `dueDate`, `scheduledAt`, `stock`, `minStock`, `daysStalled`), `NoticeGroup` (`type`, `total`, `unread`, `items`) y `NoticesSummary` (`unread`, `total`, `groups`, `generatedAt`) con `fromJson`
-- [ ] T012 [P] Crear `client/lib/models/client_notice.dart`: motivo `ClientNoticeReason` (con `apiValue` y etiqueta «Vehículo listo», «Cita de mañana», «Mantenimiento próximo», «Mantenimiento vencido») y `PendingClientNotice` (`reason`, `factId`, `factDate`, `folio` opcional, `client` con `id`, `name` y `phone`, `vehicle`) con `fromJson`
-- [ ] T013 [P] Pruebas de los modelos del cliente en `client/test/notice_models_test.dart`: `fromJson` de cada tipo y motivo, teléfono vacío y listas vacías
+- [ ] T012 [P] Crear `client/lib/models/notice.dart`: tipo `NoticeType` (con `apiValue` y etiqueta en español por tipo), `AppNotice` (`key`, `type`, `read`, `title`, `detail`, `target` con `kind` e `id`, campos opcionales `dueDate`, `scheduledAt`, `stock`, `minStock`, `daysStalled`), `NoticeGroup` (`type`, `total`, `unread`, `items`) y `NoticesSummary` (`unread`, `total`, `groups`, `generatedAt`) con `fromJson`
+- [ ] T013 [P] Crear `client/lib/models/client_notice.dart`: motivo `ClientNoticeReason` (con `apiValue` y etiqueta «Vehículo listo», «Cita de mañana», «Mantenimiento próximo», «Mantenimiento vencido») y `PendingClientNotice` (`reason`, `factId`, `factDate`, `folio` opcional, `client` con `id`, `name` y `phone`, `vehicle`) con `fromJson`
+- [ ] T014 [P] Pruebas de los modelos del cliente en `client/test/notice_models_test.dart`: `fromJson` de cada tipo y motivo, teléfono vacío y listas vacías
 
 **Punto de control**: la migración está aplicada, las reglas puras y los validadores pasan sus pruebas y los modelos del cliente se leen bien; las historias pueden empezar
 
@@ -90,19 +91,19 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 1 (escribir primero y comprobar que fallan)
 
-- [ ] T014 [P] [US1] Prueba de integración `server/tests/integration/notifications.flow.test.js`: sin avisos devuelve `unread: 0`, `total: 0` y `groups: []`; con un mantenimiento vencido devuelve 1 grupo `MAINT_OVERDUE` con su aviso; sin token responde 401; con más de 50 vencidos lista 50 y `total` real; `generatedAt` presente
-- [ ] T015 [P] [US1] Prueba de contrato `server/tests/contract/notifications.contract.test.js`: forma exacta de `GET /api/notifications` según `contracts/api-rest.md` (campos del ítem y del grupo, `target.kind`, orden de grupos)
-- [ ] T016 [P] [US1] Pruebas del cliente en `client/test/notifications_test.dart`: el proveedor consulta al iniciar y cada 60 segundos con tiempo simulado, se detiene y limpia al cerrar sesión; la campana no muestra número con 0, muestra el total y «99+» con más de 99; el panel muestra cargando, vacío («No hay avisos pendientes») y error con «Reintentar» conservando los datos previos
+- [ ] T015 [P] [US1] Prueba de integración `server/tests/integration/notifications.flow.test.js`: sin avisos devuelve `unread: 0`, `total: 0` y `groups: []`; con un mantenimiento vencido devuelve 1 grupo `MAINT_OVERDUE` con su aviso; sin token responde 401; con más de 50 vencidos lista 50 y `total` real; `generatedAt` presente
+- [ ] T016 [P] [US1] Prueba de contrato `server/tests/contract/notifications.contract.test.js`: forma exacta de `GET /api/notifications` según `contracts/api-rest.md` (campos del ítem y del grupo, `target.kind`, orden de grupos)
+- [ ] T017 [P] [US1] Pruebas del cliente en `client/test/notifications_test.dart`: el proveedor consulta al iniciar y cada 60 segundos con tiempo simulado, se detiene y limpia al cerrar sesión; la campana no muestra número con 0, muestra el total y «99+» con más de 99; el panel muestra cargando, vacío («No hay avisos pendientes») y error con «Reintentar» conservando los datos previos
 
 ### Implementación de la historia 1
 
-- [ ] T017 [US1] Crear `server/services/notificationService.js`: `list(actor)` calcula los avisos del rol con `typesForRole`, agrupa en el orden de `GROUP_ORDER`, limita a 50 avisos por tipo con el total real del tipo, marca `read` con `notificationReadModel.listReadKeys` y devuelve `unread`, `total` y `generatedAt`; registrar el tipo de referencia `MAINT_OVERDUE` con `maintenanceService.list({ status: 'PENDIENTE', indicator: 'VENCIDO', page: 1, pageSize: 50 }, actor)` (mismo cálculo que el panel de control) y la clave `MAINT_OVERDUE:{id}`, con `target` de tipo `vehicle` y `dueDate`/`dueMileage`; el servicio no ejecuta ninguna consulta de un tipo que el rol no puede ver
-- [ ] T018 [US1] Crear `server/controllers/notificationController.js` y `server/routes/notificationRoutes.js` con `GET /` (`authenticate`, sin parámetros) y montarla en `server/routes/index.js` como `/notifications`
-- [ ] T019 [P] [US1] Crear `client/lib/services/notifications_service.dart` con `fetch()` que llama `GET /notifications` y devuelve `NoticesSummary`
-- [ ] T020 [US1] Crear `client/lib/providers/notifications_provider.dart`: estado (`summary`, `loading`, `error`, `loaded`), `refresh()` que conserva el último resultado si falla, `start()` con `Timer.periodic` de 60 segundos, `stop()`/`clear()` que cancelan el temporizador y limpian, y `dispose()` seguro
-- [ ] T021 [P] [US1] Crear `client/lib/widgets/notification_bell.dart`: botón de ícono con insignia (sin número con 0; «99+» si pasa de 99; ámbar, y rojo si hay vencidos o agotados sin leer), etiqueta de accesibilidad «Notificaciones, N sin leer» y apertura por teclado, con los tokens de `client/lib/utils/tokens.dart`
-- [ ] T022 [US1] Crear `client/lib/widgets/notifications_panel.dart`: panel anclado a la campana con título «Notificaciones», «N sin leer», secciones por tipo con nombre, total y avisos (indicador de color por tipo, punto de no leído, texto atenuado si está leído), «Mostrando 50 de N» y los estados cargando, vacío («No hay avisos pendientes») y error con «Reintentar» usando `client/lib/widgets/state_views.dart`
-- [ ] T023 [US1] Integrar en `client/lib/widgets/app_shell.dart`: agregar la campana al `_Header` entre el título y el usuario; iniciar `NotificationsProvider` al montar el `AppShell`, refrescar al cambiar de sección y detenerlo al desmontarse o cerrar sesión; registrar `NotificationsService` y `NotificationsProvider` en `client/lib/main.dart`
+- [ ] T018 [US1] Crear `server/services/notificationService.js`: `list(actor)` calcula los avisos del rol con `typesForRole`, agrupa en el orden de `GROUP_ORDER`, limita a 50 avisos por tipo con el total real del tipo, marca `read` con `notificationReadModel.listReadKeys` y devuelve `unread`, `total` y `generatedAt`; registrar el tipo de referencia `MAINT_OVERDUE` con `maintenanceService.list({ status: 'PENDIENTE', indicator: 'VENCIDO', page: 1, pageSize: 50 }, actor)` (mismo cálculo que el panel de control) y la clave `MAINT_OVERDUE:{id}`, con `target` de tipo `vehicle` y `dueDate`/`dueMileage`; el servicio no ejecuta ninguna consulta de un tipo que el rol no puede ver
+- [ ] T019 [US1] Crear `server/controllers/notificationController.js` y `server/routes/notificationRoutes.js` con `GET /` (`authenticate`, sin parámetros) y montarla en `server/routes/index.js` como `/notifications`
+- [ ] T020 [P] [US1] Crear `client/lib/services/notifications_service.dart` con `fetch()` que llama `GET /notifications` y devuelve `NoticesSummary`
+- [ ] T021 [US1] Crear `client/lib/providers/notifications_provider.dart`: estado (`summary`, `loading`, `error`, `loaded`), `refresh()` que conserva el último resultado si falla, `start()` con `Timer.periodic` de 60 segundos, `stop()`/`clear()` que cancelan el temporizador y limpian, y `dispose()` seguro
+- [ ] T022 [P] [US1] Crear `client/lib/widgets/notification_bell.dart`: botón de ícono con insignia (sin número con 0; «99+» si pasa de 99; ámbar, y rojo si hay vencidos o agotados sin leer), etiqueta de accesibilidad «Notificaciones, N sin leer» y apertura por teclado, con los tokens de `client/lib/utils/tokens.dart`
+- [ ] T023 [US1] Crear `client/lib/widgets/notifications_panel.dart`: panel anclado a la campana con título «Notificaciones», «N sin leer», secciones por tipo con nombre, total y avisos (indicador de color por tipo, punto de no leído, texto atenuado si está leído), «Mostrando 50 de N» y los estados cargando, vacío («No hay avisos pendientes») y error con «Reintentar» usando `client/lib/widgets/state_views.dart`
+- [ ] T024 [US1] Integrar en `client/lib/widgets/app_shell.dart`: agregar la campana al `_Header` entre el título y el usuario; iniciar `NotificationsProvider` al montar el `AppShell`, refrescar al cambiar de sección y detenerlo al desmontarse o cerrar sesión; registrar `NotificationsService` y `NotificationsProvider` en `client/lib/main.dart`
 
 **Punto de control**: la campana y el panel funcionan de extremo a extremo con el tipo de referencia; las pruebas de la historia 1 pasan
 
@@ -116,14 +117,14 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 2 (escribir primero y comprobar que fallan)
 
-- [ ] T024 [P] [US2] Prueba de integración `server/tests/integration/notifications.reception.test.js`: la recepción recibe `MAINT_UPCOMING`, `MAINT_OVERDUE` y `APPT_TODAY` en grupos separados; la cita de hoy `PENDIENTE` o `CONFIRMADA` genera aviso y la `CANCELADA`, `COMPLETADA` o `EN_PROCESO` no; una cita de mañana o de ayer no; los totales de mantenimientos coinciden con `GET /api/dashboard` y con `GET /api/maintenance` (FR-005, SC-003)
-- [ ] T025 [P] [US2] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): el panel muestra las secciones «Mantenimientos vencidos», «Citas de hoy» y «Mantenimientos próximos» en el orden de `contracts/interfaz.md`, con el color por tipo y la hora de la cita
+- [ ] T025 [P] [US2] Prueba de integración `server/tests/integration/notifications.reception.test.js`: la recepción recibe `MAINT_UPCOMING`, `MAINT_OVERDUE` y `APPT_TODAY` en grupos separados; la cita de hoy `PENDIENTE` o `CONFIRMADA` genera aviso y la `CANCELADA`, `COMPLETADA` o `EN_PROCESO` no; una cita de mañana o de ayer no; los totales de mantenimientos coinciden con `GET /api/dashboard` y con `GET /api/maintenance` (FR-005, SC-003)
+- [ ] T026 [P] [US2] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): el panel muestra las secciones «Mantenimientos vencidos», «Citas de hoy» y «Mantenimientos próximos» en el orden de `contracts/interfaz.md`, con el color por tipo y la hora de la cita
 
 ### Implementación de la historia 2
 
-- [ ] T026 [US2] Crear `server/models/noticeModel.js` con `listAppointmentsOn(date, connection)` (citas con `DATE(scheduled_at) = date` y estado `PENDIENTE` o `CONFIRMADA`, con cliente y vehículo) y `countAppointmentsOn(date)`; la fecha de hoy es la del servidor, igual que el panel
-- [ ] T027 [US2] Ampliar `server/services/notificationService.js` con `MAINT_UPCOMING` (`maintenanceService.list` con indicador `PROXIMO`, clave `MAINT_UPCOMING:{id}`, `target` de tipo `vehicle`) y `APPT_TODAY` (clave `APPT_TODAY:{id}`, `target` de tipo `appointment`, `scheduledAt`), con el nombre del cliente en `detail` para ADMIN y RECEPTIONIST y nunca el teléfono
-- [ ] T028 [P] [US2] Ampliar `client/lib/widgets/notifications_panel.dart` y `client/lib/models/notice.dart` con las secciones de próximos y de citas del día (indicador ámbar para próximo y neutro para la cita)
+- [ ] T027 [US2] Crear (si aún no existe) `server/models/noticeModel.js`, que comparten las historias 2, 4 y 7, con `listAppointmentsOn(date, connection)` (citas con `DATE(scheduled_at) = date` y estado `PENDIENTE` o `CONFIRMADA`, con cliente y vehículo) y `countAppointmentsOn(date)`; la fecha de hoy es la del servidor, igual que el panel
+- [ ] T028 [US2] Ampliar `server/services/notificationService.js` con `MAINT_UPCOMING` (`maintenanceService.list` con indicador `PROXIMO`, clave `MAINT_UPCOMING:{id}`, `target` de tipo `vehicle`) y `APPT_TODAY` (clave `APPT_TODAY:{id}`, `target` de tipo `appointment`, `scheduledAt`), con el nombre del cliente en `detail` para ADMIN y RECEPTIONIST y nunca el teléfono
+- [ ] T029 [P] [US2] Ampliar `client/lib/widgets/notifications_panel.dart` y `client/lib/models/notice.dart` con las secciones de próximos y de citas del día (indicador ámbar para próximo y neutro para la cita)
 
 **Punto de control**: la recepción ve los avisos de mantenimientos y citas, y los números coinciden con el panel y con la lista de Mantenimientos
 
@@ -137,16 +138,16 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 6 (escribir primero y comprobar que fallan)
 
-- [ ] T029 [P] [US6] Prueba de integración `server/tests/integration/notifications.read.test.js`: marcar como leído persiste y baja `unread`; otro usuario del mismo rol lo ve sin leer; un aviso leído cuya condición deja de cumplirse desaparece; de próximo a vencido reaparece sin leer (clave nueva); claves inexistentes o de otro rol se ignoran con 200; repetir la solicitud no falla; cinco solicitudes simultáneas dejan una sola fila en `notification_reads`; 50 claves como máximo
-- [ ] T030 [P] [US6] Prueba de contrato `server/tests/contract/notifications.read.contract.test.js`: forma de `POST /api/notifications/read` (`{ marked, unread }`), 400 `VALIDATION_ERROR` con `keys` vacío, más de 50 o mal formadas, y 401 sin token
-- [ ] T031 [P] [US6] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): pulsar un aviso lo marca como leído, baja el contador y abre la pantalla relacionada (orden, cita, vehículo o inventario) cerrando el panel; el botón «Marcar como leído» solo marca; un error al marcar muestra el mensaje y no cambia el contador
+- [ ] T030 [P] [US6] Prueba de integración `server/tests/integration/notifications.read.test.js`: marcar como leído persiste y baja `unread`; otro usuario del mismo rol lo ve sin leer; un aviso leído cuya condición deja de cumplirse desaparece; de próximo a vencido reaparece sin leer (clave nueva); claves inexistentes o de otro rol se ignoran con 200; repetir la solicitud no falla; cinco solicitudes simultáneas dejan una sola fila en `notification_reads`; 50 claves como máximo
+- [ ] T031 [P] [US6] Prueba de contrato `server/tests/contract/notifications.read.contract.test.js`: forma de `POST /api/notifications/read` (`{ marked, unread }`), 400 `VALIDATION_ERROR` con `keys` vacío, más de 50 o mal formadas, y 401 sin token
+- [ ] T032 [P] [US6] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): pulsar un aviso lo marca como leído, baja el contador y abre la pantalla relacionada (orden, cita, vehículo o inventario) cerrando el panel; el botón «Marcar como leído» solo marca; un error al marcar muestra el mensaje y no cambia el contador
 
 ### Implementación de la historia 6
 
-- [ ] T032 [US6] Ampliar `server/services/notificationService.js` con `markRead(keys, actor)`: recalcula los avisos vigentes del actor, intersecta con las claves recibidas, inserta con `notificationReadModel.insertIgnore` y devuelve `{ marked, unread }`; las claves que no correspondan se ignoran sin error
-- [ ] T033 [US6] Agregar `markRead` al controlador y la ruta `POST /notifications/read` con `validate({ body: readNoticesSchema })` en `server/controllers/notificationController.js` y `server/routes/notificationRoutes.js`
-- [ ] T034 [P] [US6] Ampliar `client/lib/services/notifications_service.dart` con `markRead(List<String> keys)` y `client/lib/providers/notifications_provider.dart` con `markRead` (actualiza el aviso y el contador de inmediato y reconcilia con el servidor)
-- [ ] T035 [US6] Agregar la apertura del módulo relacionado: método `openTarget(kind, id)` en `client/lib/providers/navigation_provider.dart` (cambia a la sección de órdenes, citas, vehículos o inventario y empuja el detalle) y su uso en `client/lib/widgets/app_shell.dart`; conectar el panel (`notifications_panel.dart`) para marcar como leído y abrir el aviso, y agregar el botón «Marcar como leído»
+- [ ] T033 [US6] Ampliar `server/services/notificationService.js` con `markRead(keys, actor)`: recalcula los avisos vigentes del actor, intersecta con las claves recibidas, inserta con `notificationReadModel.insertIgnore` y devuelve `{ marked, unread }`; las claves que no correspondan se ignoran sin error
+- [ ] T034 [US6] Agregar `markRead` al controlador y la ruta `POST /notifications/read` con `validate({ body: readNoticesSchema })` en `server/controllers/notificationController.js` y `server/routes/notificationRoutes.js`
+- [ ] T035 [P] [US6] Ampliar `client/lib/services/notifications_service.dart` con `markRead(List<String> keys)` y `client/lib/providers/notifications_provider.dart` con `markRead` (actualiza el aviso y el contador de inmediato y reconcilia con el servidor)
+- [ ] T036 [US6] Agregar la apertura del módulo relacionado: método `openTarget(kind, id)` en `client/lib/providers/navigation_provider.dart` (cambia a la sección de órdenes —«Mis órdenes» para el mecánico—, citas, vehículos o inventario y empuja el detalle) y su uso en `client/lib/widgets/app_shell.dart`; conectar el panel (`notifications_panel.dart`) para marcar como leído y abrir el aviso, y agregar el botón «Marcar como leído»
 
 **Punto de control**: la lectura es por usuario y persistente, el aviso reaparece al empeorar y cada aviso abre su pantalla
 
@@ -160,19 +161,19 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 7 (escribir primero y comprobar que fallan)
 
-- [ ] T036 [P] [US7] Prueba de integración `server/tests/integration/clientNotices.flow.test.js`: la lista incluye orden Terminada (`ORDER_READY`), cita de mañana `PENDIENTE` o `CONFIRMADA` (`APPT_TOMORROW`), mantenimiento próximo y vencido; una orden Entregada, una cita cancelada y un mantenimiento atendido no aparecen; un cliente con dos motivos aparece dos veces; marcar crea el registro con quién y cuándo, saca la fila y no reaparece; una orden nueva del mismo cliente aparece de nuevo; `POST` sobre un hecho que ya no aplica responde 409 `NOTICE_NOT_APPLICABLE`; hecho inexistente responde 404
-- [ ] T037 [P] [US7] Prueba de concurrencia `server/tests/integration/clientNotices.concurrency.test.js`: cinco `POST` simultáneos del mismo hecho dejan una sola fila en `client_notices`, uno responde 201 y los demás 200, sin errores
-- [ ] T038 [P] [US7] Prueba de contrato `server/tests/contract/clientNotices.contract.test.js`: forma de `GET` y `POST /api/client-notices` según `contracts/api-rest.md`; el cuerpo con el campo `note` se rechaza con `VALIDATION_ERROR`; `MECHANIC` recibe 403 en ambas rutas; sin token 401; `phone` vacío llega como cadena vacía
-- [ ] T039 [P] [US7] Pruebas del cliente en `client/test/client_notices_test.dart`: la sección aparece solo para administrador y recepción; la tabla muestra cliente, teléfono («Sin teléfono registrado» si está vacío), vehículo, motivo con su chip y fecha; «Avisado» abre la confirmación «¿Ya avisaste a [cliente] por [motivo]?», al confirmar la fila sale y se muestra «Cliente marcado como avisado»; `NOTICE_NOT_APPLICABLE` muestra «Este aviso ya no aplica» y actualiza; estados cargando, vacío («No hay clientes por avisar») y error con «Reintentar»
+- [ ] T037 [P] [US7] Prueba de integración `server/tests/integration/clientNotices.flow.test.js`: la lista incluye orden Terminada (`ORDER_READY`), cita de mañana `PENDIENTE` o `CONFIRMADA` (`APPT_TOMORROW`), mantenimiento próximo y vencido; una orden Entregada, una cita cancelada y un mantenimiento atendido no aparecen; un cliente con dos motivos aparece dos veces; marcar crea el registro con quién y cuándo, saca la fila y no reaparece; una orden nueva del mismo cliente aparece de nuevo; `POST` sobre un hecho que ya no aplica responde 409 `NOTICE_NOT_APPLICABLE`; hecho inexistente responde 404
+- [ ] T038 [P] [US7] Prueba de concurrencia `server/tests/integration/clientNotices.concurrency.test.js`: cinco `POST` simultáneos del mismo hecho dejan una sola fila en `client_notices`, uno responde 201 y los demás 200, sin errores
+- [ ] T039 [P] [US7] Prueba de contrato `server/tests/contract/clientNotices.contract.test.js`: forma de `GET` y `POST /api/client-notices` según `contracts/api-rest.md`; el cuerpo con el campo `note` se rechaza con `VALIDATION_ERROR`; `MECHANIC` recibe 403 en ambas rutas; sin token 401; `phone` vacío llega como cadena vacía
+- [ ] T040 [P] [US7] Pruebas del cliente en `client/test/client_notices_test.dart`: la sección aparece solo para administrador y recepción; la tabla muestra cliente, teléfono («Sin teléfono registrado» si está vacío), vehículo, motivo con su chip y fecha; «Avisado» abre la confirmación «¿Ya avisaste a [cliente] por [motivo]?», al confirmar la fila sale y se muestra «Cliente marcado como avisado»; `NOTICE_NOT_APPLICABLE` muestra «Este aviso ya no aplica» y actualiza; estados cargando, vacío («No hay clientes por avisar») y error con «Reintentar»
 
 ### Implementación de la historia 7
 
-- [ ] T040 [US7] Ampliar `server/models/noticeModel.js` con `listFinishedOrders(connection)` (órdenes `TERMINADO` con cliente, vehículo y fecha en que quedaron Terminadas por el último cambio del historial) y `listAppointmentsOn(date)` para el día de mañana (reutiliza la de T026)
-- [ ] T041 [US7] Crear `server/services/clientNoticeService.js`: `listPending(actor)` arma los cuatro motivos (órdenes terminadas, citas de mañana, mantenimientos próximos y vencidos con `maintenanceService.list`), excluye los pares `(reason, fact_id)` de `clientNoticeModel.listNoticedFacts`, limita a 200 filas con el total real en `meta.total` y devuelve el teléfono; `register({ reason, factId }, actor)` verifica que el hecho cumple hoy su motivo (409 `NOTICE_NOT_APPLICABLE`, 404 si no existe), inserta con `insertIgnore` y devuelve 201 con el registro nuevo o 200 con el existente; nunca envía ningún mensaje
-- [ ] T042 [US7] Crear `server/controllers/clientNoticeController.js` y `server/routes/clientNoticeRoutes.js` con `GET /` y `POST /` (`authenticate`, `authorize(ROLES.ADMIN, ROLES.RECEPTIONIST)`, `validate` con `createClientNoticeSchema`) y montarla en `server/routes/index.js` como `/client-notices`
-- [ ] T043 [P] [US7] Crear `client/lib/services/client_notices_service.dart` (`list()` y `markNotified(reason, factId)`, tratando 200 y 201 como éxito) y `client/lib/providers/client_notices_provider.dart` (estados cargando, vacío y error; `markNotified` quita la fila y refresca la campana)
-- [ ] T044 [US7] Crear `client/lib/screens/client_notices_screen.dart`: encabezado de página con el texto «Llama o avisa en persona y marca al cliente como avisado. El sistema no envía mensajes.», tabla `AppDataTable` con Cliente, Teléfono, Vehículo, Motivo (chip verde para listo, ámbar para próximo y cita, rojo para vencido), Fecha y Acción, botón «Avisado» con `client/lib/widgets/confirm_dialog.dart` y los estados de `state_views.dart`
-- [ ] T045 [US7] Agregar la sección: `AppSection.clientNotices` («Clientes por avisar») en `client/lib/providers/navigation_provider.dart` (en `sectionsFor` solo para administrador y recepción, debajo de Mantenimientos), su ícono y su pantalla en `client/lib/widgets/app_shell.dart`, la descripción en `client/lib/screens/home_screen.dart` y el registro de los proveedores en `client/lib/main.dart`
+- [ ] T041 [US7] Ampliar (o crear, si la historia 2 aún no se hizo) `server/models/noticeModel.js` con `listFinishedOrders(connection)` (órdenes `TERMINADO` con cliente, vehículo y fecha en que quedaron Terminadas por el último cambio del historial) y `listAppointmentsOn(date)` para el día de mañana (reutiliza la de T027)
+- [ ] T042 [US7] Crear `server/services/clientNoticeService.js`: `listPending(actor)` arma los cuatro motivos (órdenes terminadas, citas de mañana, mantenimientos próximos y vencidos con `maintenanceService.list`), excluye los pares `(reason, fact_id)` de `clientNoticeModel.listNoticedFacts`, limita a 200 filas con el total real en `meta.total` y devuelve el teléfono; `register({ reason, factId }, actor)` verifica que el hecho cumple hoy su motivo (409 `NOTICE_NOT_APPLICABLE`, 404 si no existe), inserta con `insertIgnore` y devuelve 201 con el registro nuevo o 200 con el existente; nunca envía ningún mensaje
+- [ ] T043 [US7] Crear `server/controllers/clientNoticeController.js` y `server/routes/clientNoticeRoutes.js` con `GET /` y `POST /` (`authenticate`, `authorize(ROLES.ADMIN, ROLES.RECEPTIONIST)`, `validate` con `createClientNoticeSchema`) y montarla en `server/routes/index.js` como `/client-notices`
+- [ ] T044 [P] [US7] Crear `client/lib/services/client_notices_service.dart` (`list()` y `markNotified(reason, factId)`, tratando 200 y 201 como éxito) y `client/lib/providers/client_notices_provider.dart` (estados cargando, vacío y error; `markNotified` quita la fila y refresca la campana)
+- [ ] T045 [US7] Crear `client/lib/screens/client_notices_screen.dart`: encabezado de página con el texto «Llama o avisa en persona y marca al cliente como avisado. El sistema no envía mensajes.», tabla `AppDataTable` con Cliente, Teléfono, Vehículo, Motivo (chip verde para listo, ámbar para próximo y cita, rojo para vencido), Fecha y Acción, botón «Avisado» con `client/lib/widgets/confirm_dialog.dart` y los estados de `state_views.dart`
+- [ ] T046 [US7] Agregar la sección: `AppSection.clientNotices` («Clientes por avisar») en `client/lib/providers/navigation_provider.dart` (en `sectionsFor` solo para administrador y recepción, debajo de Mantenimientos), su ícono y su pantalla en `client/lib/widgets/app_shell.dart`, la descripción en `client/lib/screens/home_screen.dart` y el registro de los proveedores en `client/lib/main.dart`
 
 **Punto de control**: la recepción avisa a un cliente y lo marca en menos de un minuto; ningún cliente reaparece por el mismo hecho y no se envía ningún mensaje
 
@@ -186,14 +187,14 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 3 (escribir primero y comprobar que fallan)
 
-- [ ] T046 [P] [US3] Prueba de integración `server/tests/integration/notifications.stock.test.js`: el administrador recibe `STOCK_LOW` (con `0 < stock <= min_stock`) y `STOCK_OUT` (`stock = 0`) solo de refacciones activas; una inactiva no avisa; el total coincide con `GET /api/parts/alerts` y con el panel; la recepción y el mecánico no reciben ningún `STOCK_*`, ni siquiera marcando sus claves
-- [ ] T047 [P] [US3] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar) y `client/test/home_screen_test.dart`: el panel muestra «Stock agotado» (rojo) y «Stock bajo» (ámbar) con existencia y mínimo; la insignia de Inventario y el aviso de inicio siguen funcionando y no se contradicen con el centro (FR-009); tras un movimiento de inventario se refresca el centro
+- [ ] T047 [P] [US3] Prueba de integración `server/tests/integration/notifications.stock.test.js`: el administrador recibe `STOCK_LOW` (con `0 < stock <= min_stock`) y `STOCK_OUT` (`stock = 0`) solo de refacciones activas; una inactiva no avisa; el total coincide con `GET /api/parts/alerts` y con el panel; la recepción y el mecánico no reciben ningún `STOCK_*`, ni siquiera marcando sus claves
+- [ ] T048 [P] [US3] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar) y `client/test/home_screen_test.dart`: el panel muestra «Stock agotado» (rojo) y «Stock bajo» (ámbar) con existencia y mínimo; la insignia de Inventario y el aviso de inicio siguen funcionando y no se contradicen con el centro (FR-009); tras un movimiento de inventario se refresca el centro
 
 ### Implementación de la historia 3
 
-- [ ] T048 [US3] Ampliar `server/services/notificationService.js` con `STOCK_LOW` y `STOCK_OUT` a partir de `partService.alerts()` (claves `STOCK_LOW:{partId}` y `STOCK_OUT:{partId}`, `target` de tipo `part`, `stock` y `minStock`), ejecutado solo para ADMIN
-- [ ] T049 [P] [US3] Refrescar el centro tras los movimientos de inventario: llamar a `NotificationsProvider.refresh()` junto a `StockAlertsProvider.refresh()` en `client/lib/screens/inventory_screen.dart` y `client/lib/screens/part_detail_screen.dart`, sin cambiar `StockAlertsProvider` ni el banner
-- [ ] T050 [P] [US3] Ampliar `client/lib/widgets/notifications_panel.dart` con las secciones de stock (rojo para agotado y ámbar para bajo)
+- [ ] T049 [US3] Ampliar `server/services/notificationService.js` con `STOCK_LOW` y `STOCK_OUT` a partir de `partService.alerts()` (claves `STOCK_LOW:{partId}` y `STOCK_OUT:{partId}`, `target` de tipo `part`, `stock` y `minStock`), ejecutado solo para ADMIN
+- [ ] T050 [P] [US3] Refrescar el centro tras los movimientos de inventario: llamar a `NotificationsProvider.refresh()` junto a `StockAlertsProvider.refresh()` en `client/lib/screens/inventory_screen.dart` y `client/lib/screens/part_detail_screen.dart`, sin cambiar `StockAlertsProvider` ni el banner
+- [ ] T051 [P] [US3] Ampliar `client/lib/widgets/notifications_panel.dart` con las secciones de stock (rojo para agotado y ámbar para bajo)
 
 **Punto de control**: el administrador ve el stock en el centro y los números coinciden con el inventario
 
@@ -207,14 +208,14 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 4 (escribir primero y comprobar que fallan)
 
-- [ ] T051 [P] [US4] Prueba de integración `server/tests/integration/notifications.stalled.test.js`: una orden abierta con 4 días desde su último cambio genera `STALLED`, con 3 días exactos no; la fecha del último cambio es el mayor `changed_at` del historial (y `created_at` sin historial); `TERMINADO` y `ENTREGADO` no avisan; cambiar de estado quita el aviso y reinicia el conteo; la clave `STALLED:{orden}:{último id del historial}` cambia cuando la orden vuelve a detenerse, y el aviso reaparece sin leer; `ADMIN` y `RECEPTIONIST` lo reciben
-- [ ] T052 [P] [US4] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): la sección «Órdenes detenidas» muestra folio, cliente, estado y «N días sin cambio» con indicador ámbar y abre la orden al pulsar
+- [ ] T052 [P] [US4] Prueba de integración `server/tests/integration/notifications.stalled.test.js`: una orden abierta con 4 días desde su último cambio genera `STALLED`, con 3 días exactos no; la fecha del último cambio es el mayor `changed_at` del historial (y `created_at` sin historial); `TERMINADO` y `ENTREGADO` no avisan; cambiar de estado quita el aviso y reinicia el conteo; la clave `STALLED:{orden}:{último id del historial}` cambia cuando la orden vuelve a detenerse, y el aviso reaparece sin leer; `ADMIN` y `RECEPTIONIST` lo reciben
+- [ ] T053 [P] [US4] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): la sección «Órdenes detenidas» muestra folio, cliente, estado y «N días sin cambio» con indicador ámbar y abre la orden al pulsar
 
 ### Implementación de la historia 4
 
-- [ ] T053 [US4] Ampliar `server/models/noticeModel.js` con `listOpenOrdersWithLastChange({ mechanicId }, connection)` (órdenes en `RECIBIDO`, `DIAGNOSTICO`, `EN_REPARACION` y `ESPERANDO_REFACCION` con el último `changed_at` y el último id de `order_status_history`, o `created_at` y `0`; filtro opcional por mecánico asignado) apoyada en `idx_order_history_order`
-- [ ] T054 [US4] Ampliar `server/services/notificationService.js` con `STALLED` usando `isStalledOrder` de `noticeRules.js`, la clave `STALLED:{orderId}:{lastHistoryId}`, `target` de tipo `order`, `folio`, `status` y `daysStalled`
-- [ ] T055 [P] [US4] Ampliar `client/lib/widgets/notifications_panel.dart` con la sección «Órdenes detenidas»
+- [ ] T054 [US4] Ampliar (o crear, si aún no existe) `server/models/noticeModel.js` con `listOpenOrdersWithLastChange({ mechanicId }, connection)` (órdenes en `RECIBIDO`, `DIAGNOSTICO`, `EN_REPARACION` y `ESPERANDO_REFACCION` con el último `changed_at` y el último id de `order_status_history`, o `created_at` y `0`; filtro opcional por mecánico asignado) apoyada en `idx_order_history_order`
+- [ ] T055 [US4] Ampliar `server/services/notificationService.js` con `STALLED` usando `isStalledOrder` de `noticeRules.js`, la clave `STALLED:{orderId}:{lastHistoryId}`, `target` de tipo `order`, `folio`, `status` y `daysStalled`; **desde esta tarea** el MECHANIC solo recibe las órdenes con `mechanic_id` igual al del actor (`listOpenOrdersWithLastChange({ mechanicId })`) y sin nombre de cliente, para no filtrar avisos de órdenes ajenas aunque la historia 5 aún no se haya hecho
+- [ ] T056 [P] [US4] Ampliar `client/lib/widgets/notifications_panel.dart` con la sección «Órdenes detenidas»
 
 **Punto de control**: las órdenes detenidas aparecen y desaparecen según la regla de 3 días
 
@@ -228,13 +229,13 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 5 (escribir primero y comprobar que fallan)
 
-- [ ] T056 [P] [US5] Prueba de integración `server/tests/integration/notifications.mechanic.test.js`: el mecánico solo recibe `STALLED` de sus órdenes asignadas; no recibe las de otro mecánico ni las órdenes sin asignar, ni avisos de citas, mantenimientos o stock; los ítems no traen nombre de cliente ni teléfono; marcar claves ajenas se ignora; `GET` y `POST /api/client-notices` responden 403; el rol vigente en la base (no el del token) decide los avisos tras un cambio de rol
-- [ ] T057 [P] [US5] Pruebas del cliente en `client/test/notifications_test.dart` y `client/test/app_shell_test.dart` (ampliar): el mecánico ve solo la sección «Órdenes detenidas» y no ve «Clientes por avisar» en el menú
+- [ ] T057 [P] [US5] Prueba de integración `server/tests/integration/notifications.mechanic.test.js`: el mecánico solo recibe `STALLED` de sus órdenes asignadas; no recibe las de otro mecánico ni las órdenes sin asignar, ni avisos de citas, mantenimientos o stock; los ítems no traen nombre de cliente ni teléfono; marcar claves ajenas se ignora; `GET` y `POST /api/client-notices` responden 403; el rol vigente en la base (no el del token) decide los avisos tras un cambio de rol
+- [ ] T058 [P] [US5] Pruebas del cliente en `client/test/notifications_test.dart` y `client/test/app_shell_test.dart` (ampliar): el mecánico ve solo la sección «Órdenes detenidas» y no ve «Clientes por avisar» en el menú
 
 ### Implementación de la historia 5
 
-- [ ] T058 [US5] Ajustar `server/services/notificationService.js`: para MECHANIC consultar solo órdenes con `mechanic_id` del actor (`listOpenOrdersWithLastChange({ mechanicId })`) y proyectar los avisos sin nombre de cliente ni teléfono (`detail` con folio, vehículo y estado)
-- [ ] T059 [P] [US5] Verificar en `client/lib/providers/navigation_provider.dart` y `client/lib/widgets/app_shell.dart` que `AppSection.clientNotices` no se ofrece al mecánico y que el panel de notificaciones no pide datos que su rol no recibe
+- [ ] T059 [US5] Reforzar `server/services/notificationService.js` como defensa en profundidad: agregar `projectForRole(notice, role)` aplicada al final de `list` a todos los tipos, que para MECHANIC deja `detail` solo con folio, vehículo y estado y elimina cualquier nombre de cliente o teléfono, y que descarta cualquier aviso cuyo tipo no esté en `typesForRole(role)`; el filtro por mecánico asignado ya lo hizo T055
+- [ ] T060 [P] [US5] Verificar en `client/lib/providers/navigation_provider.dart` y `client/lib/widgets/app_shell.dart` que `AppSection.clientNotices` no se ofrece al mecánico y que el panel de notificaciones no pide datos que su rol no recibe
 
 **Punto de control**: el mecánico solo ve lo suyo, validado en el servidor
 
@@ -244,15 +245,15 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 **Propósito**: datos de ejemplo, rendimiento, documentación, regresión y cierre
 
-- [ ] T060 [P] Crear `database/seeds/006_notices.sql` (idempotente, fechas relativas a `CURDATE()`, sin llamar a servicios externos, sin editar seeds anteriores): al menos un mantenimiento próximo y uno vencido, una cita de hoy y una de mañana, una refacción con stock bajo y otra agotada (reutilizar las existentes si cumplen), una orden abierta con más de 3 días sin cambio de estado, una orden Terminada sin entregar y un aviso a cliente ya registrado; aplicarlo con `database/scripts/aplicar-seeds.ps1` en `motorix` y `motorix_test`
-- [ ] T061 [P] Prueba de datos de ejemplo `server/tests/integration/seed.notices.test.js`: tras correr el seed dos veces no se duplican filas y cada tipo de aviso y cada motivo de la lista de clientes por avisar tiene al menos un caso (usa `runSeedFile` de `server/tests/helpers/seed.js`)
-- [ ] T062 [P] Prueba de rendimiento `server/tests/integration/notifications.performance.test.js` (SC-007): con 1 000 órdenes, 1 000 citas y 1 000 mantenimientos, `GET /api/notifications` responde en menos de 2 segundos para administrador y recepción, y devuelve el total real con máximo 50 avisos por tipo
-- [ ] T063 [P] Verificar que el sistema no envía mensajes al cliente (SC-006): revisar que `server/package.json` y `client/pubspec.yaml` no tienen dependencias de mensajería (correo, SMS o WhatsApp) y que ninguna ruta o servicio nuevo hace llamadas externas; anotar el resultado en el documento de aseguramiento
-- [ ] T064 [P] Actualizar `docs/project-context.md`: §6.12 con el centro de notificaciones y la lista de clientes por avisar (tipos, roles, regla de 3 días), y las rutas `/notifications` y `/client-notices`, las tablas `notification_reads` y `client_notices` y la sección «Clientes por avisar» (FR-024)
-- [ ] T065 [P] Actualizar `docs/design-system.md` (FR-024): sección 7 («Header») con la campana y el panel, y una sección nueva «Notificaciones y avisos a clientes (Sprint 6)» con los tipos, los colores, los estados, la insignia «99+» y la tabla de clientes por avisar
-- [ ] T066 Ejecutar la regresión completa: `npm test` en `server/` y `flutter test` en `client/`; deben pasar todas las pruebas de la línea base de T001 más las nuevas, salvo las que deban actualizarse por cambios declarados en la especificación (cada una se registra en el documento de aseguramiento)
-- [ ] T067 Completar `docs/aseguramiento-calidad-sprint-6.md` (y `.docx` si el proceso lo pide): línea base, regresión, matriz final con una prueba por criterio de aceptación del insumo (CA-1 a CA-14) y por requisito (FR-001 a FR-025), capturas de la aplicación (campana, panel, clientes por avisar), tiempos de SC-001, SC-005, SC-007 y SC-009, riesgos R-01 a R-11 de plan.md y aprobación
-- [ ] T068 Ejecutar el recorrido manual de `quickstart.md` (secciones 4 a 7) con los datos de ejemplo y anotar el resultado en el documento de aseguramiento
+- [ ] T061 [P] Crear `database/seeds/006_notices.sql` (idempotente, fechas relativas a `CURDATE()`, sin llamar a servicios externos, sin editar seeds anteriores): al menos un mantenimiento próximo y uno vencido, una cita de hoy y una de mañana, una refacción con stock bajo y otra agotada (reutilizar las existentes si cumplen), una orden abierta con más de 3 días sin cambio de estado, una orden Terminada sin entregar y un aviso a cliente ya registrado; aplicarlo con `database/scripts/aplicar-seeds.ps1` en `motorix` y `motorix_test`
+- [ ] T062 [P] Prueba de datos de ejemplo `server/tests/integration/seed.notices.test.js`: tras correr el seed dos veces no se duplican filas y cada tipo de aviso y cada motivo de la lista de clientes por avisar tiene al menos un caso (usa `runSeedFile` de `server/tests/helpers/seed.js`)
+- [ ] T063 [P] Prueba de rendimiento `server/tests/integration/notifications.performance.test.js` (SC-007): con 1 000 órdenes, 1 000 citas y 1 000 mantenimientos, `GET /api/notifications` responde en menos de 2 segundos para administrador y recepción, y devuelve el total real con máximo 50 avisos por tipo
+- [ ] T064 [P] Verificar que el sistema no envía mensajes al cliente (SC-006): revisar que `server/package.json` y `client/pubspec.yaml` no tienen dependencias de mensajería (correo, SMS o WhatsApp) y que ninguna ruta o servicio nuevo hace llamadas externas; anotar el resultado en el documento de aseguramiento
+- [ ] T065 [P] Actualizar `docs/project-context.md`: §6.12 con el centro de notificaciones y la lista de clientes por avisar (tipos, roles, regla de 3 días), y las rutas `/notifications` y `/client-notices`, las tablas `notification_reads` y `client_notices` y la sección «Clientes por avisar» (FR-024)
+- [ ] T066 [P] Actualizar `docs/design-system.md` (FR-024): sección 7 («Header») con la campana y el panel, y una sección nueva «Notificaciones y avisos a clientes (Sprint 6)» con los tipos, los colores, los estados, la insignia «99+» y la tabla de clientes por avisar
+- [ ] T067 Ejecutar la regresión completa: `npm test` en `server/` y `flutter test` en `client/`; deben pasar todas las pruebas de la línea base de T001 más las nuevas, salvo las que deban actualizarse por cambios declarados en la especificación (cada una se registra en el documento de aseguramiento)
+- [ ] T068 Completar `docs/aseguramiento-calidad-sprint-6.md` (y `.docx` si el proceso lo pide): línea base, regresión, matriz final con una prueba por criterio de aceptación del insumo (CA-1 a CA-14) y por requisito (FR-001 a FR-025), capturas de la aplicación (campana, panel, clientes por avisar), tiempos de SC-001, SC-005, SC-007 y SC-009, riesgos R-01 a R-11 de plan.md y aprobación
+- [ ] T069 Ejecutar el recorrido manual de `quickstart.md` (secciones 4 a 7) con los datos de ejemplo y anotar el resultado en el documento de aseguramiento
 
 ---
 
@@ -260,12 +261,12 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Dependencias entre fases
 
-- **Fase 1 (T001)**: sin dependencias
-- **Fase 2 (T002 a T013)**: depende de T001; BLOQUEA todas las historias
+- **Fase 1 (T001 y T002)**: sin dependencias; T002 es una puerta que requiere la aprobación del responsable del proyecto
+- **Fase 2 (T003 a T014)**: depende de T001 y T002; BLOQUEA todas las historias
 - **Fase 3 (US1)**: depende de la fase 2; crea `notificationService`, la ruta, el proveedor, la campana y el panel que usan las demás historias
-- **Fases 4 a 9**: dependen de la fase 3 en lo que comparten (`notificationService.js`, `notifications_panel.dart`, `notifications_test.dart`); la fase 6 (US7) comparte solo `noticeModel.js` con la fase 4 y puede ir en paralelo con las fases 4, 5, 7, 8 y 9 si se coordinan esos archivos
+- **Fases 4 a 9**: dependen de la fase 3 en lo que comparten (`notificationService.js`, `notifications_panel.dart`, `notifications_test.dart`); la fase 6 (US7) comparte solo `noticeModel.js` (que crea la primera historia que lo necesita: T027, T041 o T054) y puede ir en paralelo con las fases 4, 5, 7, 8 y 9 si se coordinan esos archivos; la fase 9 (US5) solo agrega pruebas y la defensa en profundidad de T059, porque el filtro por mecánico se hace desde T055
 - **Fase 5 (US6)** depende de que exista al menos un tipo de aviso (lo da US1)
-- **Fase 10**: depende de las historias que se vayan a entregar; T060 a T062 necesitan todos los tipos de aviso
+- **Fase 10**: depende de las historias que se vayan a entregar; T061 a T063 necesitan todos los tipos de aviso
 
 ### Dentro de cada historia
 
@@ -275,19 +276,19 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Oportunidades de ejecución en paralelo
 
-- Fase 2: T005 a T013 son independientes entre sí (archivos distintos) tras T002 a T004
+- Fase 2: T006 a T014 son independientes entre sí (archivos distintos) tras T003 a T005
 - Dentro de cada historia: las pruebas marcadas [P] se pueden escribir en paralelo; el backend y el cliente de una historia pueden avanzar a la vez cuando el contrato está fijado (`contracts/`)
-- Fase 10: T060 a T065 son independientes
+- Fase 10: T061 a T066 son independientes
 
 ---
 
 ## Ejemplo de ejecución en paralelo: Historia 1
 
 ```text
-T014  integración notifications.flow
-T015  contrato notifications
-T016  pruebas del cliente (proveedor, campana y panel)
-      -> luego: T017 servicio -> T018 ruta;  T019 servicio del cliente -> T020 proveedor -> T021 y T022 -> T023 integración
+T015  integración notifications.flow
+T016  contrato notifications
+T017  pruebas del cliente (proveedor, campana y panel)
+      -> luego: T018 servicio -> T019 ruta;  T020 servicio del cliente -> T021 proveedor -> T022 y T023 -> T024 integración
 ```
 
 ---
@@ -296,7 +297,7 @@ T016  pruebas del cliente (proveedor, campana y panel)
 
 ### Primero el valor mínimo (historia 1)
 
-1. Fases 1 y 2 (preparación y fundamentos).
+1. Fases 1 y 2 (preparación, puerta de la constitución y fundamentos).
 2. Fase 3 (US1): campana y panel con el tipo de referencia.
 3. **Detenerse y validar**: ver la campana, abrir el panel, los tres estados y la actualización cada 60 segundos.
 
@@ -319,4 +320,4 @@ El Sprint 6 tiene 5 días planificados (20 al 24 de noviembre). El orden de prio
 - [P] = archivos distintos y sin dependencias pendientes
 - Cada historia se puede completar y probar de forma independiente
 - Hacer commit después de cada tarea o grupo lógico (Conventional Commits, tipo y alcance en inglés y descripción en español)
-- Los criterios del insumo (CA-1 a CA-14) se cubren así: CA-1 a CA-3 con US1, US2, US3 y US4; CA-4 con US5; CA-5 con US2 y US3; CA-6 y CA-7 con US6; CA-8 con US3; CA-9 con US1; CA-10 y CA-11 con US7; CA-12 con T060 y T061; CA-13 con las pruebas de cada historia; CA-14 con T064 y T065
+- Los criterios del insumo (CA-1 a CA-14) se cubren así: CA-1 a CA-3 con US1, US2, US3 y US4; CA-4 con US5; CA-5 con US2 y US3; CA-6 y CA-7 con US6; CA-8 con US3; CA-9 con US1; CA-10 y CA-11 con US7; CA-12 con T061 y T062; CA-13 con las pruebas de cada historia; CA-14 con T065 y T066

@@ -34,11 +34,11 @@ de la especificación se registran en el documento de aseguramiento.
 ## 3. Pruebas del sprint
 
 ```powershell
-cd server; npm test -- tests/unit/noticeRules.test.js tests/integration/notifications.test.js tests/integration/clientNotices.test.js
-cd ..\client; flutter test test/notifications_test.dart test/client_notices_test.dart
+cd server; npm test -- tests/unit/noticeRules.test.js tests/unit/noticeValidators.test.js tests/integration/notifications tests/integration/clientNotices tests/integration/seed.notices.test.js tests/contract/notifications tests/contract/clientNotices
+cd ..\client; flutter test test/notice_models_test.dart test/notifications_test.dart test/client_notices_test.dart
 ```
 
-Resultado esperado: todas aprobadas. Los nombres exactos de los archivos los fija `tasks.md`.
+Resultado esperado: todas aprobadas. Los nombres de los archivos son los de `tasks.md` (T006, T008, T014 a T016, T024 a T025, T029 a T031, T036 a T039, T046 a T047, T051 a T052, T056 a T057 y T061 a T062); la prueba de rendimiento se ejecuta aparte (sección 6).
 
 ## 4. Recorrido manual (flujo demostrable)
 

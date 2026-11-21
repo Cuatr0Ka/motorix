@@ -17,6 +17,12 @@ Enmienda 1.1.0 (2026-10-31)
 - Secciones añadidas: "Decisiones resueltas durante el Sprint 5"
 - Plantillas revisadas: `plan-template.md`, `spec-template.md` y `tasks-template.md` no requieren cambios
 - Pendiente (TODO): ratificación formal por el equipo (`TODO(RATIFICATION_DATE)`)
+
+Enmienda 1.1.1 (2026-11-20)
+- Cambio de versión: 1.1.0 → 1.1.1 (PATCH: solo se registra la aprobación del Sprint 6; no cambia ningún principio)
+- Secciones añadidas: "Decisiones resueltas durante el Sprint 6"
+- Plantillas revisadas: `plan-template.md`, `spec-template.md` y `tasks-template.md` no requieren cambios
+- Pendiente (TODO): ratificación formal por el equipo (`TODO(RATIFICATION_DATE)`)
 -->
 
 # Constitución de Motorix
@@ -249,6 +255,15 @@ asumirlas como definitivas:
   declarada por quien lo lleva, por tratarse de un proyecto escolar) para habilitar el Sprint 5:
   precios de refacciones y cobro completo.
 
+### Decisiones resueltas durante el Sprint 6
+
+- **Sprint 6 (notificaciones internas y clientes por avisar)**: aprobado el 2026-11-20 por el
+  responsable del proyecto (autoridad declarada por quien lo lleva, por tratarse de un proyecto
+  escolar), con el insumo `docs/sprints/sprint-6-notificaciones-internas.md` y el flujo completo de
+  Spec Kit (especificar, aclarar, planear, generar tareas, analizar e implementar), como exige el
+  principio I. El sistema no envía mensajes al cliente por ningún canal: recepción avisa por
+  teléfono o en persona y el sistema solo lo registra.
+
 ## Gobernanza
 
 - Esta constitución tiene prioridad sobre cualquier otra práctica o convención del repo.
@@ -260,4 +275,4 @@ asumirlas como definitivas:
 - El cumplimiento se revisa en cada contribución; cualquier desviación DEBE justificarse
   explícitamente o descartarse.
 
-**Versión**: 1.1.0 | **Redactada**: 2026-10-01 | **Ratificación**: TODO(RATIFICATION_DATE): pendiente de aprobación del equipo | **Última enmienda**: 2026-10-31
+**Versión**: 1.1.1 | **Redactada**: 2026-10-01 | **Ratificación**: TODO(RATIFICATION_DATE): pendiente de aprobación del equipo | **Última enmienda**: 2026-11-20
