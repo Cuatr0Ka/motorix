@@ -14,6 +14,7 @@ import 'providers/parts_provider.dart';
 import 'providers/payments_provider.dart';
 import 'providers/session_provider.dart';
 import 'providers/sidebar_provider.dart';
+import 'providers/settings_provider.dart';
 import 'providers/stock_alerts_provider.dart';
 import 'providers/tickets_provider.dart';
 import 'providers/users_provider.dart';
@@ -31,6 +32,7 @@ import 'screens/maintenance_list_screen.dart';
 import 'screens/order_detail_screen.dart';
 import 'screens/part_detail_screen.dart';
 import 'screens/payments_list_screen.dart';
+import 'screens/settings_screen.dart';
 import 'screens/tickets_list_screen.dart';
 import 'screens/orders_list_screen.dart';
 import 'screens/users_screen.dart';
@@ -47,6 +49,7 @@ import 'services/notifications_service.dart';
 import 'services/orders_service.dart';
 import 'services/parts_service.dart';
 import 'services/payments_service.dart';
+import 'services/settings_service.dart';
 import 'services/tickets_service.dart';
 import 'services/users_service.dart';
 import 'services/vehicles_service.dart';
@@ -112,6 +115,8 @@ class MotorixApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => StockAlertsProvider(context.read<PartsService>())),
         Provider<ClientNoticesService>(create: (_) => ClientNoticesService(apiClient)),
         ChangeNotifierProvider(create: (context) => ClientNoticesProvider(context.read<ClientNoticesService>())),
+        Provider<SettingsService>(create: (_) => SettingsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => SettingsProvider(context.read<SettingsService>())),
         Provider<NotificationsService>(create: (_) => NotificationsService(apiClient)),
         ChangeNotifierProvider(create: (context) => NotificationsProvider(context.read<NotificationsService>())),
         Provider<UsersService>(create: (_) => UsersService(apiClient)),
@@ -189,6 +194,8 @@ Widget buildSection(BuildContext context, AppSection section) {
       return const InventoryScreen();
     case AppSection.users:
       return const UsersScreen();
+    case AppSection.settings:
+      return const SettingsScreen();
     case AppSection.changePassword:
       return const ChangePasswordScreen();
   }

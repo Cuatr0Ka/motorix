@@ -1,5 +1,5 @@
 import { withTransaction } from '../config/db.js';
-import { getShopConfig } from '../config/env.js';
+import * as settingsService from './settingsService.js';
 import * as orderModel from '../models/orderModel.js';
 import * as orderPartModel from '../models/orderPartModel.js';
 import * as orderWorkModel from '../models/orderWorkModel.js';
@@ -43,7 +43,8 @@ export async function generate(orderId, actor) {
       ]);
 
       const content = buildTicketContent({
-        shop: getShopConfig(),
+        // Sprint 7: los datos del taller salen de la configuración guardada; el ticket guarda su instantánea.
+        shop: await settingsService.getShop(),
         order,
         customer: { name: vehicle.client.name, phone: vehicle.client.phone },
         vehicle,

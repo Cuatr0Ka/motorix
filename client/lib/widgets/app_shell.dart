@@ -48,6 +48,8 @@ IconData iconForSection(AppSection section) {
       return Icons.receipt_long_outlined;
     case AppSection.users:
       return Icons.admin_panel_settings_outlined;
+    case AppSection.settings:
+      return Icons.settings_outlined;
     case AppSection.changePassword:
       return Icons.lock_outline;
   }
@@ -81,6 +83,8 @@ IconData _selectedIconFor(AppSection section) {
       return Icons.receipt_long;
     case AppSection.users:
       return Icons.admin_panel_settings;
+    case AppSection.settings:
+      return Icons.settings;
     case AppSection.changePassword:
       return Icons.lock;
   }

@@ -10,6 +10,7 @@ import notificationRoutes from './notificationRoutes.js';
 import orderRoutes from './orderRoutes.js';
 import partRoutes from './partRoutes.js';
 import paymentRoutes from './paymentRoutes.js';
+import settingsRoutes from './settingsRoutes.js';
 import ticketRoutes from './ticketRoutes.js';
 import userRoutes from './userRoutes.js';
 import vehicleRoutes from './vehicleRoutes.js';
@@ -35,5 +36,6 @@ router.use('/tickets', ticketRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/client-notices', clientNoticeRoutes);
+router.use('/settings', settingsRoutes);
 
 export default router;

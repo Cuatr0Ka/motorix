@@ -18,6 +18,7 @@ enum AppSection {
   clientNotices('Clientes por avisar'),
   inventory('Inventario'),
   users('Usuarios'),
+  settings('Configuración'),
   changePassword('Cambiar contraseña');
 
   const AppSection(this.title);
@@ -48,6 +49,7 @@ class NavigationProvider extends ChangeNotifier {
         if (role == UserRole.mechanic) AppSection.myOrders,
         if (role == UserRole.admin) AppSection.inventory,
         if (role == UserRole.admin) AppSection.users,
+        if (role == UserRole.admin) AppSection.settings,
       ];
 
   /// Pantalla de detalle pendiente de abrir (viene de un aviso). La toma el AppShell y la abre.
