@@ -85,6 +85,9 @@ class ApiClient {
   /// Se invoca cuando el servidor responde 403 TERMS_NOT_ACCEPTED (hay una versión nueva de los términos por aceptar).
   void Function()? onTermsRequired;
 
+  /// Se invoca cuando el servidor responde 401 SESSION_INACTIVE (más de 30 minutos sin actividad).
+  void Function()? onSessionInactive;
+
   Uri _uri(String path, [Map<String, dynamic>? query]) {
     final params = <String, String>{};
     query?.forEach((key, value) {
@@ -158,6 +161,9 @@ class ApiClient {
       onSessionExpired?.call();
     }
 
+    if (response.statusCode == 401 && code == 'SESSION_INACTIVE' && token != null) {
+      onSessionInactive?.call();
+    }
     if (response.statusCode == 403 && code == 'TERMS_NOT_ACCEPTED' && token != null) {
       onTermsRequired?.call();
     }

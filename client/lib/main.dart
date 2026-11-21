@@ -14,6 +14,7 @@ import 'providers/parts_provider.dart';
 import 'providers/payments_provider.dart';
 import 'providers/session_provider.dart';
 import 'providers/sidebar_provider.dart';
+import 'providers/audit_provider.dart';
 import 'providers/service_types_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/terms_provider.dart';
@@ -34,6 +35,7 @@ import 'screens/maintenance_list_screen.dart';
 import 'screens/order_detail_screen.dart';
 import 'screens/part_detail_screen.dart';
 import 'screens/payments_list_screen.dart';
+import 'screens/audit_log_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/terms_accept_screen.dart';
 import 'screens/terms_admin_screen.dart';
@@ -53,6 +55,7 @@ import 'services/notifications_service.dart';
 import 'services/orders_service.dart';
 import 'services/parts_service.dart';
 import 'services/payments_service.dart';
+import 'services/audit_service.dart';
 import 'services/service_types_service.dart';
 import 'services/settings_service.dart';
 import 'services/terms_service.dart';
@@ -64,6 +67,7 @@ import 'utils/link_opener.dart';
 import 'utils/ticket_printer.dart';
 import 'utils/tokens.dart';
 import 'widgets/app_shell.dart';
+import 'widgets/inactivity_guard.dart';
 
 void main() {
   runApp(MotorixApp(apiClient: ApiClient()));
@@ -95,6 +99,8 @@ class MotorixApp extends StatelessWidget {
       providers: [
         Provider<ApiClient>.value(value: apiClient),
         Provider<AuthService>.value(value: authService),
+        Provider<AuditService>(create: (_) => AuditService(apiClient)),
+        ChangeNotifierProvider(create: (context) => AuditProvider(context.read<AuditService>())),
         Provider<TermsService>(create: (_) => TermsService(apiClient)),
         ChangeNotifierProvider(create: (context) => SessionProvider(apiClient, authService, context.read<TermsService>())),
         ChangeNotifierProvider(create: (context) => TermsProvider(context.read<TermsService>())),
@@ -158,7 +164,10 @@ class _AuthGate extends StatelessWidget {
       child: signedIn
           ? (termsPending
               ? const TermsAcceptScreen(key: ValueKey('terms'))
-              : const AppShell(key: ValueKey('app'), sectionBuilder: buildSection, targetBuilder: buildNoticeTarget))
+              : const InactivityGuard(
+                  key: ValueKey('app'),
+                  child: AppShell(sectionBuilder: buildSection, targetBuilder: buildNoticeTarget),
+                ))
           : const LoginScreen(key: ValueKey('login')),
     );
   }
@@ -211,6 +220,8 @@ Widget buildSection(BuildContext context, AppSection section) {
       return const SettingsScreen();
     case AppSection.terms:
       return const TermsAdminScreen();
+    case AppSection.auditLog:
+      return const AuditLogScreen();
     case AppSection.changePassword:
       return const ChangePasswordScreen();
   }

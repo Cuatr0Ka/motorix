@@ -13,6 +13,7 @@ class SessionProvider extends ChangeNotifier {
   SessionProvider(this._api, this._auth, [this._terms]) {
     _api.onSessionExpired = _handleExpired;
     _api.onTermsRequired = _handleTermsRequired;
+    _api.onSessionInactive = logoutInactive;
   }
 
   final ApiClient _api;
@@ -135,6 +136,14 @@ class SessionProvider extends ChangeNotifier {
       _termsError = 'No se pudo registrar la aceptación. Inténtalo de nuevo.';
     }
     _termsBusy = false;
+    notifyListeners();
+  }
+
+  /// Cierra la sesión por inactividad (a los 30 minutos sin actividad o cuando el servidor responde SESSION_INACTIVE).
+  void logoutInactive() {
+    if (!isSignedIn) return;
+    _clear();
+    _notice = 'Tu sesión se cerró por inactividad. Inicia sesión de nuevo.';
     notifyListeners();
   }
 
