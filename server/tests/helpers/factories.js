@@ -16,6 +16,11 @@ export async function resetDatabase() {
   if (!db.database.endsWith('_test')) {
     throw new Error(`Se canceló el reinicio: "${db.database}" no es una base de pruebas.`);
   }
+  // Sprint 7: la bitácora, las aceptaciones y la configuración dependen de los usuarios; los tipos de servicio, de las
+  // líneas de servicio. La tabla terms_versions NO se borra: conserva la versión 1.0 que entrega la migración.
+  await query('DELETE FROM audit_log');
+  await query('DELETE FROM terms_acceptances');
+  await query('DELETE FROM settings');
   await query('DELETE FROM client_notices');
   await query('DELETE FROM notification_reads');
   await query('DELETE FROM tickets');
@@ -27,6 +32,7 @@ export async function resetDatabase() {
   await query('DELETE FROM order_status_history');
   await query('DELETE FROM order_labor');
   await query('DELETE FROM order_services');
+  await query('DELETE FROM service_types');
   await query('DELETE FROM service_orders');
   await query('DELETE FROM appointments');
   await query('DELETE FROM vehicles');
@@ -50,6 +56,34 @@ export async function createUser(overrides = {}) {
   const result = await query(
     'INSERT INTO users (username, name, email, password_hash, role, active) VALUES (?, ?, ?, ?, ?, ?)',
     [data.username, data.name, data.email, hash, data.role, data.active],
+  );
+  // Sprint 7: el usuario de prueba ya aceptó la versión vigente de los términos (salvo que la prueba pida lo contrario),
+  // para que las pruebas anteriores no reciban TERMS_NOT_ACCEPTED.
+  if (data.acceptTerms !== false) await acceptTerms(result.insertId);
+  return { id: result.insertId, ...data };
+}
+
+/** Registra la aceptación de la versión vigente de los términos para un usuario (idempotente). */
+export async function acceptTerms(userId) {
+  const [version] = await query('SELECT id FROM terms_versions ORDER BY published_at DESC, id DESC LIMIT 1');
+  if (!version) return;
+  await query('INSERT IGNORE INTO terms_acceptances (user_id, terms_version_id) VALUES (?, ?)', [userId, version.id]);
+}
+
+/** Tipo de servicio de prueba (activo, con intervalo de 180 días y 5 000 km por omisión). */
+let serviceTypeCounter = 0;
+export async function createServiceType(overrides = {}) {
+  serviceTypeCounter += 1;
+  const data = {
+    name: `Tipo de servicio ${serviceTypeCounter}`,
+    intervalDays: 180,
+    intervalKm: 5000,
+    active: 1,
+    ...overrides,
+  };
+  const result = await query(
+    'INSERT INTO service_types (name, interval_days, interval_km, active) VALUES (?, ?, ?, ?)',
+    [data.name, data.intervalDays, data.intervalKm, data.active],
   );
   return { id: result.insertId, ...data };
 }
