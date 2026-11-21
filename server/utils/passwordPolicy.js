@@ -1,7 +1,9 @@
-export const PASSWORD_MIN_LENGTH = 8;
+import { PASSWORD_MIN_LENGTH } from '../config/security.js';
+
+export { PASSWORD_MIN_LENGTH };
 
 /**
- * Política mínima de contraseñas (FR-007): al menos 8 caracteres con una mayúscula, una minúscula y un número.
+ * Política mínima de contraseñas (FR-007): al menos 10 caracteres (Sprint 7) con una mayúscula, una minúscula y un número.
  * Devuelve el mensaje de incumplimiento o null si la contraseña es válida.
  */
 export function checkPasswordPolicy(password) {
