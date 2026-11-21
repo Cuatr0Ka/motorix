@@ -1,11 +1,11 @@
 {
-    "name": "motorix_client",
-    "short_name": "motorix_client",
+    "name": "Motorix",
+    "short_name": "Motorix",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F5F2F1",
+    "theme_color": "#9B4F55",
+    "description": "Motorix: sistema de gestión para taller mecánico.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

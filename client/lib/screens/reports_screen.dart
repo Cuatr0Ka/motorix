@@ -48,10 +48,23 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
   Future<void> _export() async {
     final provider = context.read<ReportsProvider>();
     final opener = context.read<LinkOpener>();
+    final saver = context.read<FileSaver>();
     final messenger = ScaffoldMessenger.of(context);
     try {
       final paths = await provider.exportCurrent();
       if (!mounted) return;
+      if (!saver.opensFolder) {
+        // En el navegador la descarga la gestiona el navegador: no hay una carpeta que abrir desde la aplicación.
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(
+            content: Text(paths.length == 1
+                ? 'Se descargó ${paths.first}. Búscalo en la carpeta de descargas del navegador.'
+                : 'Se descargaron ${paths.length} archivos. Búscalos en la carpeta de descargas del navegador.'),
+            duration: const Duration(seconds: 8),
+          ));
+        return;
+      }
       final folder = _folderOf(paths.first);
       messenger
         ..hideCurrentSnackBar()

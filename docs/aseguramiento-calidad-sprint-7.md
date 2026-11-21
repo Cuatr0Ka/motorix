@@ -2,7 +2,7 @@
 
 Este documento es el registro de calidad del Sprint 7 de Motorix. Reúne las puertas de calidad, las decisiones, los riesgos, la trazabilidad de los criterios de aceptación, los hallazgos, la regresión de los sprints anteriores y el control de calidad final, con sus evidencias.
 
-Resultado general: el sprint se aprobó con observaciones el 2026-11-21. Todas las pruebas automáticas pasan (1 534 del servidor y 446 del cliente) y no hay defectos abiertos. Las observaciones son dos: la dependencia nueva `exceljs`, aprobada por la persona responsable al cambiar la exportación de CSV a Excel (el diseño del libro también quedó aprobado), y el recorrido manual con la interfaz gráfica (capturas y tiempos de SC-010), que realiza la persona responsable.
+Resultado general: el sprint se aprobó con observaciones el 2026-11-21. Todas las pruebas automáticas pasan (1 534 del servidor y 449 del cliente) y no hay defectos abiertos. Las observaciones son dos: la dependencia nueva `exceljs`, aprobada por la persona responsable al cambiar la exportación de CSV a Excel (el diseño del libro también quedó aprobado), y el recorrido manual con la interfaz gráfica, que la persona responsable completó el 2026-11-21 (las pantallas cargan en menos de 3 segundos y el flujo de aceptar los términos y entrar toma unos 40 segundos, dentro del límite de 1 minuto de SC-010). Durante el recorrido se corrigió H-07.
 
 ## 0. Datos del documento
 
@@ -128,6 +128,7 @@ Resultado general: el sprint se aprobó con observaciones el 2026-11-21. Todas l
 | H-04 | Las pruebas transversales de exposición de datos e inyección no revelaron ningún problema | — | T062 | Resuelto | Sin cambios de código; quedan como pruebas permanentes |
 | H-05 | Las pruebas de la bitácora mostraban un error de llave foránea en la consola al ejecutarse el servicio de autenticación con un usuario simulado | Baja | Regresión | Resuelto | La prueba unitaria de `authService` simula la bitácora |
 | H-06 | El filtro `to` de la bitácora excluía el último día | Media | `audit.flow.test.js` | Resuelto | El filtro incluye todo el día indicado |
+| H-07 | Al exportar desde el navegador fallaba con «Unsupported operation: Platform._environment»: el guardado usaba `dart:io`, que no existe en la web | Media | Recorrido manual (T094) | Resuelto | Guardado propio para el navegador (`file_saver_web.dart`) que dispara la descarga del navegador, sin dependencias nuevas; el guardado de escritorio prueba Descargas, Documentos y la carpeta temporal y muestra el motivo real del error; prueba `reports_test.dart` del aviso en el navegador |
 
 **Detalle de H-02 (pruebas actualizadas, ninguna eliminada ni debilitada):**
 
@@ -143,7 +144,7 @@ Resultado general: el sprint se aprobó con observaciones el 2026-11-21. Todas l
 | Suite | Comando | Antes del sprint | Después del sprint | Diferencia |
 |---|---|---|---|---|
 | Backend | `npm test` en `server/` | 97 suites y 1 349 pruebas aprobadas, 0 fallidas | 123 suites y 1 534 pruebas aprobadas, 0 fallidas | +26 suites y +185 pruebas |
-| Frontend | `flutter test` en `client/` | 373 pruebas aprobadas, 0 fallidas | 446 pruebas aprobadas, 0 fallidas | +73 pruebas |
+| Frontend | `flutter test` en `client/` | 373 pruebas aprobadas, 0 fallidas | 449 pruebas aprobadas, 0 fallidas | +76 pruebas |
 
 **Fecha de la línea base:** 2026-11-21, sobre el commit `836abcd` de la rama `007-reportes-configuracion-seguridad`.
 
@@ -169,6 +170,6 @@ Cinco requisitos funcionales del sprint, elegidos entre los que más pueden fall
 |---|---|
 | Criterios de salida cumplidos | 5 de 5 |
 | Defectos abiertos | Ninguno crítico, alto ni medio |
-| Observaciones | Dependencia nueva `exceljs` aprobada (H-03). El aspecto del libro de Excel (logo y colores) fue aprobado por la persona responsable el 2026-11-21. Queda para la persona responsable el recorrido manual con la interfaz gráfica (capturas y tiempos de SC-010). Los cinco libros se generaron sin errores con los datos reales de la base `motorix` (7 pagos y 22 510.00 de ingresos en el último año) |
+| Observaciones | Dependencia nueva `exceljs` aprobada (H-03). El aspecto del libro de Excel (logo y colores) fue aprobado por la persona responsable el 2026-11-21. El recorrido manual con la interfaz gráfica lo completó la persona responsable: carga en menos de 3 segundos y flujo de aceptación de unos 40 segundos (SC-010 cumplido). Los cinco libros se generaron sin errores con los datos reales de la base `motorix` (7 pagos y 22 510.00 de ingresos en el último año) |
 | Aprobado por | José Adrián Mendoza Hernández, responsable del proyecto (pendiente de confirmar) |
 | Fecha | 2026-11-21 |

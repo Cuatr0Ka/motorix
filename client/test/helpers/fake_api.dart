@@ -118,10 +118,16 @@ class FakeLinkOpener extends LinkOpener {
 
 /// Guardado de archivos simulado: recuerda lo que se guardó y devuelve una ruta ficticia.
 class FakeFileSaver extends FileSaver {
-  FakeFileSaver({this.fails = false});
+  FakeFileSaver({this.fails = false, this.browser = false});
 
   final bool fails;
+
+  /// Simula el guardado del navegador (no hay carpeta que abrir).
+  final bool browser;
   final List<({String filename, List<int> bytes})> saved = [];
+
+  @override
+  bool get opensFolder => !browser;
 
   @override
   Future<String> save(String filename, List<int> bytes) async {

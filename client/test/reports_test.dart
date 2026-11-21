@@ -273,6 +273,19 @@ void main() {
       expect(find.textContaining('Archivos guardados en'), findsOneWidget);
     });
 
+    testWidgets('test_en_el_navegador_avisa_que_se_descargo_sin_boton_de_abrir_carpeta', (tester) async {
+      final fake = FakeReports();
+      final saver = FakeFileSaver(browser: true);
+      await openReports(tester, fake, saver: saver);
+
+      await tester.tap(find.byKey(const ValueKey('exportar-excel')));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Se descargó'), findsOneWidget);
+      expect(find.textContaining('carpeta de descargas del navegador'), findsOneWidget);
+      expect(find.text('Abrir carpeta'), findsNothing);
+    });
+
     testWidgets('test_si_no_se_puede_escribir_muestra_el_error_y_no_pierde_el_reporte', (tester) async {
       final fake = FakeReports();
       await openReports(tester, fake, saver: FakeFileSaver(fails: true));

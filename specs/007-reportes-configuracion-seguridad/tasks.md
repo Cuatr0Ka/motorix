@@ -325,7 +325,7 @@ P1: US1 (datos del taller), US3 (catálogo de tipos de servicio), US8 (próximo 
 - [X] T091 [P] Actualizar `.env.example` (FR-031): indicar que `SHOP_NAME`, `SHOP_ADDRESS`, `SHOP_PHONE`, `MAINTENANCE_WARN_DAYS` y `MAINTENANCE_WARN_KM` pasan a la aplicación y quedan solo como valor de respaldo
 - [X] T092 Ejecutar la regresión completa: `npm test` en `server/` y `flutter test` en `client/`; deben pasar todas las pruebas de la línea base de T001 más las nuevas, salvo las que deban actualizarse por cambios declarados en la especificación (contraseña de 10 caracteres, aceptación de términos y configuración); cada actualización se registra en el documento de aseguramiento
 - [X] T093 Completar `docs/aseguramiento-calidad-sprint-7.md` (y `.docx` si el proceso lo pide): línea base, regresión, matriz final con una prueba por criterio de aceptación del insumo (CA-1 a CA-26) y por requisito (FR-001 a FR-032), los cambios de pruebas declarados (SC-011), los resultados de `dataExposure` e `injection`, los riesgos R-01 a R-15 de plan.md y la aprobación; las capturas y los tiempos con la interfaz los toma la persona responsable en el recorrido manual
-- [ ] T094 Ejecutar el recorrido manual de `quickstart.md` (secciones 4 a 7) con los datos de ejemplo contra la API real y anotar el resultado en el documento de aseguramiento (la parte con la interfaz gráfica, con sus capturas y tiempos de SC-010, la hace el responsable)
+- [X] T094 Ejecutar el recorrido manual de `quickstart.md` (secciones 4 a 7) con los datos de ejemplo contra la API real y anotar el resultado en el documento de aseguramiento (la parte con la interfaz gráfica, con sus capturas y tiempos de SC-010, la hace el responsable)
 
 ---
 

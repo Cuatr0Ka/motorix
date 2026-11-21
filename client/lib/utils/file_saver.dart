@@ -5,6 +5,10 @@ abstract class FileSaver {
   const FileSaver();
 
   Future<String> save(String filename, List<int> bytes);
+
+  /// Si es verdadero, la ruta devuelta es una carpeta real del equipo que se puede abrir. En el navegador no: la descarga
+  /// la gestiona el navegador y deja el archivo en su carpeta de descargas.
+  bool get opensFolder => true;
 }
 
 /// Texto legible de un error de archivo: el mensaje del sistema operativo y la ruta, para saber qué falló de verdad.

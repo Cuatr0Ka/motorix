@@ -60,6 +60,7 @@ import 'services/payments_service.dart';
 import 'services/audit_service.dart';
 import 'services/reports_service.dart';
 import 'utils/file_saver.dart';
+import 'utils/file_saver_default.dart';
 import 'services/service_types_service.dart';
 import 'services/settings_service.dart';
 import 'services/terms_service.dart';
@@ -85,7 +86,7 @@ class MotorixApp extends StatelessWidget {
     this.useGoogleFonts = true,
     this.linkOpener = const SystemLinkOpener(),
     this.ticketPrinter = const SystemTicketPrinter(),
-    this.fileSaver = const DownloadsFileSaver(),
+    this.fileSaver,
   });
 
   final ApiClient apiClient;
@@ -97,7 +98,7 @@ class MotorixApp extends StatelessWidget {
   final TicketPrinter ticketPrinter;
 
   /// Guarda los archivos descargados, como los reportes de Excel (se sustituye en las pruebas).
-  final FileSaver fileSaver;
+  final FileSaver? fileSaver;
   final bool useGoogleFonts;
 
   @override
@@ -107,7 +108,7 @@ class MotorixApp extends StatelessWidget {
       providers: [
         Provider<ApiClient>.value(value: apiClient),
         Provider<AuthService>.value(value: authService),
-        Provider<FileSaver>.value(value: fileSaver),
+        Provider<FileSaver>.value(value: fileSaver ?? createDefaultFileSaver()),
         Provider<ReportsService>(create: (_) => ReportsService(apiClient)),
         ChangeNotifierProvider(create: (context) => ReportsProvider(context.read<ReportsService>(), context.read<FileSaver>())),
         Provider<AuditService>(create: (_) => AuditService(apiClient)),
