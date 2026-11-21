@@ -1,5 +1,6 @@
 import { AppError } from '../utils/AppError.js';
 import { verifyToken } from '../utils/jwt.js';
+import { ACTIVITY_WRITE_SECONDS, INACTIVITY_MINUTES } from '../config/security.js';
 import * as termsModel from '../models/termsModel.js';
 import * as userModel from '../models/userModel.js';
 
@@ -32,6 +33,14 @@ export async function authenticate(req, res, next) {
     if (!user || !user.active) {
       throw AppError.unauthenticated('Tu cuenta no está disponible. Contacta al administrador.');
     }
+
+    // Sprint 7: una sesión sin actividad más de INACTIVITY_MINUTES se cierra (el token sigue siendo válido, pero no se acepta).
+    // Sin registro previo se trata como activa; la actividad se renueva como máximo una vez por minuto.
+    const idleSeconds = await userModel.getIdleSeconds(user.id);
+    if (idleSeconds !== null && idleSeconds > INACTIVITY_MINUTES * 60) {
+      throw new AppError(401, 'SESSION_INACTIVE', 'Tu sesión se cerró por inactividad. Inicia sesión de nuevo.');
+    }
+    await userModel.touchActivity(user.id, ACTIVITY_WRITE_SECONDS);
 
     // Sprint 7: sin la aceptación de la versión vigente de los términos no se opera (salvo las rutas de la lista fija).
     if (!TERMS_EXEMPT_ROUTES.includes(routeKey(req))) {

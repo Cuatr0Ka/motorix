@@ -6,8 +6,13 @@ const userModel = {
   findByIdentifier: jest.fn(),
   registerFailedAttempt: jest.fn(),
   resetFailures: jest.fn(),
+  touchActivity: jest.fn(),
 };
 jest.unstable_mockModule('../../models/userModel.js', () => userModel);
+
+// La bitácora tiene sus propias pruebas: aquí solo se comprueba que el servicio la invoca.
+const audit = { ACTIONS: { LOGIN_FAILED: 'LOGIN_FAILED', ACCOUNT_LOCKED: 'ACCOUNT_LOCKED', PASSWORD_CHANGED: 'PASSWORD_CHANGED' }, record: jest.fn() };
+jest.unstable_mockModule('../../services/auditService.js', () => audit);
 
 const { login, MAX_FAILED_ATTEMPTS, LOCK_MINUTES } = await import('../../services/authService.js');
 
@@ -74,5 +79,31 @@ describe('authService.login', () => {
     await login('ana', 'Correcta2026');
 
     expect(userModel.resetFailures).not.toHaveBeenCalled();
+  });
+
+  it('test_un_acceso_correcto_fija_la_ultima_actividad', async () => {
+    userModel.findByIdentifier.mockResolvedValue(registro());
+
+    await login('ana', 'Correcta2026');
+
+    expect(userModel.touchActivity).toHaveBeenCalledWith(1, 0, { force: true });
+  });
+
+  it('test_un_fallo_de_una_cuenta_existente_se_registra_sin_el_texto_tecleado', async () => {
+    userModel.findByIdentifier.mockResolvedValue(registro());
+    userModel.registerFailedAttempt.mockResolvedValue({ locked: false, lockSecondsLeft: 0 });
+
+    await expect(login('ana', 'SecretoTecleado9')).rejects.toBeDefined();
+
+    expect(audit.record).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(audit.record.mock.calls)).not.toContain('SecretoTecleado9');
+  });
+
+  it('test_una_cuenta_inexistente_no_se_registra', async () => {
+    userModel.findByIdentifier.mockResolvedValue(null);
+
+    await expect(login('nadie', 'Cualquiera12345')).rejects.toBeDefined();
+
+    expect(audit.record).not.toHaveBeenCalled();
   });
 });

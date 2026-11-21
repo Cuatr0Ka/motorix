@@ -70,6 +70,8 @@ export async function login(identifier, password) {
   }
 
   if (record.failedLoginAttempts > 0) await userModel.resetFailures(record.user.id);
+  // El inicio de sesión fija la última actividad (una cuenta inactiva por tiempo puede volver a entrar).
+  await userModel.touchActivity(record.user.id, 0, { force: true });
 
   return {
     token: signToken(record.user.id),
