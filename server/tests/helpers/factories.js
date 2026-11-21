@@ -16,6 +16,8 @@ export async function resetDatabase() {
   if (!db.database.endsWith('_test')) {
     throw new Error(`Se canceló el reinicio: "${db.database}" no es una base de pruebas.`);
   }
+  await query('DELETE FROM client_notices');
+  await query('DELETE FROM notification_reads');
   await query('DELETE FROM tickets');
   await query('DELETE FROM payments');
   await query('DELETE FROM inventory_movements');
