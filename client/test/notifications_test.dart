@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:motorix_client/utils/tokens.dart';
 import 'package:motorix_client/widgets/notification_bell.dart';
 
 import 'helpers/data.dart';
@@ -37,9 +38,34 @@ Map<String, dynamic> _group(String type, List<Map<String, dynamic>> items, {int?
 class FakeNotifications {
   Map<String, dynamic> summary = _summary();
   bool failing = false;
+  bool failingToMark = false;
   int requests = 0;
+  final List<List<String>> marked = [];
+
+  /// Marca como leídos los avisos con esas claves y recalcula los contadores, como lo haría el servidor.
+  Map<String, dynamic> _markRead(List<String> keys) {
+    var count = 0;
+    final groups = (summary['groups'] as List).cast<Map<String, dynamic>>();
+    for (final group in groups) {
+      for (final item in (group['items'] as List).cast<Map<String, dynamic>>()) {
+        if (keys.contains(item['key']) && item['read'] != true) {
+          item['read'] = true;
+          count += 1;
+        }
+      }
+      group['unread'] = (group['items'] as List).where((i) => (i as Map)['read'] != true).length;
+    }
+    summary['unread'] = groups.fold<int>(0, (sum, g) => sum + (g['unread'] as int));
+    return {'marked': count, 'unread': summary['unread']};
+  }
 
   FakeHandler handler() => (r) {
+        if (r.method == 'POST' && r.path == '/notifications/read') {
+          if (failingToMark) return failure(500, 'INTERNAL_ERROR', 'Ocurrió un error inesperado.');
+          final keys = (r.body['keys'] as List).cast<String>();
+          marked.add(keys);
+          return ok(_markRead(keys));
+        }
         if (r.method == 'GET' && r.path == '/notifications') {
           requests += 1;
           if (failing) return failure(500, 'INTERNAL_ERROR', 'Ocurrió un error inesperado.');
@@ -212,6 +238,200 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const ValueKey('panel-notificaciones')), findsNothing);
+    });
+  });
+
+  group('avisos de mantenimientos y citas de la recepción (US2)', () {
+    testWidgets('test_el_panel_muestra_vencidos_citas_del_dia_y_proximos_en_ese_orden', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('MAINT_OVERDUE', [_item('MAINT_OVERDUE', 1)]),
+          _group('APPT_TODAY', [
+            _item('APPT_TODAY', 3, extra: {
+              'title': 'Cita de hoy',
+              'detail': '09:00 · Revisión general · Nissan Versa ABC-123 · Ana Torres',
+              'scheduledAt': '2026-11-20T15:00:00.000Z',
+              'target': {'kind': 'appointment', 'id': 3},
+            }),
+          ]),
+          _group('MAINT_UPCOMING', [
+            _item('MAINT_UPCOMING', 2, extra: {'title': 'Mantenimiento próximo'}),
+          ]),
+        ]);
+      await pumpAppSignedIn(tester, FakeApi(role: 'RECEPTIONIST', handler: fake.handler()));
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mantenimientos vencidos'), findsOneWidget);
+      expect(find.text('Citas de hoy'), findsOneWidget);
+      expect(find.text('Mantenimientos próximos'), findsOneWidget);
+      expect(find.text('09:00 · Revisión general · Nissan Versa ABC-123 · Ana Torres'), findsOneWidget);
+
+      double arriba(String texto) => tester.getTopLeft(find.text(texto)).dy;
+      expect(arriba('Mantenimientos vencidos'), lessThan(arriba('Citas de hoy')));
+      expect(arriba('Citas de hoy'), lessThan(arriba('Mantenimientos próximos')));
+    });
+
+    testWidgets('test_cada_tipo_usa_el_color_de_la_convencion', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('MAINT_OVERDUE', [_item('MAINT_OVERDUE', 1)]),
+          _group('MAINT_UPCOMING', [_item('MAINT_UPCOMING', 2)]),
+        ]);
+      await pumpAppSignedIn(tester, FakeApi(role: 'RECEPTIONIST', handler: fake.handler()));
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+
+      Color puntoDe(String clave) => tester.widget<Icon>(find.byKey(ValueKey('no-leido-$clave'))).color!;
+      expect(puntoDe('MAINT_OVERDUE:1'), AppColors.danger);
+      expect(puntoDe('MAINT_UPCOMING:2'), AppColors.warning);
+    });
+
+    testWidgets('test_con_avisos_vencidos_sin_leer_la_campana_usa_el_color_de_error', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('MAINT_OVERDUE', [_item('MAINT_OVERDUE', 1)]),
+        ]);
+      await pumpAppSignedIn(tester, FakeApi(role: 'RECEPTIONIST', handler: fake.handler()));
+
+      final insignia = tester.widget<Badge>(find.byKey(const ValueKey('insignia-campana')));
+      expect(insignia.backgroundColor, AppColors.danger);
+    });
+
+    testWidgets('test_con_solo_avisos_proximos_la_campana_usa_el_color_ambar', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('MAINT_UPCOMING', [_item('MAINT_UPCOMING', 2)]),
+        ]);
+      await pumpAppSignedIn(tester, FakeApi(role: 'RECEPTIONIST', handler: fake.handler()));
+
+      final insignia = tester.widget<Badge>(find.byKey(const ValueKey('insignia-campana')));
+      expect(insignia.backgroundColor, AppColors.warning);
+    });
+  });
+
+  group('marcar como leído y abrir el módulo relacionado (US6)', () {
+    FakeNotifications conUnAviso({String type = 'MAINT_OVERDUE', Map<String, dynamic>? target}) => FakeNotifications()
+      ..summary = _summary(groups: [
+        _group(type, [_item(type, 7, extra: target == null ? const {} : {'target': target})]),
+      ]);
+
+    testWidgets('test_el_boton_marcar_como_leido_baja_el_contador_y_deja_el_panel_abierto', (tester) async {
+      useDesktopWindow(tester);
+      final fake = conUnAviso();
+      await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: fake.handler()));
+      expect(find.byKey(const ValueKey('contador-campana')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('marcar-leido-MAINT_OVERDUE:7')));
+      await tester.pumpAndSettle();
+
+      expect(fake.marked, [
+        ['MAINT_OVERDUE:7'],
+      ]);
+      expect(find.byKey(const ValueKey('panel-notificaciones')), findsOneWidget);
+      expect(find.byKey(const ValueKey('no-leido-MAINT_OVERDUE:7')), findsNothing);
+      expect(find.byKey(const ValueKey('marcar-leido-MAINT_OVERDUE:7')), findsNothing);
+      expect(find.text('0 sin leer'), findsOneWidget);
+      expect(find.byKey(const ValueKey('contador-campana')), findsNothing);
+    });
+
+    testWidgets('test_un_aviso_ya_leido_no_ofrece_marcar_como_leido', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('MAINT_OVERDUE', [_item('MAINT_OVERDUE', 7, read: true)]),
+        ]);
+      await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: fake.handler()));
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('marcar-leido-MAINT_OVERDUE:7')), findsNothing);
+    });
+
+    testWidgets('test_un_error_al_marcar_muestra_el_mensaje_y_no_cambia_el_contador', (tester) async {
+      useDesktopWindow(tester);
+      final fake = conUnAviso()..failingToMark = true;
+      await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: fake.handler()));
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('marcar-leido-MAINT_OVERDUE:7')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ocurrió un error inesperado.'), findsOneWidget);
+      expect(find.byKey(const ValueKey('no-leido-MAINT_OVERDUE:7')), findsOneWidget);
+      expect(find.text('1 sin leer'), findsOneWidget);
+    });
+
+    testWidgets('test_pulsar_un_aviso_lo_marca_como_leido_cierra_el_panel_y_abre_su_pantalla', (tester) async {
+      useDesktopWindow(tester);
+      final fake = conUnAviso(target: {'kind': 'vehicle', 'id': 4});
+      final api = FakeApi(role: 'ADMIN', handler: fake.handler());
+      await pumpAppSignedIn(tester, api);
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('aviso-MAINT_OVERDUE:7')));
+      await tester.pumpAndSettle();
+
+      expect(fake.marked, [
+        ['MAINT_OVERDUE:7'],
+      ]);
+      expect(find.byKey(const ValueKey('panel-notificaciones')), findsNothing);
+      expect(find.byKey(const ValueKey('contador-campana')), findsNothing);
+      // Llegó a Vehículos y abrió el detalle del vehículo del aviso.
+      expect(api.requests.any((r) => r.method == 'GET' && r.path == '/vehicles/4'), isTrue);
+    });
+
+    testWidgets('test_un_aviso_de_stock_lleva_al_detalle_de_la_refaccion', (tester) async {
+      useDesktopWindow(tester);
+      final fake = conUnAviso(type: 'STOCK_LOW', target: {'kind': 'part', 'id': 9});
+      final api = FakeApi(role: 'ADMIN', handler: fake.handler());
+      await pumpAppSignedIn(tester, api);
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('aviso-STOCK_LOW:7')));
+      await tester.pumpAndSettle();
+
+      expect(api.requests.any((r) => r.method == 'GET' && r.path == '/parts/9'), isTrue);
+    });
+
+    testWidgets('test_un_aviso_de_cita_lleva_al_detalle_de_la_cita', (tester) async {
+      useDesktopWindow(tester);
+      final fake = conUnAviso(type: 'APPT_TODAY', target: {'kind': 'appointment', 'id': 3});
+      final api = FakeApi(role: 'RECEPTIONIST', handler: fake.handler());
+      await pumpAppSignedIn(tester, api);
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('aviso-APPT_TODAY:7')));
+      await tester.pumpAndSettle();
+
+      expect(api.requests.any((r) => r.method == 'GET' && r.path == '/appointments/3'), isTrue);
+    });
+
+    testWidgets('test_para_el_mecanico_el_aviso_de_orden_abre_su_orden_desde_mis_ordenes', (tester) async {
+      useDesktopWindow(tester);
+      final fake = conUnAviso(type: 'STALLED', target: {'kind': 'order', 'id': 5});
+      final api = FakeApi(role: 'MECHANIC', handler: fake.handler());
+      await pumpAppSignedIn(tester, api);
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('aviso-STALLED:7')));
+      await tester.pumpAndSettle();
+
+      expect(api.requests.any((r) => r.method == 'GET' && r.path == '/orders/5'), isTrue);
     });
   });
 

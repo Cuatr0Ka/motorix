@@ -117,14 +117,14 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 2 (escribir primero y comprobar que fallan)
 
-- [ ] T025 [P] [US2] Prueba de integración `server/tests/integration/notifications.reception.test.js`: la recepción recibe `MAINT_UPCOMING`, `MAINT_OVERDUE` y `APPT_TODAY` en grupos separados; la cita de hoy `PENDIENTE` o `CONFIRMADA` genera aviso y la `CANCELADA`, `COMPLETADA` o `EN_PROCESO` no; una cita de mañana o de ayer no; los totales de mantenimientos coinciden con `GET /api/dashboard` y con `GET /api/maintenance` (FR-005, SC-003)
-- [ ] T026 [P] [US2] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): el panel muestra las secciones «Mantenimientos vencidos», «Citas de hoy» y «Mantenimientos próximos» en el orden de `contracts/interfaz.md`, con el color por tipo y la hora de la cita
+- [X] T025 [P] [US2] Prueba de integración `server/tests/integration/notifications.reception.test.js`: la recepción recibe `MAINT_UPCOMING`, `MAINT_OVERDUE` y `APPT_TODAY` en grupos separados; la cita de hoy `PENDIENTE` o `CONFIRMADA` genera aviso y la `CANCELADA`, `COMPLETADA` o `EN_PROCESO` no; una cita de mañana o de ayer no; los totales de mantenimientos coinciden con `GET /api/dashboard` y con `GET /api/maintenance` (FR-005, SC-003)
+- [X] T026 [P] [US2] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): el panel muestra las secciones «Mantenimientos vencidos», «Citas de hoy» y «Mantenimientos próximos» en el orden de `contracts/interfaz.md`, con el color por tipo y la hora de la cita
 
 ### Implementación de la historia 2
 
-- [ ] T027 [US2] Crear (si aún no existe) `server/models/noticeModel.js`, que comparten las historias 2, 4 y 7, con `listAppointmentsOn(date, connection)` (citas con `DATE(scheduled_at) = date` y estado `PENDIENTE` o `CONFIRMADA`, con cliente y vehículo) y `countAppointmentsOn(date)`; la fecha de hoy es la del servidor, igual que el panel
-- [ ] T028 [US2] Ampliar `server/services/notificationService.js` con `MAINT_UPCOMING` (`maintenanceService.list` con indicador `PROXIMO`, clave `MAINT_UPCOMING:{id}`, `target` de tipo `vehicle`) y `APPT_TODAY` (clave `APPT_TODAY:{id}`, `target` de tipo `appointment`, `scheduledAt`), con el nombre del cliente en `detail` para ADMIN y RECEPTIONIST y nunca el teléfono
-- [ ] T029 [P] [US2] Ampliar `client/lib/widgets/notifications_panel.dart` y `client/lib/models/notice.dart` con las secciones de próximos y de citas del día (indicador ámbar para próximo y neutro para la cita)
+- [X] T027 [US2] Crear (si aún no existe) `server/models/noticeModel.js`, que comparten las historias 2, 4 y 7, con `listAppointmentsOn(date, connection)` (citas con `DATE(scheduled_at) = date` y estado `PENDIENTE` o `CONFIRMADA`, con cliente y vehículo) y `countAppointmentsOn(date)`; la fecha de hoy es la del servidor, igual que el panel
+- [X] T028 [US2] Ampliar `server/services/notificationService.js` con `MAINT_UPCOMING` (`maintenanceService.list` con indicador `PROXIMO`, clave `MAINT_UPCOMING:{id}`, `target` de tipo `vehicle`) y `APPT_TODAY` (clave `APPT_TODAY:{id}`, `target` de tipo `appointment`, `scheduledAt`), con el nombre del cliente en `detail` para ADMIN y RECEPTIONIST y nunca el teléfono
+- [X] T029 [P] [US2] Ampliar `client/lib/widgets/notifications_panel.dart` y `client/lib/models/notice.dart` con las secciones de próximos y de citas del día (indicador ámbar para próximo y neutro para la cita)
 
 **Punto de control**: la recepción ve los avisos de mantenimientos y citas, y los números coinciden con el panel y con la lista de Mantenimientos
 
@@ -138,16 +138,16 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 6 (escribir primero y comprobar que fallan)
 
-- [ ] T030 [P] [US6] Prueba de integración `server/tests/integration/notifications.read.test.js`: marcar como leído persiste y baja `unread`; otro usuario del mismo rol lo ve sin leer; un aviso leído cuya condición deja de cumplirse desaparece; de próximo a vencido reaparece sin leer (clave nueva); claves inexistentes o de otro rol se ignoran con 200; repetir la solicitud no falla; cinco solicitudes simultáneas dejan una sola fila en `notification_reads`; 50 claves como máximo
-- [ ] T031 [P] [US6] Prueba de contrato `server/tests/contract/notifications.read.contract.test.js`: forma de `POST /api/notifications/read` (`{ marked, unread }`), 400 `VALIDATION_ERROR` con `keys` vacío, más de 50 o mal formadas, y 401 sin token
-- [ ] T032 [P] [US6] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): pulsar un aviso lo marca como leído, baja el contador y abre la pantalla relacionada (orden, cita, vehículo o inventario) cerrando el panel; el botón «Marcar como leído» solo marca; un error al marcar muestra el mensaje y no cambia el contador
+- [X] T030 [P] [US6] Prueba de integración `server/tests/integration/notifications.read.test.js`: marcar como leído persiste y baja `unread`; otro usuario del mismo rol lo ve sin leer; un aviso leído cuya condición deja de cumplirse desaparece; de próximo a vencido reaparece sin leer (clave nueva); claves inexistentes o de otro rol se ignoran con 200; repetir la solicitud no falla; cinco solicitudes simultáneas dejan una sola fila en `notification_reads`; 50 claves como máximo
+- [X] T031 [P] [US6] Prueba de contrato `server/tests/contract/notifications.read.contract.test.js`: forma de `POST /api/notifications/read` (`{ marked, unread }`), 400 `VALIDATION_ERROR` con `keys` vacío, más de 50 o mal formadas, y 401 sin token
+- [X] T032 [P] [US6] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): pulsar un aviso lo marca como leído, baja el contador y abre la pantalla relacionada (orden, cita, vehículo o inventario) cerrando el panel; el botón «Marcar como leído» solo marca; un error al marcar muestra el mensaje y no cambia el contador
 
 ### Implementación de la historia 6
 
-- [ ] T033 [US6] Ampliar `server/services/notificationService.js` con `markRead(keys, actor)`: recalcula los avisos vigentes del actor, intersecta con las claves recibidas, inserta con `notificationReadModel.insertIgnore` y devuelve `{ marked, unread }`; las claves que no correspondan se ignoran sin error
-- [ ] T034 [US6] Agregar `markRead` al controlador y la ruta `POST /notifications/read` con `validate({ body: readNoticesSchema })` en `server/controllers/notificationController.js` y `server/routes/notificationRoutes.js`
-- [ ] T035 [P] [US6] Ampliar `client/lib/services/notifications_service.dart` con `markRead(List<String> keys)` y `client/lib/providers/notifications_provider.dart` con `markRead` (actualiza el aviso y el contador de inmediato y reconcilia con el servidor)
-- [ ] T036 [US6] Agregar la apertura del módulo relacionado: método `openTarget(kind, id)` en `client/lib/providers/navigation_provider.dart` (cambia a la sección de órdenes —«Mis órdenes» para el mecánico—, citas, vehículos o inventario y empuja el detalle) y su uso en `client/lib/widgets/app_shell.dart`; conectar el panel (`notifications_panel.dart`) para marcar como leído y abrir el aviso, y agregar el botón «Marcar como leído»
+- [X] T033 [US6] Ampliar `server/services/notificationService.js` con `markRead(keys, actor)`: recalcula los avisos vigentes del actor, intersecta con las claves recibidas, inserta con `notificationReadModel.insertIgnore` y devuelve `{ marked, unread }`; las claves que no correspondan se ignoran sin error
+- [X] T034 [US6] Agregar `markRead` al controlador y la ruta `POST /notifications/read` con `validate({ body: readNoticesSchema })` en `server/controllers/notificationController.js` y `server/routes/notificationRoutes.js`
+- [X] T035 [P] [US6] Ampliar `client/lib/services/notifications_service.dart` con `markRead(List<String> keys)` y `client/lib/providers/notifications_provider.dart` con `markRead` (actualiza el aviso y el contador de inmediato y reconcilia con el servidor)
+- [X] T036 [US6] Agregar la apertura del módulo relacionado: método `openTarget(kind, id)` en `client/lib/providers/navigation_provider.dart` (cambia a la sección de órdenes —«Mis órdenes» para el mecánico—, citas, vehículos o inventario y empuja el detalle) y su uso en `client/lib/widgets/app_shell.dart`; conectar el panel (`notifications_panel.dart`) para marcar como leído y abrir el aviso, y agregar el botón «Marcar como leído»
 
 **Punto de control**: la lectura es por usuario y persistente, el aviso reaparece al empeorar y cada aviso abre su pantalla
 

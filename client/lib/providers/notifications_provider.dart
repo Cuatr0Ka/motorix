@@ -73,6 +73,61 @@ class NotificationsProvider extends ChangeNotifier {
     _notify();
   }
 
+  /// Marca avisos como leídos. Se actualiza de inmediato en pantalla (el contador baja al instante) y después se
+  /// reconcilia con el servidor; si falla, se restaura el estado anterior y se devuelve el mensaje de error.
+  Future<String?> markRead(List<String> keys) async {
+    final pending = keys.toSet();
+    final before = _summary;
+    final unreadKeys = {
+      for (final group in before.groups)
+        for (final item in group.items)
+          if (!item.read && pending.contains(item.key)) item.key,
+    };
+    if (unreadKeys.isEmpty) return null;
+
+    _summary = _withRead(before, unreadKeys);
+    _notify();
+    try {
+      final result = await _service.markRead(unreadKeys.toList());
+      if (!_disposed) {
+        _summary = _summary.copyWith(unread: result.unread);
+        _notify();
+      }
+      return null;
+    } on ApiException catch (e) {
+      return _restore(before, e.message);
+    } catch (_) {
+      return _restore(before, 'No se pudo marcar el aviso como leído.');
+    }
+  }
+
+  String _restore(NoticesSummary before, String message) {
+    _summary = before;
+    _notify();
+    return message;
+  }
+
+  /// Copia del resumen con los avisos indicados como leídos y los contadores de cada grupo recalculados.
+  NoticesSummary _withRead(NoticesSummary summary, Set<String> keys) {
+    var unread = summary.unread;
+    final groups = <NoticeGroup>[];
+    for (final group in summary.groups) {
+      var changed = 0;
+      final items = <AppNotice>[];
+      for (final item in group.items) {
+        if (!item.read && keys.contains(item.key)) {
+          changed += 1;
+          items.add(item.copyWith(read: true));
+        } else {
+          items.add(item);
+        }
+      }
+      unread -= changed;
+      groups.add(group.copyWith(unread: group.unread - changed, items: items));
+    }
+    return summary.copyWith(unread: unread < 0 ? 0 : unread, groups: groups);
+  }
+
   /// Detiene el temporizador y limpia el estado al cerrar la sesión, para no mostrar avisos a otra persona.
   void clear() {
     stop();

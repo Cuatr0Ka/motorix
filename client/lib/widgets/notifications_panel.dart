@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/notice.dart';
+import '../providers/navigation_provider.dart';
 import '../providers/notifications_provider.dart';
+import '../providers/session_provider.dart';
 import '../utils/tokens.dart';
 import 'state_views.dart';
 
@@ -111,13 +113,16 @@ class _Body extends StatelessWidget {
     final groups = provider.summary.groups;
     if (groups.isEmpty) return const _EmptyState();
 
-    return ListView(
-      shrinkWrap: true,
+    // Son como mucho 6 secciones de 50 avisos, así que no hace falta construir la lista de forma diferida.
+    return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      children: [
-        if (provider.error != null) _InlineError(onRetry: provider.refresh),
-        for (final group in groups) _GroupSection(group: group),
-      ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (provider.error != null) _InlineError(onRetry: provider.refresh),
+          for (final group in groups) _GroupSection(group: group),
+        ],
+      ),
     );
   }
 }
@@ -195,7 +200,12 @@ class _GroupSection extends StatelessWidget {
             ],
           ),
         ),
-        for (final notice in group.items) NoticeTile(notice: notice),
+        for (final notice in group.items)
+          NoticeTile(
+            notice: notice,
+            onTap: () => _openNotice(context, notice),
+            onMarkRead: notice.read ? null : () => _markRead(context, notice),
+          ),
         if (group.isTruncated)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
@@ -210,12 +220,35 @@ class _GroupSection extends StatelessWidget {
   }
 }
 
+/// Marca el aviso como leído y, si falla, lo dice con un mensaje y deja el aviso como estaba.
+Future<void> _markRead(BuildContext context, AppNotice notice) async {
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  final error = await context.read<NotificationsProvider>().markRead([notice.key]);
+  if (error != null) messenger?.showSnackBar(SnackBar(content: Text(error)));
+}
+
+/// Pulsar un aviso lo marca como leído, cierra el panel y abre la pantalla relacionada (orden, cita, vehículo
+/// o inventario). Si marcarlo falla, el panel se cierra igual y se avisa con un mensaje.
+Future<void> _openNotice(BuildContext context, AppNotice notice) async {
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  final navigation = context.read<NavigationProvider>();
+  final provider = context.read<NotificationsProvider>();
+  final role = context.read<SessionProvider>().user?.role;
+  Navigator.of(context).pop();
+  if (role != null) navigation.openTarget(notice.target, role);
+  final error = await provider.markRead([notice.key]);
+  if (error != null) messenger?.showSnackBar(SnackBar(content: Text(error)));
+}
+
 /// Un aviso del panel. Los no leídos llevan un punto y texto normal; los leídos se atenúan.
 class NoticeTile extends StatelessWidget {
-  const NoticeTile({super.key, required this.notice, this.onTap});
+  const NoticeTile({super.key, required this.notice, this.onTap, this.onMarkRead});
 
   final AppNotice notice;
   final VoidCallback? onTap;
+
+  /// Acción «Marcar como leído» (solo si el aviso está sin leer).
+  final VoidCallback? onMarkRead;
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +286,12 @@ class NoticeTile extends StatelessWidget {
                 ],
               ),
             ),
+            if (onMarkRead != null)
+              TextButton(
+                key: ValueKey('marcar-leido-${notice.key}'),
+                onPressed: onMarkRead,
+                child: const Text('Marcar como leído'),
+              ),
           ],
         ),
       ),

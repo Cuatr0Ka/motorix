@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'models/notice.dart';
 import 'providers/appointments_provider.dart';
 import 'providers/clients_provider.dart';
 import 'providers/dashboard_provider.dart';
@@ -16,6 +17,7 @@ import 'providers/stock_alerts_provider.dart';
 import 'providers/tickets_provider.dart';
 import 'providers/users_provider.dart';
 import 'providers/vehicles_provider.dart';
+import 'screens/appointment_detail_screen.dart';
 import 'screens/appointments_list_screen.dart';
 import 'screens/change_password_screen.dart';
 import 'screens/dashboard_screen.dart';
@@ -24,10 +26,13 @@ import 'screens/clients_list_screen.dart';
 import 'screens/inventory_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/maintenance_list_screen.dart';
+import 'screens/order_detail_screen.dart';
+import 'screens/part_detail_screen.dart';
 import 'screens/payments_list_screen.dart';
 import 'screens/tickets_list_screen.dart';
 import 'screens/orders_list_screen.dart';
 import 'screens/users_screen.dart';
+import 'screens/vehicle_detail_screen.dart';
 import 'screens/vehicles_list_screen.dart';
 import 'services/api_client.dart';
 import 'services/appointments_service.dart';
@@ -130,13 +135,27 @@ class _AuthGate extends StatelessWidget {
       duration: reduceMotion ? Duration.zero : AppDurations.navigation,
       switchInCurve: AppCurves.enter,
       child: signedIn
-          ? const AppShell(key: ValueKey('app'), sectionBuilder: buildSection)
+          ? const AppShell(key: ValueKey('app'), sectionBuilder: buildSection, targetBuilder: buildNoticeTarget)
           : const LoginScreen(key: ValueKey('login')),
     );
   }
 }
 
 /// Pantalla de cada sección del menú.
+/// Pantalla de detalle a la que lleva un aviso del centro de notificaciones.
+Widget buildNoticeTarget(BuildContext context, NoticeTarget target) {
+  switch (target.kind) {
+    case 'order':
+      return OrderDetailScreen(orderId: target.id);
+    case 'appointment':
+      return AppointmentDetailScreen(appointmentId: target.id);
+    case 'vehicle':
+      return VehicleDetailScreen(vehicleId: target.id);
+    default:
+      return PartDetailScreen(partId: target.id);
+  }
+}
+
 Widget buildSection(BuildContext context, AppSection section) {
   switch (section) {
     case AppSection.home:

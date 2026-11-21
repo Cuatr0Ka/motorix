@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/notice.dart';
 import '../models/user.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/notifications_provider.dart';
@@ -13,6 +14,9 @@ import 'notification_bell.dart';
 
 /// Construye la pantalla de una sección del menú.
 typedef SectionBuilder = Widget Function(BuildContext context, AppSection section);
+
+/// Construye la pantalla de detalle a la que lleva un aviso.
+typedef NoticeTargetBuilder = Widget Function(BuildContext context, NoticeTarget target);
 
 /// Ícono del menú de cada sección (contorno). También lo usa la pantalla de Inicio.
 IconData iconForSection(AppSection section) {
@@ -88,9 +92,12 @@ Widget _withBadge(BuildContext context, AppSection section, Widget icon) {
 /// Estructura general: sidebar oscuro colapsable, encabezado y contenido con navegación propia.
 /// Los permisos se validan en el servidor; aquí solo se muestran las opciones del rol.
 class AppShell extends StatefulWidget {
-  const AppShell({super.key, required this.sectionBuilder});
+  const AppShell({super.key, required this.sectionBuilder, required this.targetBuilder});
 
   final SectionBuilder sectionBuilder;
+
+  /// Construye la pantalla de detalle a la que lleva un aviso (orden, cita, vehículo o refacción).
+  final NoticeTargetBuilder targetBuilder;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -180,6 +187,18 @@ class _AppShellState extends State<AppShell> {
         _contentNavigator.currentState?.pushAndRemoveUntil(_routeFor(_shown), (route) => false);
         // Al cambiar de sección se actualiza el contador de la campana.
         if (mounted) _notifications.refresh();
+      });
+    }
+
+    // Un aviso pidió abrir un detalle: se abre sobre la sección que ya se mostró (o se está mostrando).
+    if (navigation.pendingTarget != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final target = context.read<NavigationProvider>().takePendingTarget();
+        if (target == null) return;
+        _contentNavigator.currentState?.push(
+          MaterialPageRoute<void>(builder: (routeContext) => widget.targetBuilder(routeContext, target)),
+        );
       });
     }
 
