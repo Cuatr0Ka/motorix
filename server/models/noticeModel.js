@@ -1,4 +1,5 @@
 import { query } from '../config/db.js';
+import { STALLED_STATUSES } from '../services/noticeRules.js';
 
 /**
  * Consultas de apoyo de las notificaciones internas y de los clientes por avisar (Sprint 6). Solo leen: los
@@ -88,4 +89,45 @@ export async function findAppointmentFact(id, connection) {
   return rows[0]
     ? { id: rows[0].id, status: rows[0].status, scheduledAt: rows[0].scheduled_at, clientId: rows[0].client_id }
     : null;
+}
+
+const toOpenOrder = (row) => ({
+  id: row.id,
+  status: row.status,
+  mechanicId: row.mechanic_id,
+  createdAt: row.created_at,
+  lastChangeAt: row.last_changed_at ?? null,
+  lastHistoryId: row.last_history_id ?? 0,
+  client: { id: row.client_id, name: row.client_name },
+  vehicle: { id: row.vehicle_id, brand: row.brand, model: row.model, licensePlate: row.license_plate },
+});
+
+/**
+ * Órdenes abiertas (Recibida, Diagnóstico, En reparación o Esperando refacción) con la fecha y el identificador de
+ * su último cambio de estado, tomados del historial (el cambio más reciente). Sin historial, queda en null y el
+ * servicio usa la fecha de creación. Con `mechanicId` solo trae las órdenes asignadas a esa persona.
+ */
+export async function listOpenOrdersWithLastChange({ mechanicId } = {}, connection) {
+  const placeholders = STALLED_STATUSES.map(() => '?').join(', ');
+  const params = [...STALLED_STATUSES];
+  let mechanicFilter = '';
+  if (mechanicId !== undefined && mechanicId !== null) {
+    mechanicFilter = 'AND o.mechanic_id = ?';
+    params.push(mechanicId);
+  }
+  const rows = await query(
+    `SELECT o.id, o.status, o.mechanic_id, o.created_at,
+            (SELECT h.changed_at FROM order_status_history h WHERE h.order_id = o.id ORDER BY h.changed_at DESC, h.id DESC LIMIT 1) AS last_changed_at,
+            (SELECT h.id FROM order_status_history h WHERE h.order_id = o.id ORDER BY h.changed_at DESC, h.id DESC LIMIT 1) AS last_history_id,
+            c.id AS client_id, c.name AS client_name,
+            v.id AS vehicle_id, v.brand, v.model, v.license_plate
+       FROM service_orders o
+       JOIN clients c ON c.id = o.client_id
+       JOIN vehicles v ON v.id = o.vehicle_id
+      WHERE o.status IN (${placeholders}) ${mechanicFilter}
+      ORDER BY o.id ASC`,
+    params,
+    connection,
+  );
+  return rows.map(toOpenOrder);
 }

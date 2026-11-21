@@ -208,14 +208,14 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 4 (escribir primero y comprobar que fallan)
 
-- [ ] T052 [P] [US4] Prueba de integración `server/tests/integration/notifications.stalled.test.js`: una orden abierta con 4 días desde su último cambio genera `STALLED`, con 3 días exactos no; la fecha del último cambio es el mayor `changed_at` del historial (y `created_at` sin historial); `TERMINADO` y `ENTREGADO` no avisan; cambiar de estado quita el aviso y reinicia el conteo; la clave `STALLED:{orden}:{último id del historial}` cambia cuando la orden vuelve a detenerse, y el aviso reaparece sin leer; `ADMIN` y `RECEPTIONIST` lo reciben
-- [ ] T053 [P] [US4] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): la sección «Órdenes detenidas» muestra folio, cliente, estado y «N días sin cambio» con indicador ámbar y abre la orden al pulsar
+- [X] T052 [P] [US4] Prueba de integración `server/tests/integration/notifications.stalled.test.js`: una orden abierta con 4 días desde su último cambio genera `STALLED`, con 3 días exactos no; la fecha del último cambio es el mayor `changed_at` del historial (y `created_at` sin historial); `TERMINADO` y `ENTREGADO` no avisan; cambiar de estado quita el aviso y reinicia el conteo; la clave `STALLED:{orden}:{último id del historial}` cambia cuando la orden vuelve a detenerse, y el aviso reaparece sin leer; `ADMIN` y `RECEPTIONIST` lo reciben
+- [X] T053 [P] [US4] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar): la sección «Órdenes detenidas» muestra folio, cliente, estado y «N días sin cambio» con indicador ámbar y abre la orden al pulsar
 
 ### Implementación de la historia 4
 
-- [ ] T054 [US4] Ampliar (o crear, si aún no existe) `server/models/noticeModel.js` con `listOpenOrdersWithLastChange({ mechanicId }, connection)` (órdenes en `RECIBIDO`, `DIAGNOSTICO`, `EN_REPARACION` y `ESPERANDO_REFACCION` con el último `changed_at` y el último id de `order_status_history`, o `created_at` y `0`; filtro opcional por mecánico asignado) apoyada en `idx_order_history_order`
-- [ ] T055 [US4] Ampliar `server/services/notificationService.js` con `STALLED` usando `isStalledOrder` de `noticeRules.js`, la clave `STALLED:{orderId}:{lastHistoryId}`, `target` de tipo `order`, `folio`, `status` y `daysStalled`; **desde esta tarea** el MECHANIC solo recibe las órdenes con `mechanic_id` igual al del actor (`listOpenOrdersWithLastChange({ mechanicId })`) y sin nombre de cliente, para no filtrar avisos de órdenes ajenas aunque la historia 5 aún no se haya hecho
-- [ ] T056 [P] [US4] Ampliar `client/lib/widgets/notifications_panel.dart` con la sección «Órdenes detenidas»
+- [X] T054 [US4] Ampliar (o crear, si aún no existe) `server/models/noticeModel.js` con `listOpenOrdersWithLastChange({ mechanicId }, connection)` (órdenes en `RECIBIDO`, `DIAGNOSTICO`, `EN_REPARACION` y `ESPERANDO_REFACCION` con el último `changed_at` y el último id de `order_status_history`, o `created_at` y `0`; filtro opcional por mecánico asignado) apoyada en `idx_order_history_order`
+- [X] T055 [US4] Ampliar `server/services/notificationService.js` con `STALLED` usando `isStalledOrder` de `noticeRules.js`, la clave `STALLED:{orderId}:{lastHistoryId}`, `target` de tipo `order`, `folio`, `status` y `daysStalled`; **desde esta tarea** el MECHANIC solo recibe las órdenes con `mechanic_id` igual al del actor (`listOpenOrdersWithLastChange({ mechanicId })`) y sin nombre de cliente, para no filtrar avisos de órdenes ajenas aunque la historia 5 aún no se haya hecho
+- [X] T056 [P] [US4] Ampliar `client/lib/widgets/notifications_panel.dart` con la sección «Órdenes detenidas»
 
 **Punto de control**: las órdenes detenidas aparecen y desaparecen según la regla de 3 días
 
@@ -229,13 +229,13 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 5 (escribir primero y comprobar que fallan)
 
-- [ ] T057 [P] [US5] Prueba de integración `server/tests/integration/notifications.mechanic.test.js`: el mecánico solo recibe `STALLED` de sus órdenes asignadas; no recibe las de otro mecánico ni las órdenes sin asignar, ni avisos de citas, mantenimientos o stock; los ítems no traen nombre de cliente ni teléfono; marcar claves ajenas se ignora; `GET` y `POST /api/client-notices` responden 403; el rol vigente en la base (no el del token) decide los avisos tras un cambio de rol
-- [ ] T058 [P] [US5] Pruebas del cliente en `client/test/notifications_test.dart` y `client/test/app_shell_test.dart` (ampliar): el mecánico ve solo la sección «Órdenes detenidas» y no ve «Clientes por avisar» en el menú
+- [X] T057 [P] [US5] Prueba de integración `server/tests/integration/notifications.mechanic.test.js`: el mecánico solo recibe `STALLED` de sus órdenes asignadas; no recibe las de otro mecánico ni las órdenes sin asignar, ni avisos de citas, mantenimientos o stock; los ítems no traen nombre de cliente ni teléfono; marcar claves ajenas se ignora; `GET` y `POST /api/client-notices` responden 403; el rol vigente en la base (no el del token) decide los avisos tras un cambio de rol
+- [X] T058 [P] [US5] Pruebas del cliente en `client/test/notifications_test.dart` y `client/test/app_shell_test.dart` (ampliar): el mecánico ve solo la sección «Órdenes detenidas» y no ve «Clientes por avisar» en el menú
 
 ### Implementación de la historia 5
 
-- [ ] T059 [US5] Reforzar `server/services/notificationService.js` como defensa en profundidad: agregar `projectForRole(notice, role)` aplicada al final de `list` a todos los tipos, que para MECHANIC deja `detail` solo con folio, vehículo y estado y elimina cualquier nombre de cliente o teléfono, y que descarta cualquier aviso cuyo tipo no esté en `typesForRole(role)`; el filtro por mecánico asignado ya lo hizo T055
-- [ ] T060 [P] [US5] Verificar en `client/lib/providers/navigation_provider.dart` y `client/lib/widgets/app_shell.dart` que `AppSection.clientNotices` no se ofrece al mecánico y que el panel de notificaciones no pide datos que su rol no recibe
+- [X] T059 [US5] Reforzar `server/services/notificationService.js` como defensa en profundidad: agregar `projectForRole(notice, role)` aplicada al final de `list` a todos los tipos, que para MECHANIC deja `detail` solo con folio, vehículo y estado y elimina cualquier nombre de cliente o teléfono, y que descarta cualquier aviso cuyo tipo no esté en `typesForRole(role)`; el filtro por mecánico asignado ya lo hizo T055
+- [X] T060 [P] [US5] Verificar en `client/lib/providers/navigation_provider.dart` y `client/lib/widgets/app_shell.dart` que `AppSection.clientNotices` no se ofrece al mecánico y que el panel de notificaciones no pide datos que su rol no recibe
 
 **Punto de control**: el mecánico solo ve lo suyo, validado en el servidor
 

@@ -489,6 +489,98 @@ void main() {
     });
   });
 
+  group('avisos de órdenes detenidas (US4)', () {
+    Map<String, dynamic> detenida(int id, int dias, {String cliente = 'Ana Torres'}) => _item('STALLED', id, extra: {
+          'title': 'Orden detenida',
+          'detail': 'OS-00000$id · Nissan Versa ABC-123 · $cliente · Esperando refacción · $dias días sin cambio',
+          'folio': 'OS-00000$id',
+          'status': 'ESPERANDO_REFACCION',
+          'daysStalled': dias,
+          'target': {'kind': 'order', 'id': id},
+        });
+
+    testWidgets('test_la_seccion_ordenes_detenidas_muestra_folio_cliente_estado_y_dias_sin_cambio', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('STALLED', [detenida(5, 12), detenida(6, 4, cliente: 'Luis Gómez')]),
+        ]);
+      await pumpAppSignedIn(tester, FakeApi(role: 'RECEPTIONIST', handler: fake.handler()));
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Órdenes detenidas'), findsOneWidget);
+      expect(find.text('OS-000005 · Nissan Versa ABC-123 · Ana Torres · Esperando refacción · 12 días sin cambio'), findsOneWidget);
+      expect(find.text('OS-000006 · Nissan Versa ABC-123 · Luis Gómez · Esperando refacción · 4 días sin cambio'), findsOneWidget);
+      expect(find.text('Orden detenida'), findsNWidgets(2));
+      final punto = tester.widget<Icon>(find.byKey(const ValueKey('no-leido-STALLED:5')));
+      expect(punto.color, AppColors.warning);
+    });
+
+    testWidgets('test_pulsar_una_orden_detenida_abre_la_orden_y_la_marca_como_leida', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('STALLED', [detenida(5, 6)]),
+        ]);
+      final api = FakeApi(role: 'ADMIN', handler: fake.handler());
+      await pumpAppSignedIn(tester, api);
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('aviso-STALLED:5')));
+      await tester.pumpAndSettle();
+
+      expect(fake.marked, [
+        ['STALLED:5'],
+      ]);
+      expect(api.requests.any((r) => r.method == 'GET' && r.path == '/orders/5'), isTrue);
+    });
+  });
+
+  group('el mecánico ve solo lo que le corresponde (US5)', () {
+    testWidgets('test_el_panel_del_mecanico_solo_tiene_ordenes_detenidas_sin_datos_de_clientes', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('STALLED', [
+            _item('STALLED', 5, extra: {
+              'title': 'Orden detenida',
+              'detail': 'OS-000005 · Nissan Versa ABC-123 · En reparación · 5 días sin cambio',
+              'folio': 'OS-000005',
+              'status': 'EN_REPARACION',
+              'daysStalled': 5,
+              'target': {'kind': 'order', 'id': 5},
+            }),
+          ]),
+        ]);
+      final api = FakeApi(role: 'MECHANIC', handler: fake.handler());
+      await pumpAppSignedIn(tester, api);
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Órdenes detenidas'), findsOneWidget);
+      expect(find.text('Mantenimientos vencidos'), findsNothing);
+      expect(find.text('Citas de hoy'), findsNothing);
+      expect(find.text('Stock agotado'), findsNothing);
+      expect(find.text('OS-000005 · Nissan Versa ABC-123 · En reparación · 5 días sin cambio'), findsOneWidget);
+      // El mecánico no consulta la lista de clientes por avisar.
+      expect(api.requests.where((r) => r.path == '/client-notices'), isEmpty);
+    });
+
+    testWidgets('test_el_menu_del_mecanico_no_ofrece_clientes_por_avisar_ni_inventario', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications();
+      await pumpAppSignedIn(tester, FakeApi(role: 'MECHANIC', handler: fake.handler()));
+
+      expect(find.text('Clientes por avisar'), findsNothing);
+      expect(find.text('Inventario'), findsNothing);
+      expect(find.text('Mis órdenes'), findsWidgets);
+    });
+  });
+
   group('actualización del contador', () {
     testWidgets('test_consulta_al_iniciar_sesion_y_cada_sesenta_segundos', (tester) async {
       useDesktopWindow(tester);

@@ -2,7 +2,8 @@ import * as noticeModel from '../models/noticeModel.js';
 import * as notificationReadModel from '../models/notificationReadModel.js';
 import * as maintenanceService from './maintenanceService.js';
 import * as partService from './partService.js';
-import { GROUP_ORDER, NOTICE_TYPES, buildNoticeKey, typesForRole } from './noticeRules.js';
+import { formatFolio } from '../utils/orderFolio.js';
+import { GROUP_ORDER, NOTICE_TYPES, buildNoticeKey, daysSince, isStalledOrder, typesForRole } from './noticeRules.js';
 
 /** Máximo de avisos que se listan por tipo; el total real de cada tipo se informa aparte. */
 const LIST_LIMIT = 50;
@@ -88,6 +89,48 @@ async function loadStock(type, title) {
   return { total: notices.length, notices };
 }
 
+const ORDER_STATUS_LABELS = {
+  RECIBIDO: 'Recibida',
+  DIAGNOSTICO: 'Diagnóstico',
+  EN_REPARACION: 'En reparación',
+  ESPERANDO_REFACCION: 'Esperando refacción',
+};
+
+/**
+ * Órdenes abiertas con más de 3 días sin cambio de estado (D-01). El mecánico solo recibe las órdenes que tiene
+ * asignadas y sin el nombre del cliente; administración y recepción reciben todas. La más detenida va primero.
+ */
+async function loadStalledOrders(actor) {
+  const isMechanic = actor.role === 'MECHANIC';
+  const orders = await noticeModel.listOpenOrdersWithLastChange(isMechanic ? { mechanicId: actor.id } : {});
+  const today = new Date();
+
+  const stalled = orders
+    .map((order) => ({ order, lastChangeAt: order.lastChangeAt ?? order.createdAt }))
+    .filter(({ order, lastChangeAt }) => isStalledOrder({ status: order.status, lastChangeAt, today }))
+    .map(({ order, lastChangeAt }) => ({ order, days: daysSince(lastChangeAt, today) }))
+    .sort((a, b) => b.days - a.days || a.order.id - b.order.id);
+
+  const notices = stalled.map(({ order, days }) => {
+    const folio = formatFolio(order.id);
+    const vehicle = `${order.vehicle.brand} ${order.vehicle.model} ${order.vehicle.licensePlate}`;
+    const parts = [folio, vehicle];
+    if (!isMechanic) parts.push(order.client.name);
+    parts.push(ORDER_STATUS_LABELS[order.status] ?? order.status, `${days} días sin cambio`);
+    return {
+      key: buildNoticeKey(NOTICE_TYPES.STALLED, order.id, order.lastHistoryId),
+      type: NOTICE_TYPES.STALLED,
+      title: 'Orden detenida',
+      detail: parts.join(' · '),
+      folio,
+      status: order.status,
+      daysStalled: days,
+      target: { kind: 'order', id: order.id },
+    };
+  });
+  return { total: notices.length, notices };
+}
+
 /** Cargador de cada tipo de aviso. Las historias siguientes registran aquí los suyos. */
 const LOADERS = {
   [NOTICE_TYPES.MAINT_OVERDUE]: (actor) =>
@@ -95,13 +138,26 @@ const LOADERS = {
   [NOTICE_TYPES.MAINT_UPCOMING]: (actor) =>
     loadMaintenance({ indicator: 'PROXIMO', type: NOTICE_TYPES.MAINT_UPCOMING, title: 'Mantenimiento próximo' }, actor),
   [NOTICE_TYPES.APPT_TODAY]: () => loadAppointmentsToday(),
+  [NOTICE_TYPES.STALLED]: (actor) => loadStalledOrders(actor),
   [NOTICE_TYPES.STOCK_OUT]: () => loadStock(NOTICE_TYPES.STOCK_OUT, 'Stock agotado'),
   [NOTICE_TYPES.STOCK_LOW]: () => loadStock(NOTICE_TYPES.STOCK_LOW, 'Stock bajo'),
 };
 
+/** Campos que puede traer un aviso para el mecánico: nunca nombre de cliente ni teléfono. */
+const MECHANIC_FIELDS = ['key', 'type', 'read', 'title', 'detail', 'folio', 'status', 'daysStalled', 'target'];
+
+/**
+ * Defensa en profundidad (FR-004, FR-015): aunque un cargador agregara por error datos del cliente, el aviso del
+ * mecánico solo conserva los campos de `MECHANIC_FIELDS`.
+ */
+export function projectForRole(notice, role) {
+  if (role !== 'MECHANIC') return notice;
+  return Object.fromEntries(Object.entries(notice).filter(([field]) => MECHANIC_FIELDS.includes(field)));
+}
+
 /** Arma un grupo con la marca de lectura: lista como máximo 50 avisos y cuenta los no leídos de todos. */
-function buildGroup(type, { total, notices }, readKeys) {
-  const withRead = notices.map((notice) => ({ ...notice, read: readKeys.has(notice.key) }));
+function buildGroup(type, { total, notices }, readKeys, role) {
+  const withRead = notices.map((notice) => projectForRole({ ...notice, read: readKeys.has(notice.key) }, role));
   const readCount = withRead.filter((notice) => notice.read).length;
   return {
     type,
@@ -123,9 +179,11 @@ async function loadForActor(actor) {
 }
 
 /** Resumen listo para la API a partir de los avisos cargados y de las claves que el usuario ya leyó. */
-function summarize(loaded, readKeys) {
+function summarize(loaded, readKeys, role) {
+  const allowed = new Set(typesForRole(role));
   const groups = loaded
-    .map(({ type, total, notices }) => buildGroup(type, { total, notices }, readKeys))
+    .filter(({ type }) => allowed.has(type))
+    .map(({ type, total, notices }) => buildGroup(type, { total, notices }, readKeys, role))
     .filter((group) => group.total > 0);
 
   return {
@@ -139,7 +197,7 @@ function summarize(loaded, readKeys) {
 /** Avisos del usuario en este momento. */
 export async function list(actor) {
   const [readKeys, loaded] = await Promise.all([notificationReadModel.listReadKeys(actor.id), loadForActor(actor)]);
-  return summarize(loaded, readKeys);
+  return summarize(loaded, readKeys, actor.role);
 }
 
 /**
@@ -155,5 +213,5 @@ export async function markRead(keys, actor) {
   await notificationReadModel.insertIgnore(actor.id, valid);
 
   const readKeys = await notificationReadModel.listReadKeys(actor.id);
-  return { marked: valid.length, unread: summarize(loaded, readKeys).unread };
+  return { marked: valid.length, unread: summarize(loaded, readKeys, actor.role).unread };
 }
