@@ -3,6 +3,7 @@ import * as vehicleHistoryModel from '../models/vehicleHistoryModel.js';
 import * as vehicleModel from '../models/vehicleModel.js';
 import { AppError } from '../utils/AppError.js';
 import { presentMaintenance } from './maintenancePresenter.js';
+import * as settingsService from './settingsService.js';
 
 /** Historial del vehículo (todos los roles): órdenes terminadas o entregadas, la más reciente primero. */
 export async function getHistory(vehicleId, { page, pageSize }) {
@@ -12,6 +13,7 @@ export async function getHistory(vehicleId, { page, pageSize }) {
   const { items, total } = await vehicleHistoryModel.listFinishedOrders(vehicleId, { page, pageSize });
   const details = await vehicleHistoryModel.loadDetails(items.map((item) => item.orderId));
   const pending = await maintenanceModel.findPendingByVehicle(vehicleId);
+  const margins = await settingsService.getMaintenanceMargins();
 
   const entries = items.map((item) => {
     const maintenance = details.maintenance.get(item.orderId);
@@ -20,7 +22,7 @@ export async function getHistory(vehicleId, { page, pageSize }) {
       services: details.services.get(item.orderId) ?? [],
       labor: details.labor.get(item.orderId) ?? [],
       parts: details.parts.get(item.orderId) ?? [],
-      maintenance: maintenance ? presentMaintenance(maintenance, vehicle.currentMileage) : null,
+      maintenance: maintenance ? presentMaintenance(maintenance, vehicle.currentMileage, new Date(), margins) : null,
     };
   });
 
@@ -35,7 +37,7 @@ export async function getHistory(vehicleId, { page, pageSize }) {
         currentMileage: vehicle.currentMileage,
       },
       entries,
-      pendingMaintenance: pending ? presentMaintenance(pending, vehicle.currentMileage) : null,
+      pendingMaintenance: pending ? presentMaintenance(pending, vehicle.currentMileage, new Date(), margins) : null,
     },
     total,
   };

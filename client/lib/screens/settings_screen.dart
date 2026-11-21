@@ -63,7 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
               controller: _tabs,
               children: const [
                 _ShopTab(),
-                _PendingTab(),
+                _MaintenanceTab(),
                 _PendingTab(),
               ],
             ),
@@ -279,6 +279,161 @@ class _ShopFormState extends State<_ShopForm> {
             const SizedBox(height: AppSpacing.lg),
             FilledButton(
               key: const ValueKey('guardar-taller'),
+              onPressed: (!changed || provider.saving) ? null : _save,
+              child: Text(provider.saving ? 'Guardando…' : 'Guardar cambios'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MaintenanceTab extends StatelessWidget {
+  const _MaintenanceTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<SettingsProvider>();
+    final snapshot = provider.snapshot;
+    if (snapshot == null) {
+      if (provider.error != null) return ErrorView(message: provider.error!, onRetry: provider.load);
+      return const LoadingView();
+    }
+    return SingleChildScrollView(child: _MaintenanceForm(snapshot: snapshot));
+  }
+}
+
+class _MaintenanceForm extends StatefulWidget {
+  const _MaintenanceForm({required this.snapshot});
+
+  final SettingsSnapshot snapshot;
+
+  @override
+  State<_MaintenanceForm> createState() => _MaintenanceFormState();
+}
+
+class _MaintenanceFormState extends State<_MaintenanceForm> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _days = TextEditingController(text: '${widget.snapshot.maintenance.warnDays}');
+  late final TextEditingController _km = TextEditingController(text: '${widget.snapshot.maintenance.warnKm}');
+
+  @override
+  void dispose() {
+    _days.dispose();
+    _km.dispose();
+    super.dispose();
+  }
+
+  Map<String, int> _changes() {
+    final maintenance = widget.snapshot.maintenance;
+    final days = int.tryParse(_days.text.trim());
+    final km = int.tryParse(_km.text.trim());
+    return {
+      if (days != null && days != maintenance.warnDays) 'warnDays': days,
+      if (km != null && km != maintenance.warnKm) 'warnKm': km,
+    };
+  }
+
+  String? _validateRange(String? value, {required String serverKey, required int max, required String limit}) {
+    final serverError = context.read<SettingsProvider>().fieldErrors[serverKey];
+    if (serverError != null) return serverError;
+    final number = int.tryParse(value?.trim() ?? '');
+    if (number == null) return 'Escribe un número entero.';
+    if (number < 1 || number > max) return 'El valor debe estar entre 1 y $limit.';
+    return null;
+  }
+
+  Future<void> _save() async {
+    final provider = context.read<SettingsProvider>();
+    provider.clearFieldErrors();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final changes = _changes();
+    if (changes.isEmpty) return;
+    final failure = await provider.save({'maintenance': changes});
+    if (!mounted) return;
+    _formKey.currentState?.validate();
+    if (failure == null) {
+      showSuccess(context, 'Márgenes de mantenimiento guardados. La lista de Mantenimientos, el panel y los avisos los usan desde ahora.');
+    } else if (provider.fieldErrors.isEmpty) {
+      showFailure(context, failure);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<SettingsProvider>();
+    final snapshot = provider.snapshot ?? widget.snapshot;
+    final theme = Theme.of(context);
+    // Hay cambios si el texto difiere de lo guardado (aunque no sea un número válido: así se puede validar y marcar).
+    final saved = widget.snapshot.maintenance;
+    final changed = _days.text.trim() != '${saved.warnDays}' || _km.text.trim() != '${saved.warnKm}';
+
+    Widget field({
+      required String label,
+      required TextEditingController controller,
+      required Key fieldKey,
+      required String sourceKey,
+      required String serverKey,
+      required int max,
+      required String limit,
+    }) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(label, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(width: AppSpacing.sm),
+              KeyedSubtree(key: ValueKey('origen-$sourceKey'), child: SourceChip(source: snapshot.sourceOf(sourceKey))),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          TextFormField(
+            key: fieldKey,
+            controller: controller,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(helperText: 'Entre 1 y $limit'),
+            validator: (value) => _validateRange(value, serverKey: serverKey, max: max, limit: limit),
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+        ],
+      );
+    }
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 560),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            field(
+              label: 'Margen de Próximo (días)',
+              controller: _days,
+              fieldKey: const ValueKey('campo-margen-dias'),
+              sourceKey: 'maintenance.warn_days',
+              serverKey: 'maintenance.warnDays',
+              max: 365,
+              limit: '365',
+            ),
+            field(
+              label: 'Margen de Próximo (km)',
+              controller: _km,
+              fieldKey: const ValueKey('campo-margen-km'),
+              sourceKey: 'maintenance.warn_km',
+              serverKey: 'maintenance.warnKm',
+              max: 100000,
+              limit: '100 000',
+            ),
+            Text(
+              'Un mantenimiento es Próximo cuando falta este margen o menos, en días o en kilómetros.',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            FilledButton(
+              key: const ValueKey('guardar-margenes'),
               onPressed: (!changed || provider.saving) ? null : _save,
               child: Text(provider.saving ? 'Guardando…' : 'Guardar cambios'),
             ),

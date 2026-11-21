@@ -1,11 +1,11 @@
 import { withTransaction } from '../config/db.js';
-import { getMaintenanceConfig } from '../config/env.js';
 import * as maintenanceModel from '../models/maintenanceModel.js';
 import * as vehicleModel from '../models/vehicleModel.js';
 import { AppError } from '../utils/AppError.js';
 import { presentFullMaintenance, toDateOnly } from './maintenancePresenter.js';
 import { assertMaintenanceTarget } from './maintenanceStatus.js';
 import { loadOrderForActor } from './orderService.js';
+import * as settingsService from './settingsService.js';
 
 const notEditable = () =>
   AppError.conflict('MAINTENANCE_NOT_EDITABLE', 'El mantenimiento ya fue atendido: no admite cambios.');
@@ -60,7 +60,7 @@ export async function schedule(orderId, data, actor) {
       connection,
     );
   });
-  return presentFullMaintenance(await maintenanceModel.findById(id), actor);
+  return presentFullMaintenance(await maintenanceModel.findById(id), actor, new Date(), await settingsService.getMaintenanceMargins());
 }
 
 /**
@@ -100,7 +100,7 @@ export async function update(id, data, actor) {
       connection,
     );
   });
-  return presentFullMaintenance(await maintenanceModel.findById(id), actor);
+  return presentFullMaintenance(await maintenanceModel.findById(id), actor, new Date(), await settingsService.getMaintenanceMargins());
 }
 
 /** Marca un mantenimiento pendiente como Atendido (acción explícita y definitiva). */
@@ -111,15 +111,16 @@ export async function attend(id, actor) {
     if (locked.status !== 'PENDIENTE') throw notEditable();
     await maintenanceModel.markAttended(id, connection);
   });
-  return presentFullMaintenance(await maintenanceModel.findById(id), actor);
+  return presentFullMaintenance(await maintenanceModel.findById(id), actor, new Date(), await settingsService.getMaintenanceMargins());
 }
 
 /** Lista general de mantenimientos con cliente y teléfono (ADMIN y RECEPTIONIST). */
 export async function list(filters, actor) {
-  const { warnDays, warnKm } = getMaintenanceConfig();
+  const margins = await settingsService.getMaintenanceMargins();
+  const { warnDays, warnKm } = margins;
   const pad = (n) => String(n).padStart(2, '0');
   const now = new Date();
   const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
   const { items, total } = await maintenanceModel.list({ ...filters, today, warnDays, warnKm });
-  return { items: items.map((item) => presentFullMaintenance(item, actor, now)), total };
+  return { items: items.map((item) => presentFullMaintenance(item, actor, now, margins)), total };
 }

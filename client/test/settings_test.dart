@@ -211,4 +211,93 @@ void main() {
       expect(find.byKey(const ValueKey('campo-taller-nombre')), findsOneWidget);
     });
   });
+
+  group('pestaña Mantenimiento (US2)', () {
+    Future<void> abrirPestana(WidgetTester tester, FakeSettings fake) async {
+      useDesktopWindow(tester);
+      await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: fake.handler()));
+      await openSection(tester, 'Configuración');
+      await tester.tap(find.byKey(const ValueKey('pestana-mantenimiento')));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('test_muestra_los_dos_margenes_con_su_limite_y_el_texto_de_ayuda', (tester) async {
+      final fake = FakeSettings(_snapshot(warnDays: 15, warnKm: 800, sources: {
+        'shop.name': 'DEFAULT',
+        'shop.address': 'DEFAULT',
+        'shop.phone': 'DEFAULT',
+        'maintenance.warn_days': 'STORED',
+        'maintenance.warn_km': 'ENV',
+      }));
+      await abrirPestana(tester, fake);
+
+      expect(find.widgetWithText(TextFormField, '15'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, '800'), findsOneWidget);
+      expect(find.text('Entre 1 y 365'), findsOneWidget);
+      expect(find.text('Entre 1 y 100 000'), findsOneWidget);
+      expect(find.text('Un mantenimiento es Próximo cuando falta este margen o menos, en días o en kilómetros.'), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const ValueKey('origen-maintenance.warn_days')), matching: find.text('Guardado')), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const ValueKey('origen-maintenance.warn_km')), matching: find.text('Variable de entorno')), findsOneWidget);
+    });
+
+    testWidgets('test_guardar_envia_los_valores_cambiados', (tester) async {
+      final fake = FakeSettings();
+      await abrirPestana(tester, fake);
+
+      await tester.enterText(find.byKey(const ValueKey('campo-margen-dias')), '15');
+      await tester.enterText(find.byKey(const ValueKey('campo-margen-km')), '500');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('guardar-margenes')));
+      await tester.pumpAndSettle();
+
+      expect(fake.saved, [
+        {
+          'maintenance': {'warnDays': 15, 'warnKm': 500},
+        },
+      ]);
+      expect(find.textContaining('Márgenes de mantenimiento guardados'), findsOneWidget);
+    });
+
+    testWidgets('test_un_valor_fuera_de_rango_se_marca_en_su_campo_sin_enviar_nada', (tester) async {
+      final fake = FakeSettings();
+      await abrirPestana(tester, fake);
+
+      await tester.enterText(find.byKey(const ValueKey('campo-margen-dias')), '400');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('guardar-margenes')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('El valor debe estar entre 1 y 365.'), findsOneWidget);
+      expect(fake.saved, isEmpty);
+
+      await tester.enterText(find.byKey(const ValueKey('campo-margen-dias')), '30');
+      await tester.enterText(find.byKey(const ValueKey('campo-margen-km')), '150000');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('guardar-margenes')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('El valor debe estar entre 1 y 100 000.'), findsOneWidget);
+      expect(fake.saved, isEmpty);
+    });
+
+    testWidgets('test_un_valor_que_no_es_numero_se_marca_en_su_campo', (tester) async {
+      final fake = FakeSettings();
+      await abrirPestana(tester, fake);
+
+      await tester.enterText(find.byKey(const ValueKey('campo-margen-km')), 'mil');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('guardar-margenes')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Escribe un número entero.'), findsOneWidget);
+      expect(fake.saved, isEmpty);
+    });
+
+    testWidgets('test_guardar_esta_deshabilitado_sin_cambios', (tester) async {
+      final fake = FakeSettings();
+      await abrirPestana(tester, fake);
+
+      expect(tester.widget<FilledButton>(find.byKey(const ValueKey('guardar-margenes'))).onPressed, isNull);
+    });
+  });
 }

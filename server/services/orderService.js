@@ -12,6 +12,7 @@ import { presentOrderPart, presentTotals } from './orderTotals.js';
 import { getBilling } from './paymentService.js';
 import { assertEntryMileage } from './mileageRule.js';
 import { ORDER_STATUS_LABELS, allowedFor, assertTransition, canActorTransition } from './orderTransitions.js';
+import * as settingsService from './settingsService.js';
 
 const AVAILABLE_APPOINTMENT_STATUSES = ['PENDIENTE', 'CONFIRMADA'];
 
@@ -81,7 +82,7 @@ export async function buildDetail(order, actor, connection) {
     observations: order.observations,
     recommendations: order.recommendations,
     serviceMileage: order.serviceMileage,
-    maintenance: scheduled ? presentMaintenance(scheduled, scheduled.currentMileage) : null,
+    maintenance: scheduled ? presentMaintenance(scheduled, scheduled.currentMileage, new Date(), await settingsService.getMaintenanceMargins()) : null,
     mileageCorrection: order.mileageCorrection,
     mileageCorrectionReason: order.mileageCorrectionReason,
     appointment: order.appointment,

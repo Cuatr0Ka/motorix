@@ -1,4 +1,3 @@
-import { getMaintenanceConfig } from '../config/env.js';
 import * as clientNoticeModel from '../models/clientNoticeModel.js';
 import * as maintenanceModel from '../models/maintenanceModel.js';
 import * as noticeModel from '../models/noticeModel.js';
@@ -8,6 +7,7 @@ import { toDateOnly } from './maintenancePresenter.js';
 import * as maintenanceService from './maintenanceService.js';
 import { computeIndicator } from './maintenanceStatus.js';
 import { CLIENT_NOTICE_REASONS } from './noticeRules.js';
+import * as settingsService from './settingsService.js';
 
 /** Máximo de filas que devuelve la lista; el total real va en `meta.total`. */
 const LIST_LIMIT = 200;
@@ -139,7 +139,7 @@ async function resolveFact(reason, factId) {
 
   const maintenance = await maintenanceModel.findById(factId);
   if (!maintenance) throw notFound();
-  const { warnDays, warnKm } = getMaintenanceConfig();
+  const { warnDays, warnKm } = await settingsService.getMaintenanceMargins();
   const indicator =
     maintenance.status === 'PENDIENTE'
       ? computeIndicator({

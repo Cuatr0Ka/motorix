@@ -1,4 +1,3 @@
-import { getMaintenanceConfig } from '../config/env.js';
 import { computeIndicator } from './maintenanceStatus.js';
 
 /** Formato `YYYY-MM-DD` de una fecha de la base (columna DATE), sin desfase de zona horaria. */
@@ -9,9 +8,13 @@ export function toDateOnly(value) {
   return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
 }
 
-/** Mantenimiento listo para la API: fechas en texto e indicador calculado (null si ya fue atendido). */
-export function presentMaintenance(row, currentMileage, today = new Date()) {
-  const { warnDays, warnKm } = getMaintenanceConfig();
+/**
+ * Mantenimiento listo para la API: fechas en texto e indicador calculado (null si ya fue atendido). Los márgenes de «Próximo»
+ * (`margins`: `{ warnDays, warnKm }`) los obtiene quien llama UNA vez por petición con `settingsService.getMaintenanceMargins()`.
+ */
+export function presentMaintenance(row, currentMileage, today = new Date(), margins) {
+  if (!margins) throw new Error('presentMaintenance necesita los márgenes de «Próximo» (settingsService.getMaintenanceMargins).');
+  const { warnDays, warnKm } = margins;
   const dueDate = toDateOnly(row.dueDate);
   return {
     id: row.id,
@@ -31,8 +34,8 @@ export function presentMaintenance(row, currentMileage, today = new Date()) {
  * Mantenimiento completo (con orden de origen, vehículo y cliente). El mecánico no recibe los datos
  * de contacto del cliente.
  */
-export function presentFullMaintenance(maintenance, actor, today = new Date()) {
-  const base = presentMaintenance(maintenance, maintenance.vehicle.currentMileage, today);
+export function presentFullMaintenance(maintenance, actor, today = new Date(), margins) {
+  const base = presentMaintenance(maintenance, maintenance.vehicle.currentMileage, today, margins);
   const full = {
     ...base,
     orderId: maintenance.orderId,
