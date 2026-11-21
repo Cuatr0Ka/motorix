@@ -18,6 +18,12 @@ Enmienda 1.1.0 (2026-10-31)
 - Plantillas revisadas: `plan-template.md`, `spec-template.md` y `tasks-template.md` no requieren cambios
 - Pendiente (TODO): ratificación formal por el equipo (`TODO(RATIFICATION_DATE)`)
 
+Enmienda 1.1.2 (2026-11-21)
+- Cambio de versión: 1.1.1 → 1.1.2 (PATCH: solo se registra la aprobación del Sprint 7; no cambia ningún principio)
+- Secciones añadidas: "Decisiones resueltas durante el Sprint 7"
+- Plantillas revisadas: `plan-template.md`, `spec-template.md` y `tasks-template.md` no requieren cambios
+- Pendiente (TODO): ratificación formal por el equipo (`TODO(RATIFICATION_DATE)`)
+
 Enmienda 1.1.1 (2026-11-20)
 - Cambio de versión: 1.1.0 → 1.1.1 (PATCH: solo se registra la aprobación del Sprint 6; no cambia ningún principio)
 - Secciones añadidas: "Decisiones resueltas durante el Sprint 6"
@@ -264,6 +270,14 @@ asumirlas como definitivas:
   principio I. El sistema no envía mensajes al cliente por ningún canal: recepción avisa por
   teléfono o en persona y el sistema solo lo registra.
 
+### Decisiones resueltas durante el Sprint 7
+
+- **Sprint 7 (reportes, configuración, términos y condiciones y seguridad de la información)**: aprobado el
+  2026-11-21 por el responsable del proyecto (autoridad declarada por quien lo lleva, por tratarse de un proyecto
+  escolar), con el insumo `docs/sprints/sprint-7-reportes-configuracion.md` y el flujo completo de Spec Kit, como
+  exige el principio I. El sistema sigue sin enviar mensajes al cliente por ningún canal; los reportes se exportan
+  en CSV sin dependencias nuevas.
+
 ## Gobernanza
 
 - Esta constitución tiene prioridad sobre cualquier otra práctica o convención del repo.
@@ -275,4 +289,4 @@ asumirlas como definitivas:
 - El cumplimiento se revisa en cada contribución; cualquier desviación DEBE justificarse
   explícitamente o descartarse.
 
-**Versión**: 1.1.1 | **Redactada**: 2026-10-01 | **Ratificación**: TODO(RATIFICATION_DATE): pendiente de aprobación del equipo | **Última enmienda**: 2026-11-20
+**Versión**: 1.1.2 | **Redactada**: 2026-10-01 | **Ratificación**: TODO(RATIFICATION_DATE): pendiente de aprobación del equipo | **Última enmienda**: 2026-11-21
