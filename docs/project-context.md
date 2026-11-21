@@ -371,9 +371,42 @@ duplicar datos solo para estadísticas.
 
 ## 6.12 Notificaciones internas
 
-Debe contemplar avisos relacionados con: - Mantenimientos próximos. -
-Mantenimientos vencidos. - Citas. - Stock bajo. - Órdenes que requieran
-atención.
+Centro de notificaciones en el encabezado (campana con el total de avisos no leídos y un panel con los
+avisos agrupados por tipo) y lista de **clientes por avisar** para la recepción. Se construyó en el
+Sprint 6.
+
+Los avisos **no se guardan**: se calculan al consultar con los mismos cálculos del panel de control, de la
+lista de Mantenimientos y de las alertas de stock, para que los números coincidan entre pantallas. Lo único
+que se guarda es qué avisos leyó cada usuario y a qué clientes ya se avisó.
+
+**Tipos de aviso y quién los recibe:**
+
+| Tipo | Se genera cuando | ADMIN | RECEPTIONIST | MECHANIC |
+|------|------------------|:-----:|:------------:|:--------:|
+| Mantenimiento próximo | Mantenimiento pendiente con indicador Próximo | ✔ | ✔ | ✘ |
+| Mantenimiento vencido | Mantenimiento pendiente con indicador Vencido | ✔ | ✔ | ✘ |
+| Cita del día | Cita de hoy pendiente o confirmada | ✔ | ✔ | ✘ |
+| Stock bajo | Refacción activa en o bajo su mínimo | ✔ | ✘ | ✘ |
+| Stock agotado | Refacción activa con existencia en cero | ✔ | ✘ | ✘ |
+| Orden detenida | Orden abierta (Recibida, Diagnóstico, En reparación o Esperando refacción) con más de 3 días sin cambio de estado | ✔ | ✔ | ✔ (solo sus órdenes asignadas, sin datos del cliente) |
+
+- **Lectura por usuario**: cada aviso tiene una clave estable (`TIPO:id` o `TIPO:id:variante`). Marcarlo como
+  leído se guarda por usuario y persiste entre sesiones. Si el aviso empeora (de mantenimiento próximo a
+  vencido, de stock bajo a agotado) o si una orden vuelve a detenerse, la clave cambia y reaparece sin leer.
+  Si la condición deja de cumplirse, el aviso desaparece.
+- **Orden detenida**: se cuenta desde el último cambio de estado del historial (o la creación de la orden si no
+  tiene historial). El valor de 3 días es fijo; el Sprint 7 puede volverlo configurable.
+- **Actualización del contador**: al iniciar sesión, al cambiar de sección y cada 60 segundos mientras la
+  sesión esté abierta. No hay notificaciones en tiempo real por empuje ni del sistema operativo.
+- **Apertura**: cada aviso abre su pantalla (la orden, la cita, el vehículo o la refacción).
+- **Clientes por avisar** (solo ADMIN y RECEPTIONIST; el mecánico no accede): lista con el cliente, su teléfono,
+  el vehículo y el motivo: vehículo listo (orden Terminada sin entregar), cita de mañana, mantenimiento próximo
+  o mantenimiento vencido. La recepción avisa por teléfono o en persona y marca al cliente como **avisado**; el
+  sistema guarda quién avisó y cuándo, saca la fila de la lista y no vuelve a mostrarla por el mismo hecho. Un
+  hecho nuevo (otra orden u otra cita) vuelve a aparecer. No hay notas ni intentos.
+- **El sistema NO envía mensajes al cliente** por ningún canal (WhatsApp, correo o SMS): solo registra el aviso.
+- **API**: `GET /api/notifications`, `POST /api/notifications/read`, `GET /api/client-notices` y
+  `POST /api/client-notices`. Los permisos se validan en el servidor según el rol vigente en la base.
 
 ------------------------------------------------------------------------
 
@@ -805,6 +838,14 @@ generatedAt
 > - Un pago de Mercado Pago pendiente cuyo importe ya no coincide con el total se señala como
 >   desfasado y la recepción lo cancela con confirmación para generar uno nuevo.
 
+> **Decisión del Sprint 6:** notificaciones internas y clientes por avisar (ver la sección 6.12).
+> - `NotificationRead` (`notification_reads`): `user_id`, `notice_key` (clave del aviso, hasta 60
+>   caracteres) y `read_at`; llave primaria `(user_id, notice_key)`. Es el único estado que se guarda de los
+>   avisos, que se calculan al consultar.
+> - `ClientNotice` (`client_notices`): `client_id`, `reason` (ORDER_READY, APPT_TOMORROW, MAINT_UPCOMING,
+>   MAINT_OVERDUE), `fact_id` (orden, cita o mantenimiento según el motivo), `notified_by` y
+>   `notified_at`; clave única `(reason, fact_id)`. No guarda notas ni el canal.
+
 ------------------------------------------------------------------------
 
 # 13. Reglas de negocio iniciales
@@ -844,7 +885,8 @@ generatedAt
 
 El MVP se construirá mediante cuatro sprints. Los sprints posteriores al MVP se proponen en
 `docs/sprints/propuesta-sprints-post-mvp.md` y se rigen por la enmienda 1.1.0 de la constitución;
-el Sprint 5 (precios de refacciones y cobro completo) es el primero.
+el Sprint 5 (precios de refacciones y cobro completo) es el primero y el Sprint 6 (notificaciones
+internas y clientes por avisar) el segundo.
 
 ## 14.1 Base de datos del MVP (Sprints 1 a 4)
 
@@ -1392,6 +1434,15 @@ Antes de asumirlas como definitivas, el equipo debe decidir:
 - **Límites**: precio de refacción y total de la orden hasta 9 999 999.99; el redondeo no aplica porque la cantidad es entera (D-08).
 - **Tickets anteriores**: se muestran e imprimen como se emitieron; solo los nuevos llevan precio e importe (D-09).
 - **Visibilidad**: el mecánico no ve ningún precio; el precio de compra solo lo ve el administrador (D-10).
+
+### Decisiones resueltas durante el Sprint 6
+
+- **Orden detenida**: orden abierta con más de 3 días sin cambio de estado; no incluye las Terminadas, que se avisan por la lista de clientes por avisar (D-01).
+- **Aviso al cliente**: solo se registra quién avisó y cuándo, sin nota; el cliente sale de la lista aunque no haya contestado (D-02).
+- **Contador de la campana**: se actualiza al iniciar sesión, al navegar y cada 60 segundos (D-03).
+- **Cita del día**: solo la de hoy; las citas de mañana se avisan por la lista de clientes por avisar (D-04).
+- **Identidad de un aviso**: tipo y objeto; un cambio de estado del mismo objeto cuenta como un aviso nuevo (D-05).
+- **Mecánico**: no ve avisos de mantenimiento; solo los de las órdenes que tiene asignadas (D-06).
 
 CLAUDE puede proponer opciones para estas decisiones, pero no debe
 introducir dependencias grandes sin justificar su necesidad.

@@ -230,6 +230,7 @@ Vehículos
 Citas
 Órdenes de servicio
 Mantenimientos
+Clientes por avisar
 Inventario
 Pagos
 Tickets
@@ -243,11 +244,16 @@ Cerrar sesión
 - Mostrar solo los módulos implementados en el sprint actual.
 - Mostrar solo los módulos permitidos para el rol del usuario.
 - En el Sprint 1 el menú era: **Inicio** (bienvenida con accesos directos, sin indicadores), Clientes, Vehículos y, solo para ADMIN, Usuarios. En el Sprint 4 "Inicio" se mantiene como bienvenida ligera (saludo, rol, fecha y accesos rápidos según el rol, sin indicadores) y, para ADMIN, suma un acceso destacado al **Panel de control**, que es la pantalla de los indicadores y gráficas.
+- **Clientes por avisar** (Sprint 6) solo aparece para ADMIN y RECEPTIONIST, debajo de Mantenimientos.
 - Ocultar un botón **no es seguridad**: los permisos se validan también en backend.
 
 ### Header
 
-Nombre de sección, buscador cuando sea útil, notificaciones, usuario actual y rol.
+Nombre de sección, buscador cuando sea útil, **campana de notificaciones**, usuario actual y rol.
+
+- La campana va entre el título y el usuario. Su insignia muestra el total de avisos **no leídos**: sin número con
+  cero avisos y «99+» si pasa de 99. Es ámbar y roja solo si hay avisos críticos (vencidos o stock agotado) sin
+  leer. Etiqueta de accesibilidad: «Notificaciones, N sin leer». Ver la sección 8.5.2.
 
 ---
 
@@ -309,6 +315,37 @@ El diálogo debe ser breve, claro y en español. Texto sugerido:
 - **Desglose del cobro**: servicios, mano de obra y refacciones (cantidad, precio e importe) con tres subtotales y el total; las líneas anteriores a los precios muestran 0.00 y «Anterior a los precios».
 - **Aviso de importe desfasado** (ámbar) con el botón «Cancelar pago y generar uno nuevo», que pide confirmación.
 - **Aviso de diferencia por cobrar** (ámbar), sin botón de cobro: «El total de la orden supera el pago registrado por $X. La diferencia se cobra fuera del sistema.»
+
+### 8.5.2 Notificaciones y avisos a clientes (Sprint 6)
+
+**Panel de notificaciones**
+
+- Panel anclado a la esquina superior derecha, bajo la campana (no pantalla completa), de 420 px de ancho y
+  hasta el 75 % de la altura de la ventana, con desplazamiento vertical y botón de cierre.
+- Encabezado con «Notificaciones» y «N sin leer». Debajo, una sección por tipo con su nombre, su total y sus
+  avisos, en este orden: **Mantenimientos vencidos**, **Stock agotado**, **Órdenes detenidas**, **Citas de hoy**,
+  **Mantenimientos próximos** y **Stock bajo**. Solo aparecen las secciones con avisos.
+- Colores por tipo (siempre acompañados de texto): rojo para vencido y agotado, ámbar para próximo, bajo y orden
+  detenida, neutro para la cita del día.
+- Cada aviso muestra título y detalle; los no leídos llevan un punto del color del tipo y texto en negrita, y los
+  leídos se atenúan. Pulsar un aviso lo marca como leído, cierra el panel y abre la pantalla relacionada; el botón
+  «Marcar como leído» solo lo marca. No pide confirmación porque no es una acción destructiva.
+- Si un tipo tiene más avisos de los listados (50), la sección dice «Mostrando 50 de N».
+- **Estados**: cargando (indicador centrado, solo la primera vez; después se conserva el contenido), vacío
+  («No hay avisos pendientes» y «Cuando haya algo que atender aparecerá aquí») y error («No se pudieron consultar
+  los avisos» con **Reintentar**; si había datos previos se conservan y el error se muestra arriba).
+
+**Clientes por avisar**
+
+- Pantalla con el título «Clientes por avisar» y el texto «Llama o avisa en persona y marca al cliente como
+  avisado. El sistema no envía mensajes.». Tabla con Cliente, Teléfono, Vehículo, Motivo, Fecha y Acción.
+- Chip de motivo: verde «Vehículo listo», ámbar «Cita de mañana» y «Mantenimiento próximo», rojo «Mantenimiento
+  vencido».
+- Un teléfono vacío se muestra como «Sin teléfono registrado» en texto atenuado.
+- El botón **Avisado** abre una confirmación («¿Ya avisaste a [cliente] por [motivo]?» con **Cancelar** y
+  **Sí, avisado**). Al confirmar, la fila sale y se muestra «Cliente marcado como avisado»; si el hecho ya no
+  aplica, «Este aviso ya no aplica».
+- Estados: cargando, vacío («No hay clientes por avisar») y error con **Reintentar**.
 
 ### 8.6 Tarjetas
 
