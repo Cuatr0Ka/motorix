@@ -187,14 +187,14 @@ P1: US1 (campana y panel), US2 (mantenimientos y citas para recepción), US6 (le
 
 ### Pruebas de la historia 3 (escribir primero y comprobar que fallan)
 
-- [ ] T047 [P] [US3] Prueba de integración `server/tests/integration/notifications.stock.test.js`: el administrador recibe `STOCK_LOW` (con `0 < stock <= min_stock`) y `STOCK_OUT` (`stock = 0`) solo de refacciones activas; una inactiva no avisa; el total coincide con `GET /api/parts/alerts` y con el panel; la recepción y el mecánico no reciben ningún `STOCK_*`, ni siquiera marcando sus claves
-- [ ] T048 [P] [US3] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar) y `client/test/home_screen_test.dart`: el panel muestra «Stock agotado» (rojo) y «Stock bajo» (ámbar) con existencia y mínimo; la insignia de Inventario y el aviso de inicio siguen funcionando y no se contradicen con el centro (FR-009); tras un movimiento de inventario se refresca el centro
+- [X] T047 [P] [US3] Prueba de integración `server/tests/integration/notifications.stock.test.js`: el administrador recibe `STOCK_LOW` (con `0 < stock <= min_stock`) y `STOCK_OUT` (`stock = 0`) solo de refacciones activas; una inactiva no avisa; el total coincide con `GET /api/parts/alerts` y con el panel; la recepción y el mecánico no reciben ningún `STOCK_*`, ni siquiera marcando sus claves
+- [X] T048 [P] [US3] Pruebas del cliente en `client/test/notifications_test.dart` (ampliar) y `client/test/home_screen_test.dart`: el panel muestra «Stock agotado» (rojo) y «Stock bajo» (ámbar) con existencia y mínimo; la insignia de Inventario y el aviso de inicio siguen funcionando y no se contradicen con el centro (FR-009); tras un movimiento de inventario se refresca el centro
 
 ### Implementación de la historia 3
 
-- [ ] T049 [US3] Ampliar `server/services/notificationService.js` con `STOCK_LOW` y `STOCK_OUT` a partir de `partService.alerts()` (claves `STOCK_LOW:{partId}` y `STOCK_OUT:{partId}`, `target` de tipo `part`, `stock` y `minStock`), ejecutado solo para ADMIN
-- [ ] T050 [P] [US3] Refrescar el centro tras los movimientos de inventario: llamar a `NotificationsProvider.refresh()` junto a `StockAlertsProvider.refresh()` en `client/lib/screens/inventory_screen.dart` y `client/lib/screens/part_detail_screen.dart`, sin cambiar `StockAlertsProvider` ni el banner
-- [ ] T051 [P] [US3] Ampliar `client/lib/widgets/notifications_panel.dart` con las secciones de stock (rojo para agotado y ámbar para bajo)
+- [X] T049 [US3] Ampliar `server/services/notificationService.js` con `STOCK_LOW` y `STOCK_OUT` a partir de `partService.alerts()` (claves `STOCK_LOW:{partId}` y `STOCK_OUT:{partId}`, `target` de tipo `part`, `stock` y `minStock`), ejecutado solo para ADMIN
+- [X] T050 [P] [US3] Refrescar el centro tras los movimientos de inventario: llamar a `NotificationsProvider.refresh()` junto a `StockAlertsProvider.refresh()` en `client/lib/screens/inventory_screen.dart` y `client/lib/screens/part_detail_screen.dart`, sin cambiar `StockAlertsProvider` ni el banner
+- [X] T051 [P] [US3] Ampliar `client/lib/widgets/notifications_panel.dart` con las secciones de stock (rojo para agotado y ámbar para bajo)
 
 **Punto de control**: el administrador ve el stock en el centro y los números coinciden con el inventario
 

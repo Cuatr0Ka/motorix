@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/part.dart';
+import '../providers/notifications_provider.dart';
 import '../providers/parts_provider.dart';
 import '../providers/stock_alerts_provider.dart';
 import '../utils/formatters.dart';
@@ -36,6 +37,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       provider.setFilters();
       provider.load(search: '', page: 1);
       context.read<StockAlertsProvider>().refresh();
+      context.read<NotificationsProvider>().refresh();
     });
   }
 
@@ -45,6 +47,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       await context.read<PartsProvider>().reload();
       if (!mounted) return;
       context.read<StockAlertsProvider>().refresh();
+      context.read<NotificationsProvider>().refresh();
       showSuccess(context, 'Refacción registrada correctamente.');
     }
   }
@@ -56,6 +59,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       if (!mounted) return;
       context.read<PartsProvider>().reload();
       context.read<StockAlertsProvider>().refresh();
+      context.read<NotificationsProvider>().refresh();
     });
   }
 

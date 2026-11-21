@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../models/part.dart';
 import '../providers/part_detail_provider.dart';
+import '../providers/notifications_provider.dart';
 import '../providers/stock_alerts_provider.dart';
 import '../services/parts_service.dart';
 import '../utils/formatters.dart';
@@ -41,6 +42,7 @@ class _PartDetailView extends StatelessWidget {
     if (failure == null) {
       // Cualquier movimiento puede cambiar las alertas de stock bajo.
       context.read<StockAlertsProvider>().refresh();
+      context.read<NotificationsProvider>().refresh();
       showSuccess(context, success);
     } else {
       showFailure(context, failure);

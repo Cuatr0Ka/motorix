@@ -1,6 +1,7 @@
 import * as noticeModel from '../models/noticeModel.js';
 import * as notificationReadModel from '../models/notificationReadModel.js';
 import * as maintenanceService from './maintenanceService.js';
+import * as partService from './partService.js';
 import { GROUP_ORDER, NOTICE_TYPES, buildNoticeKey, typesForRole } from './noticeRules.js';
 
 /** Máximo de avisos que se listan por tipo; el total real de cada tipo se informa aparte. */
@@ -66,6 +67,27 @@ async function loadAppointmentsToday() {
   return { total: notices.length, notices };
 }
 
+/**
+ * Refacciones activas con stock bajo (en o bajo su mínimo) o agotado, con el mismo cálculo de las alertas del
+ * inventario y del panel de control. Solo se ejecuta para el administrador.
+ */
+async function loadStock(type, title) {
+  const alerts = await partService.alerts();
+  const wanted = type === NOTICE_TYPES.STOCK_OUT ? 'AGOTADO' : 'BAJO';
+  const notices = alerts.items
+    .filter((part) => part.stockStatus === wanted)
+    .map((part) => ({
+      key: buildNoticeKey(type, part.id),
+      type,
+      title,
+      detail: `${part.name} · ${part.code}`,
+      stock: part.stock,
+      minStock: part.minStock,
+      target: { kind: 'part', id: part.id },
+    }));
+  return { total: notices.length, notices };
+}
+
 /** Cargador de cada tipo de aviso. Las historias siguientes registran aquí los suyos. */
 const LOADERS = {
   [NOTICE_TYPES.MAINT_OVERDUE]: (actor) =>
@@ -73,6 +95,8 @@ const LOADERS = {
   [NOTICE_TYPES.MAINT_UPCOMING]: (actor) =>
     loadMaintenance({ indicator: 'PROXIMO', type: NOTICE_TYPES.MAINT_UPCOMING, title: 'Mantenimiento próximo' }, actor),
   [NOTICE_TYPES.APPT_TODAY]: () => loadAppointmentsToday(),
+  [NOTICE_TYPES.STOCK_OUT]: () => loadStock(NOTICE_TYPES.STOCK_OUT, 'Stock agotado'),
+  [NOTICE_TYPES.STOCK_LOW]: () => loadStock(NOTICE_TYPES.STOCK_LOW, 'Stock bajo'),
 };
 
 /** Arma un grupo con la marca de lectura: lista como máximo 50 avisos y cuenta los no leídos de todos. */

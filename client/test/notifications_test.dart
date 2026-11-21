@@ -435,6 +435,60 @@ void main() {
     });
   });
 
+  group('avisos de stock para el administrador (US3)', () {
+    testWidgets('test_el_panel_muestra_stock_agotado_en_rojo_y_stock_bajo_en_ambar_con_existencia_y_minimo', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications()
+        ..summary = _summary(groups: [
+          _group('STOCK_OUT', [
+            _item('STOCK_OUT', 3, extra: {
+              'title': 'Stock agotado',
+              'detail': 'Correa · COR-003',
+              'stock': 0,
+              'minStock': 4,
+              'target': {'kind': 'part', 'id': 3},
+            }),
+          ]),
+          _group('STOCK_LOW', [
+            _item('STOCK_LOW', 1, extra: {
+              'title': 'Stock bajo',
+              'detail': 'Filtro de aceite · FIL-001',
+              'stock': 2,
+              'minStock': 3,
+              'target': {'kind': 'part', 'id': 1},
+            }),
+          ]),
+        ]);
+      await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: fake.handler()));
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Stock agotado'), findsWidgets);
+      expect(find.text('Stock bajo'), findsWidgets);
+      expect(find.text('Correa · COR-003'), findsOneWidget);
+      expect(find.text('Filtro de aceite · FIL-001'), findsOneWidget);
+      Color puntoDe(String clave) => tester.widget<Icon>(find.byKey(ValueKey('no-leido-$clave'))).color!;
+      expect(puntoDe('STOCK_OUT:3'), AppColors.danger);
+      expect(puntoDe('STOCK_LOW:1'), AppColors.warning);
+      expect(find.byKey(const ValueKey('contador-campana')), findsOneWidget);
+      final insignia = tester.widget<Badge>(find.byKey(const ValueKey('insignia-campana')));
+      expect(insignia.backgroundColor, AppColors.danger);
+    });
+
+    testWidgets('test_la_recepcion_no_pide_ni_muestra_avisos_de_stock', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeNotifications();
+      await pumpAppSignedIn(tester, FakeApi(role: 'RECEPTIONIST', handler: fake.handler()));
+
+      await tester.tap(find.byKey(const ValueKey('campana')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Stock agotado'), findsNothing);
+      expect(find.text('Stock bajo'), findsNothing);
+    });
+  });
+
   group('actualización del contador', () {
     testWidgets('test_consulta_al_iniciar_sesion_y_cada_sesenta_segundos', (tester) async {
       useDesktopWindow(tester);

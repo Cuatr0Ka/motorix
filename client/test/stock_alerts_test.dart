@@ -121,6 +121,36 @@ void main() {
     expect(find.text('2 refacciones con stock bajo, 1 agotada'), findsNothing);
   });
 
+  testWidgets('test_un_movimiento_de_inventario_refresca_tambien_el_centro_de_notificaciones', (tester) async {
+    useDesktopWindow(tester);
+    final inventory = FakeInventoryWithAlerts();
+    var consultasDeAvisos = 0;
+    final base = inventory.handler();
+    final api = FakeApi(
+      role: 'ADMIN',
+      handler: (r) {
+        if (r.method == 'GET' && r.path == '/notifications') {
+          consultasDeAvisos += 1;
+          return ok({'unread': 0, 'total': 0, 'generatedAt': '2026-11-20T15:04:05.000Z', 'groups': []});
+        }
+        return base(r);
+      },
+    );
+    await pumpAppSignedIn(tester, api);
+    await openSection(tester, 'Inventario');
+    await tester.tap(find.text('COR-003'));
+    await tester.pumpAndSettle();
+    final antes = consultasDeAvisos;
+
+    await tester.tap(find.byKey(const ValueKey('registrar-entrada')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('entrada-cantidad')), '10');
+    await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.widgetWithText(FilledButton, 'Guardar')));
+    await tester.pumpAndSettle();
+
+    expect(consultasDeAvisos, greaterThan(antes));
+  });
+
   for (final role in ['RECEPTIONIST', 'MECHANIC']) {
     testWidgets('test_el_rol_${role.toLowerCase()}_no_consulta_ni_ve_alertas', (tester) async {
       useDesktopWindow(tester);
