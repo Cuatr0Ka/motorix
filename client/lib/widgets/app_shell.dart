@@ -50,6 +50,8 @@ IconData iconForSection(AppSection section) {
       return Icons.admin_panel_settings_outlined;
     case AppSection.settings:
       return Icons.settings_outlined;
+    case AppSection.terms:
+      return Icons.gavel_outlined;
     case AppSection.changePassword:
       return Icons.lock_outline;
   }
@@ -85,6 +87,8 @@ IconData _selectedIconFor(AppSection section) {
       return Icons.admin_panel_settings;
     case AppSection.settings:
       return Icons.settings;
+    case AppSection.terms:
+      return Icons.gavel;
     case AppSection.changePassword:
       return Icons.lock;
   }

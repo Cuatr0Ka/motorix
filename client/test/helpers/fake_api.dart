@@ -70,6 +70,17 @@ class FakeApi {
       final custom = handler?.call(fake);
       if (custom != null) return custom;
 
+      // Sprint 7: por omisión los términos ya están aceptados, para no bloquear las pruebas anteriores.
+      if (fake.method == 'GET' && fake.path == '/terms/current') {
+        return ok({
+          'id': 1,
+          'version': '1.0',
+          'title': 'Términos y condiciones y aviso de privacidad',
+          'body': 'Texto de los términos.',
+          'publishedAt': '2026-11-21T00:00:00.000Z',
+          'accepted': true,
+        });
+      }
       if (fake.method == 'POST' && fake.path == '/auth/login') {
         if (fake.body['password'] == 'Incorrecta1') {
           return failure(401, 'INVALID_CREDENTIALS', 'Usuario o contraseña incorrectos.');

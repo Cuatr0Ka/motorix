@@ -16,6 +16,7 @@ import 'providers/session_provider.dart';
 import 'providers/sidebar_provider.dart';
 import 'providers/service_types_provider.dart';
 import 'providers/settings_provider.dart';
+import 'providers/terms_provider.dart';
 import 'providers/stock_alerts_provider.dart';
 import 'providers/tickets_provider.dart';
 import 'providers/users_provider.dart';
@@ -34,6 +35,8 @@ import 'screens/order_detail_screen.dart';
 import 'screens/part_detail_screen.dart';
 import 'screens/payments_list_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/terms_accept_screen.dart';
+import 'screens/terms_admin_screen.dart';
 import 'screens/tickets_list_screen.dart';
 import 'screens/orders_list_screen.dart';
 import 'screens/users_screen.dart';
@@ -52,6 +55,7 @@ import 'services/parts_service.dart';
 import 'services/payments_service.dart';
 import 'services/service_types_service.dart';
 import 'services/settings_service.dart';
+import 'services/terms_service.dart';
 import 'services/tickets_service.dart';
 import 'services/users_service.dart';
 import 'services/vehicles_service.dart';
@@ -91,7 +95,9 @@ class MotorixApp extends StatelessWidget {
       providers: [
         Provider<ApiClient>.value(value: apiClient),
         Provider<AuthService>.value(value: authService),
-        ChangeNotifierProvider(create: (_) => SessionProvider(apiClient, authService)),
+        Provider<TermsService>(create: (_) => TermsService(apiClient)),
+        ChangeNotifierProvider(create: (context) => SessionProvider(apiClient, authService, context.read<TermsService>())),
+        ChangeNotifierProvider(create: (context) => TermsProvider(context.read<TermsService>())),
         ChangeNotifierProvider(create: (_) => SidebarProvider()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         Provider<ClientsService>(create: (_) => ClientsService(apiClient)),
@@ -143,13 +149,16 @@ class _AuthGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final signedIn = context.select<SessionProvider, bool>((s) => s.isSignedIn);
+    final termsPending = context.select<SessionProvider, bool>((s) => s.termsPending);
     // Respeta la preferencia del sistema de reducir el movimiento.
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     return AnimatedSwitcher(
       duration: reduceMotion ? Duration.zero : AppDurations.navigation,
       switchInCurve: AppCurves.enter,
       child: signedIn
-          ? const AppShell(key: ValueKey('app'), sectionBuilder: buildSection, targetBuilder: buildNoticeTarget)
+          ? (termsPending
+              ? const TermsAcceptScreen(key: ValueKey('terms'))
+              : const AppShell(key: ValueKey('app'), sectionBuilder: buildSection, targetBuilder: buildNoticeTarget))
           : const LoginScreen(key: ValueKey('login')),
     );
   }
@@ -200,6 +209,8 @@ Widget buildSection(BuildContext context, AppSection section) {
       return const UsersScreen();
     case AppSection.settings:
       return const SettingsScreen();
+    case AppSection.terms:
+      return const TermsAdminScreen();
     case AppSection.changePassword:
       return const ChangePasswordScreen();
   }

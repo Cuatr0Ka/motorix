@@ -82,6 +82,9 @@ class ApiClient {
   /// Se invoca cuando el servidor rechaza el token (sesión vencida o cuenta desactivada).
   void Function()? onSessionExpired;
 
+  /// Se invoca cuando el servidor responde 403 TERMS_NOT_ACCEPTED (hay una versión nueva de los términos por aceptar).
+  void Function()? onTermsRequired;
+
   Uri _uri(String path, [Map<String, dynamic>? query]) {
     final params = <String, String>{};
     query?.forEach((key, value) {
@@ -153,6 +156,10 @@ class ApiClient {
     // Un 401 con token activo significa sesión vencida o cuenta desactivada.
     if (response.statusCode == 401 && code == 'UNAUTHENTICATED' && token != null) {
       onSessionExpired?.call();
+    }
+
+    if (response.statusCode == 403 && code == 'TERMS_NOT_ACCEPTED' && token != null) {
+      onTermsRequired?.call();
     }
 
     throw ApiException(
