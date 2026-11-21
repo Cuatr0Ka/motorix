@@ -8,6 +8,26 @@
 
 **Entrada**: Descripción del usuario: "Sprint 7: Reportes, configuración del taller, términos y condiciones y seguridad de la información. Usar como insumo docs/sprints/sprint-7-reportes-configuracion.md"
 
+## Aclaraciones
+
+### Sesión 2026-11-21 (primera ronda)
+
+- Q: ¿En qué formato se exportan los reportes? → A: CSV, sin dependencias nuevas: codificación UTF-8 con marca de orden de bytes para que Excel lo abra bien, separador coma, importes con punto decimal y dos decimales, y fechas `AAAA-MM-DD` (D-01).
+- Q: ¿Cómo se publican los términos y condiciones y quién los redacta? → A: Texto fijo entregado con el sistema y versionado por el equipo (versión 1.0 con los datos de ejemplo); no hay editor en la aplicación. El administrador consulta la versión vigente y las aceptaciones. Una versión nueva se publica agregando su texto en una migración o en los datos de ejemplo (D-02).
+- Q: ¿Qué exige la política de contraseñas y cuándo se cierra la sesión por inactividad? → A: Mínimo 10 caracteres con al menos una mayúscula, una minúscula y un número; la sesión se cierra a los 30 minutos sin actividad y se avisa 2 minutos antes con la opción de seguir conectado. Las cuentas sembradas con la contraseña estándar no se obligan a cambiarla (D-03).
+
+### Sesión 2026-11-21 (segunda ronda: decisiones por omisión confirmadas)
+
+- Q: ¿Qué se entrega primero si el sprint no alcanza? → A: Configuración, catálogo, ticket, términos y seguridad primero; reportes y exportación después (D-04).
+- Q: ¿Qué periodos tienen los reportes y con qué corte? → A: Día, semana, mes o rango libre, máximo un año por consulta, con corte por la fecha local del servidor (D-05).
+- Q: ¿Cómo se mide la productividad por mecánico? → A: Órdenes terminadas e importe de mano de obra del periodo (D-06).
+- Q: ¿Cómo se calcula la rotación del inventario? → A: Salidas del periodo sobre la existencia promedio de cada refacción (D-07).
+- Q: ¿Cómo se calcula el margen sin precio de compra? → A: Se muestra «Sin costo» y esa línea no entra en el margen total (D-08).
+- Q: ¿El tipo de servicio se enlaza a las líneas de servicio de la orden? → A: Sí, de forma opcional; las líneas existentes sin tipo no cambian (D-09).
+- Q: ¿La recepción ve los reportes? → A: No; son exclusivos del administrador (D-10).
+- Q: ¿Qué acciones registra la bitácora y cuánto se conserva? → A: Las del FR-023; se conserva sin borrarse, se pagina y no se exporta (D-11).
+- Q: ¿Qué pasa con los usuarios existentes y sus contraseñas? → A: Aceptan los términos en su siguiente inicio de sesión; la política de contraseñas solo se aplica al crear o cambiar la contraseña (D-12).
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia de usuario 1 - Editar los datos del taller (Prioridad: P1)
@@ -174,7 +194,9 @@ datos y filtros que la pantalla.
 2. **Dado** los importes del reporte, **cuando** los exporto, **entonces** coinciden con la pantalla al centavo.
 3. **Dado** un reporte vacío, **cuando** lo exporto, **entonces** el archivo trae los encabezados y ninguna fila de
    datos.
-4. **Dado** un periodo inválido, **cuando** intento exportar, **entonces** el sistema lo rechaza igual que en pantalla.
+4. **Dado** un reporte exportado, **cuando** lo abro en una hoja de cálculo, **entonces** es un archivo CSV en UTF-8
+   con las tildes y la eñe correctas, importes con dos decimales y fechas `AAAA-MM-DD`.
+5. **Dado** un periodo inválido, **cuando** intento exportar, **entonces** el sistema lo rechaza igual que en pantalla.
 
 ---
 
@@ -254,10 +276,11 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
    forma de hacerlo desde la aplicación.
 4. **Dado** un registro de la bitácora, **cuando** se consulta, **entonces** nunca contiene contraseñas, hashes,
    tokens ni datos de tarjeta.
-5. **Dado** una contraseña que no cumple la política, **cuando** se crea o se cambia una cuenta, **entonces** el
-   sistema la rechaza con un mensaje claro de lo que falta.
-6. **Dado** una sesión sin actividad durante el periodo de inactividad, **cuando** pasa ese tiempo, **entonces** la
-   sesión se cierra y se pide iniciar sesión de nuevo.
+5. **Dado** una contraseña de menos de 10 caracteres o sin una mayúscula, una minúscula o un número, **cuando** se
+   crea o se cambia una cuenta, **entonces** el sistema la rechaza con un mensaje claro de lo que falta.
+6. **Dado** una sesión sin actividad durante 28 minutos, **cuando** faltan 2 minutos para el cierre, **entonces** se
+   avisa y la persona puede seguir conectada; si no responde, a los 30 minutos la sesión se cierra y se pide
+   iniciar sesión de nuevo.
 7. **Dado** cualquier respuesta de la API de usuarios, refacciones, órdenes, pagos y tickets, **cuando** la recibe un
    rol, **entonces** no incluye el hash de contraseña, el token ni los precios reservados a ese rol.
 8. **Dado** un texto de búsqueda con caracteres de inyección, **cuando** se envía a un campo de búsqueda, **entonces**
@@ -329,8 +352,8 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 - **FR-013**: Los importes DEBEN calcularse en centavos enteros y coincidir con los pagos y las órdenes que los
   originan; la suma de las partes DEBE ser igual al total mostrado.
 - **FR-014**: Cada reporte DEBE poder exportarse a un archivo con los mismos datos, periodo y filtros que la
-  pantalla, en [NEEDS CLARIFICATION: ¿en qué formato se exportan los reportes? Opciones: (A) CSV; (B) Excel; (C) PDF;
-  (D) más de uno].
+  pantalla, en formato CSV (UTF-8 con marca de orden de bytes, separador coma, importes con punto decimal y dos decimales y fechas
+  `AAAA-MM-DD`), sin dependencias nuevas.
 - **FR-015**: Los reportes DEBEN responder en un tiempo razonable con muchos datos, limitando el periodo o paginando
   los listados largos.
 
@@ -349,9 +372,9 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
   y se pide de nuevo cuando se publica una versión nueva.
 - **FR-020**: Los términos DEBEN cubrir el uso permitido del sistema, la confidencialidad de los datos de clientes y
   vehículos, la responsabilidad de las cuentas personales y el aviso de privacidad. El administrador DEBE poder
-  consultar la versión vigente y las aceptaciones. [NEEDS CLARIFICATION: ¿cómo se publican los términos y quién los
-  redacta? Opciones: (A) texto fijo entregado con el sistema y versionado por el equipo; (B) el administrador los
-  edita y publica versiones desde la aplicación].
+  consultar la versión vigente y las aceptaciones. El texto es fijo, lo entrega el sistema versionado por el equipo
+  (versión 1.0 en los datos de ejemplo) y NO se edita desde la aplicación; una versión nueva se publica agregando su
+  texto en una migración o en los datos de ejemplo.
 - **FR-021**: La aceptación DEBE validarse en el servidor: sin aceptación vigente, la API DEBE rechazar las
   operaciones del usuario, salvo consultar los términos, aceptarlos y cerrar sesión.
 - **FR-022**: Los usuarios existentes DEBEN aceptar los términos en su siguiente inicio de sesión.
@@ -364,12 +387,11 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 - **FR-024**: El administrador DEBE poder consultar la bitácora con filtros por fecha, usuario y acción y paginada;
   nadie DEBE poder editar ni borrar sus registros desde la aplicación, y los registros se conservan.
 - **FR-025**: La bitácora NO DEBE guardar contraseñas, hashes, tokens ni datos de tarjeta.
-- **FR-026**: La política de contraseñas DEBE aplicarse al crear y al cambiar la contraseña, con un mensaje claro;
-  las contraseñas siguen guardándose solo con hash. [NEEDS CLARIFICATION: ¿qué exige la política de contraseñas y
-  tras cuánto tiempo de inactividad se cierra la sesión? Propuesta: mínimo 10 caracteres con mayúscula, minúscula y
-  número; cierre a los 30 minutos sin actividad con aviso previo; ¿se acepta o se ajusta?].
-- **FR-027**: La sesión DEBE cerrarse tras el periodo de inactividad y pedir iniciar sesión de nuevo; la expiración
-  del token se mantiene validada en el servidor.
+- **FR-026**: La política de contraseñas DEBE aplicarse al crear y al cambiar la contraseña, con un mensaje claro:
+  mínimo 10 caracteres con al menos una mayúscula, una minúscula y un número. Las contraseñas siguen guardándose
+  solo con hash y las cuentas sembradas no se obligan a cambiarla.
+- **FR-027**: La sesión DEBE cerrarse a los 30 minutos sin actividad, avisando 2 minutos antes con la opción de
+  seguir conectado, y pedir iniciar sesión de nuevo; la expiración del token se mantiene validada en el servidor.
 - **FR-028**: Ninguna respuesta de la API DEBE incluir el hash de contraseña, el token ni los precios reservados al
   rol; DEBEN existir pruebas por cada endpoint de usuarios, refacciones, órdenes, pagos y tickets.
 - **FR-029**: Las consultas DEBEN usar parámetros y las entradas DEBEN validarse en el servidor; una prueba
@@ -418,7 +440,7 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 - **SC-007** (FR-023, FR-025): El 100 % de las acciones sensibles de las pruebas queda en la bitácora y ningún
   registro contiene contraseñas, hashes, tokens ni datos de tarjeta.
 - **SC-008** (FR-026, FR-027): El 100 % de las contraseñas que no cumplen la política se rechaza con un mensaje
-  claro, y la sesión se cierra al pasar el periodo de inactividad en el 100 % de los casos de prueba.
+  claro, y la sesión se cierra a los 30 minutos de inactividad (con aviso a los 28) en el 100 % de los casos de prueba.
 - **SC-009** (FR-028, FR-029): En ninguna respuesta de los endpoints revisados aparece el hash de contraseña, el
   token ni un precio reservado al rol, y los intentos de inyección de las pruebas no alteran ninguna consulta.
 - **SC-010** (FR-018, FR-019): Un usuario nuevo acepta los términos y entra al sistema en menos de 1 minuto, y no se
@@ -435,7 +457,9 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 - El insumo es `docs/sprints/sprint-7-reportes-configuracion.md`. El sprint es amplio: si el tiempo no alcanza,
   se entregan primero configuración, catálogo, ticket, términos y seguridad, y después los reportes y su
   exportación.
-- Los reportes son exclusivos del administrador; no hay una versión reducida para la recepción.
+- Los reportes son exclusivos del administrador; no hay una versión reducida para la recepción (D-10).
+- La exportación es en CSV y no agrega dependencias (D-01); los términos son un texto fijo sin editor en la aplicación
+  (D-02); la política de contraseñas y la inactividad son las de las aclaraciones (D-03).
 - Los periodos de los reportes son día, semana, mes o rango libre, con corte por la fecha local del servidor y un
   máximo de un año por consulta.
 - La productividad por mecánico se mide con las órdenes terminadas y el importe de mano de obra del periodo.
@@ -459,20 +483,20 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 
 ## Decisiones pendientes para /speckit.clarify
 
-Vienen de la sección 9 del insumo. Las tres con marcador están en los requisitos; las demás tienen una opción por
-omisión en las suposiciones y se confirman en `/speckit.clarify`:
+Vienen de la sección 9 del insumo. Todas se resolvieron el 2026-11-21 y están registradas en la sección Aclaraciones:
 
-- **D-01** (FR-014): formato de exportación de los reportes.
-- **D-02** (FR-020): cómo se publican los términos y quién los redacta.
-- **D-03** (FR-026): política de contraseñas y tiempo de inactividad.
-- **D-04**: prioridad si el sprint no alcanza (por omisión, configuración, términos y seguridad primero).
-- **D-05**: periodos de los reportes y corte por la fecha local del servidor (por omisión, día, semana, mes y rango
-  libre, máximo un año).
-- **D-06**: productividad por mecánico (por omisión, órdenes terminadas e importe de mano de obra).
-- **D-07**: rotación del inventario (por omisión, salidas sobre existencia promedio).
-- **D-08**: margen sin precio de compra (por omisión, «Sin costo» fuera del total).
-- **D-09**: enlace del tipo de servicio con las líneas de servicio (por omisión, opcional).
-- **D-10**: reportes para la recepción (por omisión, no).
-- **D-11**: bitácora (por omisión, acciones del FR-023, sin borrar, paginada, sin exportar).
-- **D-12**: usuarios existentes y contraseñas sembradas (por omisión, aceptan en su siguiente ingreso; la política
-  solo aplica al crear o cambiar).
+- **D-01** *(resuelta el 2026-11-21)*: Exportación en CSV, sin dependencias nuevas.
+- **D-02** *(resuelta el 2026-11-21)*: Términos con texto fijo versionado por el equipo, sin editor en la aplicación.
+- **D-03** *(resuelta el 2026-11-21)*: Contraseña de mínimo 10 caracteres con mayúscula, minúscula y número; cierre de
+  sesión a los 30 minutos con aviso previo.
+- **D-04** *(resuelta el 2026-11-21)*: Si el sprint no alcanza, primero configuración, términos y seguridad.
+- **D-05** *(resuelta el 2026-11-21)*: Periodos de día, semana, mes o rango libre, máximo un año, con la fecha local del
+  servidor.
+- **D-06** *(resuelta el 2026-11-21)*: Productividad con órdenes terminadas e importe de mano de obra.
+- **D-07** *(resuelta el 2026-11-21)*: Rotación como salidas sobre existencia promedio.
+- **D-08** *(resuelta el 2026-11-21)*: Margen sin precio de compra como «Sin costo», fuera del total.
+- **D-09** *(resuelta el 2026-11-21)*: Tipo de servicio enlazado de forma opcional a las líneas de servicio.
+- **D-10** *(resuelta el 2026-11-21)*: Reportes solo para el administrador.
+- **D-11** *(resuelta el 2026-11-21)*: Bitácora con las acciones del FR-023, sin borrar, paginada y sin exportar.
+- **D-12** *(resuelta el 2026-11-21)*: Usuarios existentes aceptan los términos en su siguiente ingreso; la política de
+  contraseñas solo aplica al crear o cambiar.

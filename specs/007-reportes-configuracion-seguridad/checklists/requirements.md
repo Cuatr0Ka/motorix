@@ -13,7 +13,7 @@
 
 ## Completitud de los requisitos
 
-- [ ] Sin marcadores [NEEDS CLARIFICATION] pendientes (quedan 3: FR-014, FR-020 y FR-026)
+- [x] Sin marcadores [NEEDS CLARIFICATION] pendientes
 - [x] Los requisitos son comprobables y sin ambigüedad (salvo los ligados a los marcadores)
 - [x] Los criterios de éxito son medibles
 - [x] Los criterios de éxito no dependen de la tecnología
@@ -31,4 +31,4 @@
 
 ## Notas
 
-- Los tres marcadores se resuelven con el usuario antes de pasar a `/speckit.clarify` o `/speckit.plan`.
+- Los tres marcadores se resolvieron en `/speckit.clarify` el 2026-11-21 (D-01 a D-03) y se confirmaron las decisiones por omisión D-04 a D-12.
