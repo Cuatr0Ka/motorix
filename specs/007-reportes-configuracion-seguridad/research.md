@@ -161,7 +161,9 @@ justificación y las alternativas descartadas.
   `PAYMENT_CANCELLED` y `TERMS_ACCEPTED`. El `summary` se arma con datos permitidos (nombre de usuario, rol anterior
   y nuevo, nombre de la refacción, precio anterior y nuevo, folio de la orden), **nunca** contraseñas, hashes, tokens
   ni datos de tarjeta, y en un inicio de sesión fallido **no** se guarda el texto que se tecleó (podría ser una
-  contraseña escrita en el campo de usuario): solo el usuario si existe. No hay rutas de edición ni de borrado. Se
+  contraseña escrita en el campo de usuario): solo se registra el fallido de una cuenta **existente**, atribuido a esa
+  cuenta; los intentos con cuentas inexistentes no se registran (no se pueden atribuir y cualquiera podría llenar la
+  bitácora sin iniciar sesión). No hay rutas de edición ni de borrado. Se
   consulta con `GET /api/audit-log` (ADMIN), filtros `from`, `to`, `userId` y `action`, paginada.
 - **Justificación**: FR-023 a FR-025 y SC-007. Una prueba revisa que ninguna fila contenga cadenas reservadas.
 - **Alternativas descartadas**: registrar dentro de la misma transacción de cada acción (acopla todos los servicios y

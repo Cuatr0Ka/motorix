@@ -73,7 +73,7 @@ borra filas ni columnas existentes. Los reportes se **calculan** al consultar y 
 | Columna | Tipo | Reglas |
 |---------|------|--------|
 | `id` | `INT UNSIGNED` | Llave primaria, autoincremental |
-| `actor_user_id` | `INT UNSIGNED` | Nullable (un inicio de sesión fallido de una cuenta inexistente no tiene usuario); llave foránea a `users(id)` con `ON DELETE RESTRICT` |
+| `actor_user_id` | `INT UNSIGNED` | Nullable (reservado para acciones del sistema sin usuario; en este sprint toda acción registrada tiene usuario); llave foránea a `users(id)` con `ON DELETE RESTRICT` |
 | `action` | `VARCHAR(40)` | Obligatoria; una de las acciones de la tabla «Acciones de la bitácora» |
 | `entity_type` | `VARCHAR(30)` | Nullable: `user`, `settings`, `service_type`, `part`, `payment` o `terms` |
 | `entity_id` | `INT UNSIGNED` | Nullable |
@@ -90,7 +90,7 @@ borra filas ni columnas existentes. Los reportes se **calculan** al consultar y 
 
 | Acción | Cuándo se registra | Ejemplo de resumen |
 |--------|--------------------|--------------------|
-| `LOGIN_FAILED` | Credenciales incorrectas de una cuenta existente | `Intento fallido de inicio de sesión` (con `actor_user_id` de esa cuenta) |
+| `LOGIN_FAILED` | Credenciales incorrectas de una cuenta **existente** (los intentos con cuentas inexistentes no se registran) | `Intento fallido de inicio de sesión` (con `actor_user_id` de esa cuenta) |
 | `ACCOUNT_LOCKED` | La cuenta se bloquea por intentos fallidos | `Cuenta bloqueada 15 minutos` |
 | `PASSWORD_CHANGED` | Cambio de contraseña propia | `Cambió su contraseña` |
 | `USER_CREATED` | Alta de usuario | `Alta de «recepcion2» con rol RECEPTIONIST` |
@@ -121,7 +121,7 @@ importes como cadenas con dos decimales calculadas desde centavos enteros.
 | **Ingresos** | Pagos `PAGADO` con `paid_at` en el rango: `total`, `paymentsCount`, `byMethod[]` (método, pagos, total) y `byDay[]` (día, pagos, total) |
 | **Servicios frecuentes** | Servicios de órdenes terminadas en el rango, agrupados por tipo (o por descripción si no tienen tipo): `name`, `times`, `amount` |
 | **Productividad** | Por mecánico: `ordersFinished`, `laborAmount`; las órdenes sin mecánico no se atribuyen |
-| **Refacciones** | Por refacción: `units`, `revenue` (suma de `quantity × unit_price`), `cost` (suma de `quantity × purchase_price` actual), `margin`, `marginPercent` y `noCost` (verdadero si no hay precio de compra); `totals` sin las líneas «Sin costo» en el margen |
+| **Refacciones** | Por refacción: `units`, `revenue` (suma de `quantity × unit_price`), `cost` (suma de `quantity × purchase_price` actual), `margin`, `marginPercent` (margen entre ingreso por 100, sobre el precio de venta) y `noCost` (verdadero si no hay precio de compra); `totals` sin las líneas «Sin costo» en el margen |
 | **Rotación** | Por refacción: `out` (suma de salidas `OUT`), `stockStart`, `stockEnd`, `averageStock` y `rotation` (`out / averageStock`, nulo si el promedio es cero) |
 
 **Fecha de una orden terminada**: la del último cambio a `TERMINADO` del historial (o `updated_at` si no hay historial).

@@ -152,8 +152,8 @@ client/
 │   ├── providers/                  # settings_provider, service_types_provider, reports_provider, terms_provider,
 │   │                               # audit_provider, session_provider (términos), navigation_provider (4 secciones)
 │   ├── screens/                    # settings_screen, reports_screen, audit_log_screen, terms_admin_screen, terms_accept_screen
-│   ├── widgets/                    # inactivity_guard, period_selector, order_work_section, maintenance_dialog,
-│   │                               # ticket_view, app_shell
+│   ├── widgets/                    # inactivity_guard, period_selector, maintenance_dialog, ticket_view, app_shell
+│   │                               # (el diálogo de líneas está en screens/order_detail_screen.dart)
 │   ├── utils/                      # csv_saver.dart, password_policy.dart, ticket_printer.dart
 │   └── main.dart                   # registra los proveedores y la pantalla de aceptación
 └── test/                           # settings, service_types, reports, terms, audit_log, inactivity y los helpers (fake_api)

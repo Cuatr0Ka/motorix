@@ -49,7 +49,7 @@ Pantalla con tres pestañas: **Taller**, **Mantenimiento** y **Tipos de servicio
 
 ## Servicios de la orden y próximo mantenimiento
 
-- **Formulario de servicio** (`order_work_section`): selector opcional **Tipo de servicio** (los activos) junto a la
+- **Formulario de servicio** (el diálogo de líneas de `order_detail_screen`): selector opcional **Tipo de servicio** (los activos) junto a la
   descripción; la línea muestra el tipo en un chip. Sin elegir, funciona como hasta ahora.
 - **Programar el próximo mantenimiento** (`maintenance_dialog`): botón **Usar el intervalo del servicio** que consulta la
   propuesta y rellena fecha y kilometraje; la persona los corrige antes de guardar. Sin propuesta, el botón explica «Ningún
@@ -63,7 +63,7 @@ kilometraje (los que existan). Los tickets de versión 1 y 2 se ven e imprimen i
 ## Reportes (solo ADMIN)
 
 - Encabezado con título y, a la derecha, **Exportar CSV**.
-- **Selector de periodo**: botones Hoy, Esta semana, Este mes y Rango, con dos selectores de fecha para el rango libre;
+- **Selector de periodo**: botones Hoy, Esta semana (del lunes a hoy), Este mes (del día 1 a hoy) y Rango, con dos selectores de fecha para el rango libre;
   muestra el periodo elegido. Máximo un año: si se pasa, el campo se marca con «El periodo no puede pasar de un año».
 - Pestañas: **Ingresos**, **Servicios y productividad** y **Refacciones y rotación**.
   - **Ingresos**: tarjetas con total y número de pagos, barras por día (`fl_chart`) y tabla por método de pago.

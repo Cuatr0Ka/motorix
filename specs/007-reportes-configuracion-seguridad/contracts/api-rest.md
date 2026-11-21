@@ -222,8 +222,8 @@ Parámetros: `from`, `to` (fechas), `userId`, `action` (una de las acciones del 
   "meta": { "page": 1, "pageSize": 20, "total": 1 } }
 ```
 
-- De la más reciente a la más antigua. `actor` es `null` cuando no hay usuario (inicio de sesión fallido de una cuenta
-  inexistente).
+- De la más reciente a la más antigua. `actor` siempre trae el usuario que hizo la acción o al que se atribuye (los intentos
+  de inicio de sesión con cuentas inexistentes no se registran).
 - **No existe** `POST`, `PUT`, `PATCH` ni `DELETE`: la bitácora no se edita ni se borra desde la aplicación.
 - Ningún registro contiene contraseñas, hashes, tokens ni datos de tarjeta.
 

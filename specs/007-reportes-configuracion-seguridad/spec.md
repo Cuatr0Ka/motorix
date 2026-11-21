@@ -28,6 +28,15 @@
 - Q: ¿Qué acciones registra la bitácora y cuánto se conserva? → A: Las del FR-023; se conserva sin borrarse, se pagina y no se exporta (D-11).
 - Q: ¿Qué pasa con los usuarios existentes y sus contraseñas? → A: Aceptan los términos en su siguiente inicio de sesión; la política de contraseñas solo se aplica al crear o cambiar la contraseña (D-12).
 
+### Sesión 2026-11-21 (tercera ronda: análisis de consistencia)
+
+- Q: ¿Los reportes se paginan cuando hay muchos datos? → A: No; los listados ya vienen agrupados (por día, método, servicio, mecánico o refacción) y el límite es el periodo máximo de un año; la bitácora sí se pagina (D-13).
+- Q: ¿Qué abarcan «Esta semana» y «Este mes»? → A: «Esta semana» va del lunes a hoy y «Este mes» del día 1 a hoy; «Hoy» es solo el día actual; el rango libre lo eligen las fechas (D-14).
+- Q: ¿Sobre qué base se calcula el porcentaje de margen? → A: Sobre el precio de venta: margen entre ingreso por 100, con dos decimales (D-15).
+- Q: ¿Qué cuenta como actividad para el cierre por inactividad? → A: Cualquier interacción con la interfaz (movimiento del puntero, clic, desplazamiento o tecla) o cualquier petición a la API (D-16).
+- Q: ¿Se registran en la bitácora los inicios de sesión fallidos de cuentas que no existen? → A: No; se registran los fallidos de cuentas existentes y los bloqueos, porque los de cuentas inexistentes no se pueden atribuir a nadie y cualquiera podría llenar la bitácora (D-17).
+- Q: ¿Qué fecha usan los reportes de servicios, productividad y refacciones? → A: La fecha en que la orden quedó Terminada (el último cambio a ese estado del historial) (D-18).
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia de usuario 1 - Editar los datos del taller (Prioridad: P1)
@@ -296,8 +305,8 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
   el último cambio y ambos quedan en la bitácora; ningún dato queda a medias.
 - **Tipo de servicio sin intervalo en días ni en kilómetros**: se rechaza; debe tener al menos uno.
 - **Tipo de servicio desactivado y en uso**: las órdenes y los mantenimientos ya creados lo conservan.
-- **Periodo de reportes muy amplio**: se limita (por ejemplo, a un año) y el reporte indica el límite; con muchos
-  datos, el reporte pagina o resume y responde en un tiempo razonable.
+- **Periodo de reportes muy amplio**: se limita a un año y el reporte indica el límite; los reportes no se paginan
+  porque sus listados ya vienen agrupados, y responden en un tiempo razonable.
 - **Zona horaria del corte**: el día, la semana y el mes se cortan con la fecha local del servidor, igual que el
   panel de control.
 - **Pagos cancelados después de emitir un ticket**: el reporte de ingresos solo cuenta pagos pagados al momento de
@@ -345,8 +354,8 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 - **FR-010**: El sistema DEBE ofrecer un reporte de servicios más frecuentes y de productividad por mecánico (órdenes
   terminadas e importe de mano de obra) del periodo.
 - **FR-011**: El sistema DEBE ofrecer un reporte de refacciones usadas con unidades, costo, precio de venta y margen
-  (importe y porcentaje), y la rotación del inventario del periodo; el precio de compra DEBE verlo solo el
-  administrador.
+  (importe y porcentaje sobre el precio de venta), y la rotación del inventario del periodo; el precio de compra
+  DEBE verlo solo el administrador.
 - **FR-012**: Los reportes DEBEN filtrarse por rango de fechas (día, semana, mes o rango libre), con un máximo de un
   año por consulta y mensajes claros ante rangos inválidos.
 - **FR-013**: Los importes DEBEN calcularse en centavos enteros y coincidir con los pagos y las órdenes que los
@@ -354,8 +363,8 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 - **FR-014**: Cada reporte DEBE poder exportarse a un archivo con los mismos datos, periodo y filtros que la
   pantalla, en formato CSV (UTF-8 con marca de orden de bytes, separador coma, importes con punto decimal y dos decimales y fechas
   `AAAA-MM-DD`), sin dependencias nuevas.
-- **FR-015**: Los reportes DEBEN responder en un tiempo razonable con muchos datos, limitando el periodo o paginando
-  los listados largos.
+- **FR-015**: Los reportes DEBEN responder en un tiempo razonable con muchos datos, limitando el periodo a un año; los
+  listados de los reportes vienen agrupados y no se paginan.
 
 **Ticket**
 
@@ -383,15 +392,17 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 
 - **FR-023**: El sistema DEBE registrar en una bitácora, como mínimo: inicios de sesión fallidos y bloqueos, altas,
   bajas y cambios de rol de usuarios, cambios de configuración y de precios, y pagos cancelados, con quién, cuándo y
-  sobre qué.
+  sobre qué. Los inicios de sesión fallidos se registran solo para cuentas existentes (se atribuyen a esa cuenta) y no
+  se guarda el texto que se tecleó; los intentos con cuentas inexistentes no se registran.
 - **FR-024**: El administrador DEBE poder consultar la bitácora con filtros por fecha, usuario y acción y paginada;
   nadie DEBE poder editar ni borrar sus registros desde la aplicación, y los registros se conservan.
 - **FR-025**: La bitácora NO DEBE guardar contraseñas, hashes, tokens ni datos de tarjeta.
 - **FR-026**: La política de contraseñas DEBE aplicarse al crear y al cambiar la contraseña, con un mensaje claro:
   mínimo 10 caracteres con al menos una mayúscula, una minúscula y un número. Las contraseñas siguen guardándose
   solo con hash y las cuentas sembradas no se obligan a cambiarla.
-- **FR-027**: La sesión DEBE cerrarse a los 30 minutos sin actividad, avisando 2 minutos antes con la opción de
-  seguir conectado, y pedir iniciar sesión de nuevo; la expiración del token se mantiene validada en el servidor.
+- **FR-027**: La sesión DEBE cerrarse a los 30 minutos sin actividad (cualquier interacción con la interfaz o petición a
+  la API cuenta como actividad), avisando 2 minutos antes con la opción de seguir conectado, y pedir iniciar sesión de
+  nuevo; la expiración del token se mantiene validada en el servidor.
 - **FR-028**: Ninguna respuesta de la API DEBE incluir el hash de contraseña, el token ni los precios reservados al
   rol; DEBEN existir pruebas por cada endpoint de usuarios, refacciones, órdenes, pagos y tickets.
 - **FR-029**: Las consultas DEBEN usar parámetros y las entradas DEBEN validarse en el servidor; una prueba
@@ -399,9 +410,10 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 
 **Datos, documentación y compatibilidad**
 
-- **FR-030**: Los datos de ejemplo del sprint DEBEN incluir la configuración inicial, tipos de servicio, una
-  versión de términos y datos suficientes para que los reportes muestren información, y DEBEN poder cargarse varias
-  veces sin duplicarse.
+- **FR-030**: Los datos de ejemplo del sprint DEBEN incluir la configuración inicial, tipos de servicio y datos
+  suficientes para que los reportes muestren información, y DEBEN poder cargarse varias veces sin duplicarse. La
+  versión 1.0 de los términos la entrega la migración (el sistema no puede operar sin ella), por lo que está presente
+  en toda instalación y no depende de los datos de ejemplo.
 - **FR-031**: La documentación del proyecto (sección de configuración y reportes del contexto maestro, y el sistema de
   diseño) DEBE actualizarse en este sprint, y `.env.example` DEBE indicar qué pasa a la aplicación y qué queda como
   valor de respaldo.
@@ -461,7 +473,10 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
 - La exportación es en CSV y no agrega dependencias (D-01); los términos son un texto fijo sin editor en la aplicación
   (D-02); la política de contraseñas y la inactividad son las de las aclaraciones (D-03).
 - Los periodos de los reportes son día, semana, mes o rango libre, con corte por la fecha local del servidor y un
-  máximo de un año por consulta.
+  máximo de un año por consulta; «Esta semana» va del lunes a hoy y «Este mes» del día 1 a hoy (D-14).
+- Los reportes de servicios, productividad y refacciones toman las órdenes que quedaron Terminadas dentro del periodo,
+  con la fecha del último cambio a ese estado del historial (D-18); el porcentaje de margen es sobre el precio de
+  venta (D-15).
 - La productividad por mecánico se mide con las órdenes terminadas y el importe de mano de obra del periodo.
 - La rotación del inventario es las salidas del periodo sobre la existencia promedio de cada refacción.
 - El margen de una refacción sin precio de compra (o con líneas anteriores al Sprint 5 con precio cero) se muestra
@@ -470,7 +485,8 @@ bitácora con quién, cuándo y qué; una contraseña débil se rechaza; tras la
   cambian aunque la configuración cambie.
 - El tipo de servicio se enlaza de forma opcional a las líneas de servicio de una orden; las líneas existentes sin
   tipo no se modifican.
-- La bitácora se conserva sin borrarse, se pagina y no se exporta; las acciones registradas son las del FR-023.
+- La bitácora se conserva sin borrarse, se pagina y no se exporta; las acciones registradas son las del FR-023 y los
+  inicios de sesión fallidos solo se registran para cuentas existentes (D-17).
 - Los usuarios existentes aceptan los términos en su siguiente inicio de sesión, y la política de contraseñas solo se
   aplica al crear o cambiar la contraseña.
 - Quedan fuera: cifrado de la base en disco, respaldos, HTTPS y despliegue (se descartó el antiguo Sprint 8),
@@ -500,3 +516,6 @@ Vienen de la sección 9 del insumo. Todas se resolvieron el 2026-11-21 y están 
 - **D-11** *(resuelta el 2026-11-21)*: Bitácora con las acciones del FR-023, sin borrar, paginada y sin exportar.
 - **D-12** *(resuelta el 2026-11-21)*: Usuarios existentes aceptan los términos en su siguiente ingreso; la política de
   contraseñas solo aplica al crear o cambiar.
+- **D-13 a D-18** *(resueltas el 2026-11-21, tercera ronda)*: Los reportes no se paginan; «Esta semana» y «Este mes» van
+  hasta hoy; el margen es sobre la venta; la actividad es cualquier interacción o petición; los fallidos de cuentas
+  inexistentes no se registran; los reportes usan la fecha en que la orden quedó Terminada.
