@@ -75,6 +75,24 @@ plano en el código ni en los scripts: la base solo contiene su hash bcrypt. Des
 nuevas deben tener al menos 10 caracteres con mayúscula, minúscula y número (las ya guardadas siguen valiendo), y en el
 primer ingreso cada persona debe aceptar los términos y condiciones.
 
+## Despliegue web (una sola URL)
+
+La API puede servir también la web de Flutter, de modo que se comparte un solo enlace. La web compilada vive en
+`server/public/` (sin la carpeta `canvaskit`, que el navegador baja del CDN de Flutter) y se activa con `SERVE_WEB=true`.
+
+```powershell
+# Compilar desde PowerShell (no desde Git Bash: convertiría "/api" en una ruta de Windows)
+cd client
+flutter build web --release --web-resources-cdn --dart-define=API_BASE_URL=/api
+# Copiar el resultado a server/public sin la carpeta canvaskit
+Remove-Item ..\server\public -Recurse -Force -ErrorAction SilentlyContinue
+robocopy build\web ..\server\public /E /XD canvaskit
+```
+
+Variables de entorno del despliegue (ver `.env.example`): `DB_SSL`, `SERVE_WEB`, `TRUST_PROXY` y `CORS_ORIGIN`. Antes de
+publicar, reemplaza las contraseñas de prueba: `$env:NEW_PASSWORD = '<contraseña nueva>'; node scripts/restablecerContrasena.js admin`
+(desde `server/`; repítelo por cada cuenta).
+
 ## Pruebas
 
 ```powershell

@@ -83,6 +83,35 @@ export function getMercadoPagoConfig(source = process.env) {
   };
 }
 
+/**
+ * Despliegue web (opcional). Con SERVE_WEB=true la API también sirve la aplicación web compilada (carpeta WEB_DIR, por
+ * omisión server/public) y responde `index.html` a las rutas que no son de la API.
+ */
+export function getWebConfig(source = process.env) {
+  const serve = String(source.SERVE_WEB ?? '').toLowerCase() === 'true';
+  const dir = path.resolve(source.WEB_DIR || path.join(rootDir, 'server', 'public'));
+  return { serve, dir };
+}
+
+/**
+ * Detrás de un proxy (Render, Caddy…) Express debe confiar en él para ver la IP real del cliente; sin eso el límite de
+ * intentos de inicio de sesión vería la IP del proxy y bloquearía a todos juntos. TRUST_PROXY = número de proxies
+ * (por ejemplo 1) o `true`; vacío = no confiar en ninguno.
+ */
+export function getTrustProxy(source = process.env) {
+  const raw = String(source.TRUST_PROXY ?? '').trim().toLowerCase();
+  if (raw === '' || raw === 'false' || raw === '0') return false;
+  if (raw === 'true') return true;
+  if (/^\d+$/.test(raw)) return Number(raw);
+  throw new Error(`La variable de entorno TRUST_PROXY debe ser un entero, true o false (recibida: "${source.TRUST_PROXY}").`);
+}
+
+/** Orígenes permitidos por CORS (lista separada por comas en CORS_ORIGIN). Sin valor, CORS queda abierto como hasta ahora. */
+export function getCorsOrigins(source = process.env) {
+  const list = String(source.CORS_ORIGIN ?? '').split(',').map((item) => item.trim()).filter(Boolean);
+  return list.length > 0 ? list : null;
+}
+
 /** Datos del taller que aparecen en el ticket (configurables sin tocar el código). */
 export function getShopConfig(source = process.env) {
   return {
