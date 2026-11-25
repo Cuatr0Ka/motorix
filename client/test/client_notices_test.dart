@@ -15,7 +15,7 @@ Map<String, dynamic> _fila(
       'reason': reason,
       'factId': factId,
       'factDate': '2026-11-19',
-      if (folio != null) 'folio': folio,
+      'folio': ?folio,
       'description': 'Orden terminada, lista para entregar',
       'client': {'id': 9, 'name': cliente, 'phone': telefono},
       'vehicle': {'id': 14, 'brand': 'Chevrolet', 'model': 'Aveo', 'licensePlate': 'XYZ-987'},
