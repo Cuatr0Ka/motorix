@@ -42,6 +42,8 @@ export function loadConfig(source = process.env) {
       user: source.DB_USER,
       password: source.DB_PASSWORD,
       database: dbName,
+      // Bases administradas (por ejemplo TiDB Cloud) exigen TLS: se activa con DB_SSL=true.
+      ssl: String(source.DB_SSL ?? '').toLowerCase() === 'true',
     },
   };
 }

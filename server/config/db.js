@@ -14,6 +14,7 @@ export function getPool() {
       password: db.password,
       database: db.database,
       charset: 'utf8mb4',
+      ssl: db.ssl ? { minVersion: 'TLSv1.2', rejectUnauthorized: true } : undefined,
       waitForConnections: true,
       connectionLimit: 10,
       // Las fechas del bloqueo se calculan con NOW() en SQL, así que no dependen de la zona horaria de Node.

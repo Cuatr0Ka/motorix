@@ -71,7 +71,7 @@ export async function add(orderId, { partId, quantity }, actor) {
     if (!part.active) throw partInactive();
     if (part.sale_price == null) throw priceMissing();
 
-    const existing = await orderPartModel.findByOrderAndPart(orderId, partId, connection);
+    const existing = await orderPartModel.findByOrderAndPart(orderId, partId, connection, { forUpdate: true });
     const unitPriceCents = existing ? toCents(existing.unitPrice) : toCents(part.sale_price);
     if (existing && isLegacyLine(unitPriceCents)) throw legacyLineLocked();
 
@@ -106,7 +106,7 @@ export async function updateQuantity(orderId, lineId, quantity, actor) {
   const order = await loadOrderForActor(orderId, actor);
   return withTransaction(async (connection) => {
     await lockEditableOrder(orderId, connection);
-    const line = await orderPartModel.findLine(orderId, lineId, connection);
+    const line = await orderPartModel.findLine(orderId, lineId, connection, { forUpdate: true });
     if (!line) throw lineNotFound();
 
     const delta = quantity - line.quantity;
@@ -142,7 +142,7 @@ export async function remove(orderId, lineId, actor) {
   await loadOrderForActor(orderId, actor);
   return withTransaction(async (connection) => {
     await lockEditableOrder(orderId, connection);
-    const line = await orderPartModel.findLine(orderId, lineId, connection);
+    const line = await orderPartModel.findLine(orderId, lineId, connection, { forUpdate: true });
     if (!line) throw lineNotFound();
 
     await partModel.lockById(line.partId, connection);

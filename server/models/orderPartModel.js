@@ -34,13 +34,26 @@ export async function listByOrder(orderId, connection) {
   return rows.map(toLine);
 }
 
-export async function findLine(orderId, lineId, connection) {
-  const rows = await query(`${SELECT} WHERE op.order_id = ? AND op.id = ?`, [orderId, lineId], connection);
+/**
+ * Con `forUpdate` la lectura es bloqueante y siempre ve lo último confirmado. Se usa dentro de las transacciones que
+ * modifican la línea: en MySQL no cambia el resultado (la orden ya está bloqueada), y en bases con aislamiento por
+ * instantánea (TiDB) evita leer una foto vieja y duplicar la línea.
+ */
+export async function findLine(orderId, lineId, connection, { forUpdate = false } = {}) {
+  const rows = await query(
+    `${SELECT} WHERE op.order_id = ? AND op.id = ?${forUpdate ? ' FOR UPDATE' : ''}`,
+    [orderId, lineId],
+    connection,
+  );
   return rows[0] ? toLine(rows[0]) : null;
 }
 
-export async function findByOrderAndPart(orderId, partId, connection) {
-  const rows = await query(`${SELECT} WHERE op.order_id = ? AND op.part_id = ?`, [orderId, partId], connection);
+export async function findByOrderAndPart(orderId, partId, connection, { forUpdate = false } = {}) {
+  const rows = await query(
+    `${SELECT} WHERE op.order_id = ? AND op.part_id = ?${forUpdate ? ' FOR UPDATE' : ''}`,
+    [orderId, partId],
+    connection,
+  );
   return rows[0] ? toLine(rows[0]) : null;
 }
 
