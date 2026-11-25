@@ -153,7 +153,7 @@ Map<String, dynamic> orderDetailJson(
     'services': services,
     'labor': labor,
     'parts': parts,
-    if (billing != null) 'billing': billing,
+    'billing': ?billing,
     'serviceMileage': serviceMileage,
     'maintenance': maintenance,
     'totals': {
