@@ -4,7 +4,8 @@ import '../models/report.dart';
 
 import 'package:http/http.dart' as http;
 
-/// URL base de la API; se define al ejecutar con `--dart-define=API_BASE_URL=...`.
+/// URL base de la API; se define al ejecutar con `--dart-define=API_BASE_URL=...`. Puede ser relativa (por ejemplo `/api`):
+/// en la web se resuelve contra el origen de la página, así la misma compilación sirve en cualquier dominio.
 const String kDefaultApiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
   defaultValue: 'http://localhost:3000/api',
@@ -72,7 +73,13 @@ class ApiResponse {
 class ApiClient {
   ApiClient({http.Client? httpClient, String? baseUrl})
       : _http = httpClient ?? http.Client(),
-        _baseUrl = (baseUrl ?? kDefaultApiBaseUrl).replaceAll(RegExp(r'/+$'), '');
+        _baseUrl = resolveBaseUrl(baseUrl ?? kDefaultApiBaseUrl);
+
+  /// Quita las barras finales y, si la URL empieza con `/`, la completa con el origen de [origin] (por omisión, el de la página).
+  static String resolveBaseUrl(String url, {String? origin}) {
+    final clean = url.replaceAll(RegExp(r'/+$'), '');
+    return clean.startsWith('/') ? '${origin ?? Uri.base.origin}$clean' : clean;
+  }
 
   final http.Client _http;
   final String _baseUrl;
