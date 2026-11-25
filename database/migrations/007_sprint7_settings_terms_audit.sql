@@ -1,5 +1,6 @@
 -- Migración 007 (Sprint 7): configuración, tipos de servicio, términos y condiciones, bitácora y actividad de la sesión.
 -- Los scripts aplicados NO se editan: los cambios de esquema van en nuevos scripts numerados.
+-- Única excepción (2026-11-25): se dividió el ALTER TABLE de order_services para que corra también en TiDB; el esquema es idéntico.
 -- Es aditiva: crea cinco tablas nuevas y agrega dos columnas nulas. No modifica ni borra filas ni columnas existentes.
 -- Los reportes (ingresos, servicios, productividad, refacciones y rotación) NO se guardan: se calculan al consultar.
 
@@ -81,11 +82,10 @@ CREATE TABLE audit_log (
 
 -- Las líneas de servicio de una orden pueden enlazarse, de forma opcional, a un tipo de servicio.
 -- Las líneas existentes quedan en NULL y siguen funcionando como texto libre.
-ALTER TABLE order_services
-  ADD COLUMN service_type_id INT UNSIGNED NULL AFTER order_id,
-  ADD KEY idx_order_services_type (service_type_id),
-  ADD CONSTRAINT fk_order_services_type FOREIGN KEY (service_type_id)
-    REFERENCES service_types (id) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE order_services ADD COLUMN service_type_id INT UNSIGNED NULL AFTER order_id;
+ALTER TABLE order_services ADD KEY idx_order_services_type (service_type_id);
+ALTER TABLE order_services ADD CONSTRAINT fk_order_services_type FOREIGN KEY (service_type_id)
+  REFERENCES service_types (id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- Última actividad autenticada de cada usuario (cierre de sesión por inactividad). NULL se trata como activa.
 ALTER TABLE users
