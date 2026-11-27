@@ -20,7 +20,7 @@ describe('contrato de GET y PUT /api/settings', () => {
     expect(res.status).toBe(200);
     expect(Object.keys(res.body)).toEqual(['data']);
     expect(Object.keys(res.body.data).sort()).toEqual(['maintenance', 'shop', 'sources']);
-    expect(Object.keys(res.body.data.shop).sort()).toEqual(['address', 'name', 'phone']);
+    expect(Object.keys(res.body.data.shop).sort()).toEqual(['address', 'email', 'name', 'phone']);
     expect(Object.keys(res.body.data.maintenance).sort()).toEqual(['warnDays', 'warnKm']);
     expect(Number.isInteger(res.body.data.maintenance.warnDays)).toBe(true);
     expect(Number.isInteger(res.body.data.maintenance.warnKm)).toBe(true);
@@ -28,6 +28,7 @@ describe('contrato de GET y PUT /api/settings', () => {
       'maintenance.warn_days',
       'maintenance.warn_km',
       'shop.address',
+      'shop.email',
       'shop.name',
       'shop.phone',
     ]);

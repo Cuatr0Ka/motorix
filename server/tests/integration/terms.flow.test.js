@@ -125,3 +125,45 @@ describe('términos y condiciones (US9, FR-010 a FR-012)', () => {
     for (const u of [recepcion, mecanico]) expect((await request(app).get('/api/terms/acceptances').set(auth(u.token))).status).toBe(403);
   });
 });
+
+describe('términos y aviso de privacidad por separado (versión 2.0)', () => {
+  it('test_una_version_con_aviso_devuelve_los_dos_textos_con_los_datos_del_taller', async () => {
+    await query("INSERT INTO settings (setting_key, setting_value) VALUES ('shop.name', 'Taller Los Pinos'), ('shop.address', 'Calle 5 número 10, Centro'), ('shop.phone', '5512345678'), ('shop.email', 'privacidad@pinos.mx')");
+    await query(
+      "INSERT INTO terms_versions (version, title, body, privacy_notice) VALUES ('2.0', 'Términos', 'Términos de {{TALLER_NOMBRE}}', 'Responsable: {{TALLER_NOMBRE}}, {{TALLER_DOMICILIO}}, tel. {{TALLER_TELEFONO}}, correo {{TALLER_CORREO}}')",
+    );
+
+    const res = await actual(nuevo);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.body).toBe('Términos de Taller Los Pinos');
+    expect(res.body.data.privacyNotice).toBe('Responsable: Taller Los Pinos, Calle 5 número 10, Centro, tel. 5512345678, correo privacidad@pinos.mx');
+  });
+
+  it('test_sin_domicilio_ni_telefono_el_aviso_pide_capturarlos_en_configuracion', async () => {
+    await query(
+      "INSERT INTO terms_versions (version, title, body, privacy_notice) VALUES ('2.0', 'Términos', 'x', 'Domicilio: {{TALLER_DOMICILIO}}')",
+    );
+
+    const res = await actual(nuevo);
+
+    expect(res.body.data.privacyNotice).toContain('capturarlo en Configuración > Taller');
+    expect(res.body.data.privacyNotice).not.toContain('{{');
+  });
+
+  it('test_una_version_sin_aviso_aparte_devuelve_aviso_nulo', async () => {
+    const res = await actual(nuevo);
+
+    expect(res.body.data.version).toBe('1.0');
+    expect(res.body.data.privacyNotice).toBeNull();
+  });
+
+  it('test_aceptar_la_version_2_0_una_sola_vez_cubre_ambos_textos', async () => {
+    await query("INSERT INTO terms_versions (version, title, body, privacy_notice) VALUES ('2.0', 'T', 'x', 'y')");
+    const { id } = (await actual(nuevo)).body.data;
+
+    expect((await aceptar(nuevo, id)).status).toBe(200);
+
+    expect((await actual(nuevo)).body.data.accepted).toBe(true);
+  });
+});

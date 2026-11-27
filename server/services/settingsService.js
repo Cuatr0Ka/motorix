@@ -11,6 +11,7 @@ export const KEYS = Object.freeze({
   SHOP_NAME: 'shop.name',
   SHOP_ADDRESS: 'shop.address',
   SHOP_PHONE: 'shop.phone',
+  SHOP_EMAIL: 'shop.email',
   WARN_DAYS: 'maintenance.warn_days',
   WARN_KM: 'maintenance.warn_km',
 });
@@ -19,6 +20,7 @@ export const DEFAULTS = Object.freeze({
   shopName: 'Motorix Taller Mecánico',
   shopAddress: '',
   shopPhone: '',
+  shopEmail: '',
   warnDays: 30,
   warnKm: 1000,
 });
@@ -27,6 +29,7 @@ const ENV_NAMES = {
   [KEYS.SHOP_NAME]: 'SHOP_NAME',
   [KEYS.SHOP_ADDRESS]: 'SHOP_ADDRESS',
   [KEYS.SHOP_PHONE]: 'SHOP_PHONE',
+  [KEYS.SHOP_EMAIL]: 'SHOP_EMAIL',
   [KEYS.WARN_DAYS]: 'MAINTENANCE_WARN_DAYS',
   [KEYS.WARN_KM]: 'MAINTENANCE_WARN_KM',
 };
@@ -56,22 +59,24 @@ export async function getAll() {
   const name = resolve(stored, KEYS.SHOP_NAME, DEFAULTS.shopName, asText);
   const address = resolve(stored, KEYS.SHOP_ADDRESS, DEFAULTS.shopAddress, asText);
   const phone = resolve(stored, KEYS.SHOP_PHONE, DEFAULTS.shopPhone, asText);
+  const email = resolve(stored, KEYS.SHOP_EMAIL, DEFAULTS.shopEmail, asText);
   const warnDays = resolve(stored, KEYS.WARN_DAYS, DEFAULTS.warnDays, Number);
   const warnKm = resolve(stored, KEYS.WARN_KM, DEFAULTS.warnKm, Number);
   return {
-    shop: { name: name.value, address: address.value, phone: phone.value },
+    shop: { name: name.value, address: address.value, phone: phone.value, email: email.value },
     maintenance: { warnDays: warnDays.value, warnKm: warnKm.value },
     sources: {
       [KEYS.SHOP_NAME]: name.source,
       [KEYS.SHOP_ADDRESS]: address.source,
       [KEYS.SHOP_PHONE]: phone.source,
+      [KEYS.SHOP_EMAIL]: email.source,
       [KEYS.WARN_DAYS]: warnDays.source,
       [KEYS.WARN_KM]: warnKm.source,
     },
   };
 }
 
-/** Datos del taller para el ticket: `{ name, address, phone }`. */
+/** Datos del taller: `{ name, address, phone, email }`. */
 export async function getShop() {
   return (await getAll()).shop;
 }
@@ -81,7 +86,7 @@ export async function getMaintenanceMargins() {
   return (await getAll()).maintenance;
 }
 
-const SHOP_LABELS = { name: 'nombre', address: 'dirección', phone: 'teléfono' };
+const SHOP_LABELS = { name: 'nombre', address: 'dirección', phone: 'teléfono', email: 'correo' };
 const MARGIN_LABELS = { warnDays: 'margen en días', warnKm: 'margen en km' };
 
 /**
@@ -94,7 +99,7 @@ export async function update(fields, actor) {
   const changes = [];
 
   const shop = fields.shop ?? {};
-  const shopKeys = { name: KEYS.SHOP_NAME, address: KEYS.SHOP_ADDRESS, phone: KEYS.SHOP_PHONE };
+  const shopKeys = { name: KEYS.SHOP_NAME, address: KEYS.SHOP_ADDRESS, phone: KEYS.SHOP_PHONE, email: KEYS.SHOP_EMAIL };
   const shopChanged = [];
   for (const [field, key] of Object.entries(shopKeys)) {
     if (shop[field] === undefined) continue;

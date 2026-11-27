@@ -17,6 +17,12 @@ const shopPhone = z
   .max(20, 'El teléfono no puede pasar de 20 caracteres.')
   .regex(/^[0-9+\-() ]*$/, 'El teléfono solo puede llevar dígitos, espacios, +, - y paréntesis.');
 
+const shopEmail = z
+  .string({ invalid_type_error: 'El correo no es válido.' })
+  .trim()
+  .max(254, 'El correo no puede pasar de 254 caracteres.')
+  .refine((value) => value === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value), 'El correo no tiene un formato válido.');
+
 const warnDays = z
   .number({ invalid_type_error: 'El margen en días debe ser un número.' })
   .int('El margen en días debe ser un número entero.')
@@ -36,7 +42,7 @@ const warnKm = z
 export const updateSettingsSchema = z
   .object({
     shop: z
-      .object({ name: shopName.optional(), address: shopAddress.optional(), phone: shopPhone.optional() })
+      .object({ name: shopName.optional(), address: shopAddress.optional(), phone: shopPhone.optional(), email: shopEmail.optional() })
       .strict('Hay campos del taller que no se pueden enviar.')
       .optional(),
     maintenance: z

@@ -1,12 +1,21 @@
 import { query } from '../config/db.js';
 
 const toVersion = (row) =>
-  row ? { id: row.id, version: row.version, title: row.title, body: row.body, publishedAt: row.published_at } : null;
+  row
+    ? {
+        id: row.id,
+        version: row.version,
+        title: row.title,
+        body: row.body,
+        privacyNotice: row.privacy_notice,
+        publishedAt: row.published_at,
+      }
+    : null;
 
 /** Versión vigente de los términos: la publicada más recientemente. */
 export async function findCurrent(connection) {
   const rows = await query(
-    'SELECT id, version, title, body, published_at FROM terms_versions ORDER BY published_at DESC, id DESC LIMIT 1',
+    'SELECT id, version, title, body, privacy_notice, published_at FROM terms_versions ORDER BY published_at DESC, id DESC LIMIT 1',
     [],
     connection,
   );
@@ -14,7 +23,7 @@ export async function findCurrent(connection) {
 }
 
 export async function findById(id, connection) {
-  const rows = await query('SELECT id, version, title, body, published_at FROM terms_versions WHERE id = ?', [id], connection);
+  const rows = await query('SELECT id, version, title, body, privacy_notice, published_at FROM terms_versions WHERE id = ?', [id], connection);
   return toVersion(rows[0]);
 }
 

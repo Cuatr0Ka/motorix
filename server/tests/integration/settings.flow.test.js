@@ -17,7 +17,7 @@ let admin;
 let recepcion;
 let mecanico;
 
-const ENV_KEYS = ['SHOP_NAME', 'SHOP_ADDRESS', 'SHOP_PHONE', 'MAINTENANCE_WARN_DAYS', 'MAINTENANCE_WARN_KM'];
+const ENV_KEYS = ['SHOP_NAME', 'SHOP_ADDRESS', 'SHOP_PHONE', 'SHOP_EMAIL', 'MAINTENANCE_WARN_DAYS', 'MAINTENANCE_WARN_KM'];
 let envOriginal;
 
 const leer = (user = admin) => request(app).get('/api/settings').set(auth(user.token));
@@ -58,12 +58,13 @@ describe('configuración del taller (US1, FR-001 a FR-003, FR-008)', () => {
     const res = await leer();
 
     expect(res.status).toBe(200);
-    expect(res.body.data.shop).toEqual({ name: 'Motorix Taller Mecánico', address: '', phone: '' });
+    expect(res.body.data.shop).toEqual({ name: 'Motorix Taller Mecánico', address: '', phone: '', email: '' });
     expect(res.body.data.maintenance).toEqual({ warnDays: 30, warnKm: 1000 });
     expect(res.body.data.sources).toEqual({
       'shop.name': 'DEFAULT',
       'shop.address': 'DEFAULT',
       'shop.phone': 'DEFAULT',
+      'shop.email': 'DEFAULT',
       'maintenance.warn_days': 'DEFAULT',
       'maintenance.warn_km': 'DEFAULT',
     });
@@ -73,14 +74,15 @@ describe('configuración del taller (US1, FR-001 a FR-003, FR-008)', () => {
     process.env.SHOP_NAME = 'Taller del Norte';
     process.env.SHOP_ADDRESS = 'Calle 5 #10';
     process.env.SHOP_PHONE = '7760001122';
+    process.env.SHOP_EMAIL = 'taller@norte.mx';
     process.env.MAINTENANCE_WARN_DAYS = '20';
     process.env.MAINTENANCE_WARN_KM = '800';
 
     const res = await leer();
 
-    expect(res.body.data.shop).toEqual({ name: 'Taller del Norte', address: 'Calle 5 #10', phone: '7760001122' });
+    expect(res.body.data.shop).toEqual({ name: 'Taller del Norte', address: 'Calle 5 #10', phone: '7760001122', email: 'taller@norte.mx' });
     expect(res.body.data.maintenance).toEqual({ warnDays: 20, warnKm: 800 });
-    expect(Object.values(res.body.data.sources)).toEqual(['ENV', 'ENV', 'ENV', 'ENV', 'ENV']);
+    expect(Object.values(res.body.data.sources)).toEqual(['ENV', 'ENV', 'ENV', 'ENV', 'ENV', 'ENV']);
   });
 
   it('test_guardar_solo_cambia_los_campos_enviados_y_marca_su_origen_como_guardado', async () => {
@@ -89,7 +91,7 @@ describe('configuración del taller (US1, FR-001 a FR-003, FR-008)', () => {
     const res = await guardar({ shop: { name: 'Taller Los Pinos', phone: '7761112233' } });
 
     expect(res.status).toBe(200);
-    expect(res.body.data.shop).toEqual({ name: 'Taller Los Pinos', address: 'Dirección de respaldo', phone: '7761112233' });
+    expect(res.body.data.shop).toEqual({ name: 'Taller Los Pinos', address: 'Dirección de respaldo', phone: '7761112233', email: '' });
     expect(res.body.data.maintenance).toEqual({ warnDays: 30, warnKm: 1000 });
     expect(res.body.data.sources['shop.name']).toBe('STORED');
     expect(res.body.data.sources['shop.phone']).toBe('STORED');
@@ -125,6 +127,8 @@ describe('configuración del taller (US1, FR-001 a FR-003, FR-008)', () => {
       [{ shop: { address: 'x'.repeat(201) } }, 'address'],
       [{ shop: { phone: 'x'.repeat(21) } }, 'phone'],
       [{ shop: { phone: 'llamar al taller' } }, 'phone'],
+      [{ shop: { email: 'sin-arroba' } }, 'email'],
+      [{ shop: { email: 'a'.repeat(250) + '@x.mx' } }, 'email'],
     ];
     for (const [cuerpo, campo] of casos) {
       const res = await guardar(cuerpo);
@@ -183,6 +187,7 @@ describe('configuración del taller (US1, FR-001 a FR-003, FR-008)', () => {
       name: `Taller ${sufijo}`,
       address: `Dirección ${sufijo}`,
       phone: sufijo === 'A' ? '7761111111' : '7762222222',
+      email: '',
     });
     expect((await query("SELECT id FROM audit_log WHERE action = 'SETTINGS_CHANGED'")).length).toBe(2);
   });

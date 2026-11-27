@@ -16,7 +16,7 @@ describe('contrato de /api/terms', () => {
     const res = await request(app).get('/api/terms/current').set(auth(admin.token));
 
     expect(res.status).toBe(200);
-    expect(Object.keys(res.body.data).sort()).toEqual(['accepted', 'body', 'id', 'publishedAt', 'title', 'version']);
+    expect(Object.keys(res.body.data).sort()).toEqual(['accepted', 'body', 'id', 'privacyNotice', 'publishedAt', 'title', 'version']);
     expect(res.body.data).toMatchObject({ version: '1.0', accepted: true, title: expect.any(String), body: expect.any(String) });
     expect(res.body.data.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
