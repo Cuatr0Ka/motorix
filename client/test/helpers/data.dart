@@ -65,7 +65,17 @@ FakeHandler vehiclesHandler({List<Map<String, dynamic>>? items, FakeHandler? ext
 }
 
 /// Abre una sección del menú lateral (por ejemplo, "Clientes" o "Vehículos").
+/// Las secciones de administración (Usuarios, Reportes, Configuración, Términos y Bitácora)
+/// viven en el menú de la cuenta, del encabezado.
 Future<void> openSection(WidgetTester tester, String label) async {
+  const adminLabels = ['Usuarios', 'Reportes', 'Configuración', 'Términos', 'Bitácora'];
+  if (adminLabels.contains(label)) {
+    await tester.tap(find.byTooltip('Opciones de la cuenta'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(of: find.byType(PopupMenuItem<String>), matching: find.text(label)));
+    await tester.pumpAndSettle();
+    return;
+  }
   final item = find.descendant(of: find.byType(NavigationRail), matching: find.text(label));
   // En ventanas bajas el menú se desplaza: se trae la opción a la vista antes de tocarla.
   await tester.ensureVisible(item);

@@ -73,7 +73,11 @@ void main() {
       useDesktopWindow(tester);
       await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: FakeSettings().handler()));
 
-      expect(find.text('Configuración'), findsWidgets);
+      // Ya no está en el menú lateral: vive en el menú de la cuenta.
+      expect(find.text('Configuración'), findsNothing);
+      await tester.tap(find.byTooltip('Opciones de la cuenta'));
+      await tester.pumpAndSettle();
+      expect(find.text('Configuración'), findsOneWidget);
     });
 
     for (final role in ['RECEPTIONIST', 'MECHANIC']) {

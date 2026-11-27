@@ -8,7 +8,7 @@ Finder menuItem(String label) => find.descendant(of: find.byType(NavigationRail)
 void main() {
   group('menú lateral según el rol', () {
     for (final entry in {
-      'ADMIN': ['Inicio', 'Clientes', 'Vehículos', 'Citas', 'Órdenes', 'Usuarios'],
+      'ADMIN': ['Inicio', 'Clientes', 'Vehículos', 'Citas', 'Órdenes', 'Inventario'],
       'RECEPTIONIST': ['Inicio', 'Clientes', 'Vehículos', 'Citas', 'Órdenes'],
       'MECHANIC': ['Inicio', 'Clientes', 'Vehículos', 'Mis órdenes'],
     }.entries) {
@@ -19,8 +19,16 @@ void main() {
         for (final label in entry.value) {
           expect(menuItem(label), findsOneWidget, reason: '$label debe aparecer para ${entry.key}');
         }
-        if (entry.key != 'ADMIN') {
-          expect(menuItem('Usuarios'), findsNothing);
+        // La administración ya no va en el menú lateral sino en el menú de la cuenta.
+        for (final label in ['Usuarios', 'Reportes', 'Configuración', 'Términos', 'Bitácora']) {
+          expect(menuItem(label), findsNothing, reason: '$label no debe estar en el menú lateral');
+        }
+        await tester.tap(find.byTooltip('Opciones de la cuenta'));
+        await tester.pumpAndSettle();
+        for (final label in ['Usuarios', 'Reportes', 'Configuración', 'Términos', 'Bitácora']) {
+          expect(find.descendant(of: find.byType(PopupMenuItem<String>), matching: find.text(label)),
+              entry.key == 'ADMIN' ? findsOneWidget : findsNothing,
+              reason: '$label en el menú de la cuenta para ${entry.key}');
         }
         if (entry.key == 'MECHANIC') {
           expect(menuItem('Citas'), findsNothing);

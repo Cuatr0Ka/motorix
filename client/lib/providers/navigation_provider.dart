@@ -51,11 +51,17 @@ class NavigationProvider extends ChangeNotifier {
         ],
         if (role == UserRole.mechanic) AppSection.myOrders,
         if (role == UserRole.admin) AppSection.inventory,
-        if (role == UserRole.admin) AppSection.users,
-        if (role == UserRole.admin) AppSection.settings,
-        if (role == UserRole.admin) AppSection.reports,
-        if (role == UserRole.admin) AppSection.terms,
-        if (role == UserRole.admin) AppSection.auditLog,
+      ];
+
+  /// Secciones de administración: no van en el menú lateral sino en el menú de la cuenta (encabezado).
+  static List<AppSection> adminSectionsFor(UserRole role) => [
+        if (role == UserRole.admin) ...[
+          AppSection.users,
+          AppSection.reports,
+          AppSection.settings,
+          AppSection.terms,
+          AppSection.auditLog,
+        ],
       ];
 
   /// Pantalla de detalle pendiente de abrir (viene de un aviso). La toma el AppShell y la abre.

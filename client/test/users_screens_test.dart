@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'helpers/data.dart';
 import 'helpers/fake_api.dart';
 
 Map<String, dynamic> userRow(int id, String username, String role, {bool active = true, String? name}) => {
@@ -32,8 +33,7 @@ FakeHandler usersHandler({List<Map<String, dynamic>>? items, FakeHandler? extra}
 }
 
 Future<void> openUsers(WidgetTester tester) async {
-  await tester.tap(find.descendant(of: find.byType(NavigationRail), matching: find.text('Usuarios')));
-  await tester.pumpAndSettle();
+  await openSection(tester, 'Usuarios');
 }
 
 Future<void> openRowMenu(WidgetTester tester, String username) async {

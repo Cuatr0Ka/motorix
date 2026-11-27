@@ -395,6 +395,26 @@ class _RailLabel extends StatelessWidget {
   }
 }
 
+/// Fila del menú de la cuenta: ícono y texto.
+class _AccountMenuRow extends StatelessWidget {
+  const _AccountMenuRow({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 20, color: AppColors.textSecondary),
+        const SizedBox(width: AppSpacing.md),
+        Flexible(child: Text(label)),
+      ],
+    );
+  }
+}
+
 class _Header extends StatelessWidget {
   const _Header({required this.user, required this.title});
 
@@ -412,26 +432,59 @@ class _Header extends StatelessWidget {
           Expanded(child: Text(title, style: theme.textTheme.titleMedium)),
           const NotificationBell(),
           const SizedBox(width: AppSpacing.sm),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(user.name, style: theme.textTheme.bodyLarge),
-              Text(user.role.label, style: theme.textTheme.bodySmall),
-            ],
-          ),
-          const SizedBox(width: AppSpacing.sm),
+          // El nombre y la flecha son el botón del menú de la cuenta (administración y cambio de contraseña).
           PopupMenuButton<String>(
             tooltip: 'Opciones de la cuenta',
-            icon: const Icon(Icons.account_circle_outlined, color: AppColors.textSecondary),
+            color: AppColors.surface,
+            surfaceTintColor: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(user.name, style: theme.textTheme.bodyLarge),
+                      Text(user.role.label, style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
+                ],
+              ),
+            ),
             onSelected: (value) {
+              final navigation = context.read<NavigationProvider>();
               if (value == 'password') {
-                context.read<NavigationProvider>().goTo(AppSection.changePassword);
+                navigation.goTo(AppSection.changePassword);
+              } else {
+                navigation.goTo(AppSection.values.byName(value));
               }
             },
-            itemBuilder: (context) => const [
-              PopupMenuItem(value: 'password', child: Text('Cambiar contraseña')),
-            ],
+            itemBuilder: (context) {
+              final adminSections = NavigationProvider.adminSectionsFor(user.role);
+              return [
+                if (adminSections.isNotEmpty) ...[
+                  PopupMenuItem<String>(
+                    enabled: false,
+                    height: 32,
+                    child: Text('ADMINISTRACIÓN', style: theme.textTheme.labelSmall),
+                  ),
+                  for (final section in adminSections)
+                    PopupMenuItem<String>(
+                      value: section.name,
+                      child: _AccountMenuRow(icon: iconForSection(section), label: section.title),
+                    ),
+                  const PopupMenuDivider(),
+                ],
+                PopupMenuItem<String>(
+                  value: 'password',
+                  child: _AccountMenuRow(icon: iconForSection(AppSection.changePassword), label: 'Cambiar contraseña'),
+                ),
+              ];
+            },
           ),
         ],
       ),
