@@ -19,7 +19,7 @@ enum AppSection {
   inventory('Inventario'),
   users('Usuarios'),
   settings('Configuración'),
-  terms('Términos'),
+  terms('Términos y privacidad'),
   reports('Reportes'),
   auditLog('Bitácora'),
   changePassword('Cambiar contraseña');

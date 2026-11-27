@@ -68,7 +68,7 @@ FakeHandler vehiclesHandler({List<Map<String, dynamic>>? items, FakeHandler? ext
 /// Las secciones de administración (Usuarios, Reportes, Configuración, Términos y Bitácora)
 /// viven en el menú de la cuenta, del encabezado.
 Future<void> openSection(WidgetTester tester, String label) async {
-  const adminLabels = ['Usuarios', 'Reportes', 'Configuración', 'Términos', 'Bitácora'];
+  const adminLabels = ['Usuarios', 'Reportes', 'Configuración', 'Términos y privacidad', 'Bitácora'];
   if (adminLabels.contains(label)) {
     await tester.tap(find.byTooltip('Opciones de la cuenta'));
     await tester.pumpAndSettle();

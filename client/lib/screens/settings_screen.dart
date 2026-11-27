@@ -130,10 +130,11 @@ class _ShopFormState extends State<_ShopForm> {
   late final TextEditingController _name = TextEditingController(text: widget.snapshot.shop.name);
   late final TextEditingController _address = TextEditingController(text: widget.snapshot.shop.address);
   late final TextEditingController _phone = TextEditingController(text: widget.snapshot.shop.phone);
+  late final TextEditingController _email = TextEditingController(text: widget.snapshot.shop.email);
 
   @override
   void dispose() {
-    for (final controller in [_name, _address, _phone]) {
+    for (final controller in [_name, _address, _phone, _email]) {
       controller.dispose();
     }
     super.dispose();
@@ -146,6 +147,7 @@ class _ShopFormState extends State<_ShopForm> {
       if (_name.text.trim() != shop.name) 'name': _name.text.trim(),
       if (_address.text.trim() != shop.address) 'address': _address.text.trim(),
       if (_phone.text.trim() != shop.phone) 'phone': _phone.text.trim(),
+      if (_email.text.trim() != shop.email) 'email': _email.text.trim(),
     };
   }
 
@@ -162,6 +164,17 @@ class _ShopFormState extends State<_ShopForm> {
     final serverError = context.read<SettingsProvider>().fieldErrors['shop.address'];
     if (serverError != null) return serverError;
     if ((value?.trim().length ?? 0) > 200) return 'La dirección no puede pasar de 200 caracteres.';
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    final serverError = context.read<SettingsProvider>().fieldErrors['shop.email'];
+    if (serverError != null) return serverError;
+    final text = value?.trim() ?? '';
+    if (text.length > 254) return 'El correo no puede pasar de 254 caracteres.';
+    if (text.isNotEmpty && !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(text)) {
+      return 'El correo no tiene un formato válido.';
+    }
     return null;
   }
 
@@ -183,8 +196,7 @@ class _ShopFormState extends State<_ShopForm> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final changes = _changes();
     if (changes.isEmpty) return;
-    final failure = await provider.save({'shop': changes});
-    if (!mounted) return;
+    final failure = await provider.save({'shop': changes});    if (!mounted) return;
     _formKey.currentState?.validate();
     if (failure == null) {
       showSuccess(context, 'Datos del taller guardados. Los tickets nuevos los usarán; los emitidos no cambian.');
@@ -269,8 +281,18 @@ class _ShopFormState extends State<_ShopForm> {
               hint: 'Opcional',
               keyboard: TextInputType.phone,
             ),
+            field(
+              label: 'Correo para asuntos de privacidad',
+              controller: _email,
+              fieldKey: const ValueKey('campo-taller-correo'),
+              sourceKey: 'shop.email',
+              validator: _validateEmail,
+              maxLength: 254,
+              hint: 'Opcional; aparece en el aviso de privacidad',
+              keyboard: TextInputType.emailAddress,
+            ),
             Text(
-              'Estos datos se imprimen en los tickets nuevos. Los tickets ya emitidos conservan los datos con los que se emitieron.',
+              'Nombre, dirección y teléfono se imprimen en los tickets nuevos (los ya emitidos conservan sus datos). Todos estos datos, con el correo, aparecen también en el aviso de privacidad y en los términos y condiciones.',
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: AppSpacing.lg),

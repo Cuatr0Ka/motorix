@@ -20,12 +20,12 @@ void main() {
           expect(menuItem(label), findsOneWidget, reason: '$label debe aparecer para ${entry.key}');
         }
         // La administración ya no va en el menú lateral sino en el menú de la cuenta.
-        for (final label in ['Usuarios', 'Reportes', 'Configuración', 'Términos', 'Bitácora']) {
+        for (final label in ['Usuarios', 'Reportes', 'Configuración', 'Términos y privacidad', 'Bitácora']) {
           expect(menuItem(label), findsNothing, reason: '$label no debe estar en el menú lateral');
         }
         await tester.tap(find.byTooltip('Opciones de la cuenta'));
         await tester.pumpAndSettle();
-        for (final label in ['Usuarios', 'Reportes', 'Configuración', 'Términos', 'Bitácora']) {
+        for (final label in ['Usuarios', 'Reportes', 'Configuración', 'Términos y privacidad', 'Bitácora']) {
           expect(find.descendant(of: find.byType(PopupMenuItem<String>), matching: find.text(label)),
               entry.key == 'ADMIN' ? findsOneWidget : findsNothing,
               reason: '$label en el menú de la cuenta para ${entry.key}');

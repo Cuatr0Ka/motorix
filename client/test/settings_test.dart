@@ -180,6 +180,30 @@ void main() {
       expect(fake.saved, isEmpty);
     });
 
+    testWidgets('test_un_correo_sin_arroba_se_marca_y_uno_valido_se_envia', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeSettings();
+      await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: fake.handler()));
+      await openSection(tester, 'Configuración');
+
+      await tester.enterText(find.byKey(const ValueKey('campo-taller-correo')), 'sin-arroba');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('guardar-taller')));
+      await tester.pumpAndSettle();
+      expect(find.text('El correo no tiene un formato válido.'), findsOneWidget);
+      expect(fake.saved, isEmpty);
+
+      await tester.enterText(find.byKey(const ValueKey('campo-taller-correo')), 'privacidad@taller.mx');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('guardar-taller')));
+      await tester.pumpAndSettle();
+      expect(fake.saved, [
+        {
+          'shop': {'email': 'privacidad@taller.mx'},
+        },
+      ]);
+    });
+
     testWidgets('test_un_error_del_servidor_se_muestra_en_su_campo', (tester) async {
       useDesktopWindow(tester);
       final fake = FakeSettings()

@@ -19,17 +19,21 @@ enum SettingSource {
 
 /// Datos del taller que se imprimen en el ticket.
 class ShopSettings {
-  const ShopSettings({required this.name, required this.address, required this.phone});
+  const ShopSettings({required this.name, required this.address, required this.phone, this.email = ''});
 
   factory ShopSettings.fromJson(Map<String, dynamic> json) => ShopSettings(
         name: '${json['name'] ?? ''}',
         address: '${json['address'] ?? ''}',
         phone: '${json['phone'] ?? ''}',
+        email: '${json['email'] ?? ''}',
       );
 
   final String name;
   final String address;
   final String phone;
+
+  /// Correo para asuntos de privacidad (aparece en el aviso de privacidad).
+  final String email;
 }
 
 /// Márgenes con los que un mantenimiento se considera «Próximo».

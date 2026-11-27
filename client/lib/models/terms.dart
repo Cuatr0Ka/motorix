@@ -5,6 +5,7 @@ class TermsDocument {
     required this.version,
     required this.title,
     required this.body,
+    this.privacyNotice,
     required this.accepted,
     this.publishedAt,
   });
@@ -14,6 +15,7 @@ class TermsDocument {
         version: '${json['version']}',
         title: '${json['title']}',
         body: '${json['body']}',
+        privacyNotice: json['privacyNotice'] == null ? null : '${json['privacyNotice']}',
         accepted: json['accepted'] as bool? ?? false,
         publishedAt: json['publishedAt'] == null ? null : DateTime.tryParse('${json['publishedAt']}'),
       );
@@ -22,6 +24,9 @@ class TermsDocument {
   final String version;
   final String title;
   final String body;
+
+  /// Aviso de privacidad (versión 2.0 en adelante). En versiones anteriores es nulo y su texto va dentro de [body].
+  final String? privacyNotice;
   final bool accepted;
   final DateTime? publishedAt;
 }

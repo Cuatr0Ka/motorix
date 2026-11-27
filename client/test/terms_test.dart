@@ -6,7 +6,10 @@ import 'helpers/fake_api.dart';
 
 /// API simulada de términos: la versión vigente, si la persona ya aceptó y las aceptaciones de administración.
 class FakeTerms {
-  FakeTerms({this.accepted = false});
+  FakeTerms({this.accepted = false, this.withPrivacy = false});
+
+  /// Versión 2.0: el aviso de privacidad viene como un texto aparte.
+  final bool withPrivacy;
 
   bool accepted;
   bool failingToLoad = false;
@@ -18,6 +21,7 @@ class FakeTerms {
         'version': '1.0',
         'title': 'Términos y condiciones y aviso de privacidad',
         'body': 'TÉRMINOS DE USO DE MOTORIX\n\n1. Uso permitido del sistema',
+        if (withPrivacy) 'privacyNotice': 'AVISO DE PRIVACIDAD INTEGRAL\n\n1. Quién es el responsable de sus datos',
         'publishedAt': '2026-11-21T00:00:00.000Z',
         'accepted': accepted,
       };
@@ -135,7 +139,7 @@ void main() {
     testWidgets('test_muestra_la_version_vigente_las_aceptaciones_y_los_pendientes_sin_boton_de_edicion', (tester) async {
       useDesktopWindow(tester);
       await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: FakeTerms(accepted: true).handler()));
-      await openSection(tester, 'Términos');
+      await openSection(tester, 'Términos y privacidad');
 
       expect(find.textContaining('Versión vigente 1.0'), findsOneWidget);
       expect(find.byKey(const ValueKey('aceptacion-1')), findsOneWidget);
@@ -149,8 +153,76 @@ void main() {
         useDesktopWindow(tester);
         await pumpAppSignedIn(tester, FakeApi(role: role, handler: FakeTerms(accepted: true).handler()));
 
-        expect(find.text('Términos'), findsNothing);
+        expect(find.text('Términos y privacidad'), findsNothing);
       });
     }
+  });
+
+  group('términos y aviso de privacidad como dos textos', () {
+    Finder terminosTab() => find.descendant(of: find.byKey(const ValueKey('legal-selector')), matching: find.text('Términos y condiciones'));
+    Finder privacidadTab() => find.descendant(of: find.byKey(const ValueKey('legal-selector')), matching: find.text('Aviso de privacidad'));
+
+    testWidgets('test_con_aviso_aparte_muestra_el_selector_y_cambia_entre_los_dos_textos', (tester) async {
+      useDesktopWindow(tester);
+      await pumpAppSignedIn(tester, FakeApi(role: 'RECEPTIONIST', handler: FakeTerms(withPrivacy: true).handler()));
+
+      expect(find.byKey(const ValueKey('legal-selector')), findsOneWidget);
+      expect(find.byKey(const ValueKey('terms-body')), findsOneWidget);
+      expect(find.byKey(const ValueKey('privacy-body')), findsNothing);
+
+      await tester.tap(privacidadTab());
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('privacy-body')), findsOneWidget);
+      expect(find.textContaining('AVISO DE PRIVACIDAD INTEGRAL'), findsOneWidget);
+      expect(find.byKey(const ValueKey('terms-body')), findsNothing);
+
+      await tester.tap(terminosTab());
+      await tester.pumpAndSettle();
+      expect(find.textContaining('TÉRMINOS DE USO DE MOTORIX'), findsOneWidget);
+    });
+
+    testWidgets('test_aceptar_exige_las_dos_casillas_y_envia_una_sola_aceptacion', (tester) async {
+      useDesktopWindow(tester);
+      final fake = FakeTerms(withPrivacy: true);
+      final api = FakeApi(role: 'RECEPTIONIST', handler: fake.handler());
+      await pumpAppSignedIn(tester, api);
+
+      FilledButton boton() => tester.widget<FilledButton>(find.byKey(const ValueKey('terms-accept')));
+      expect(boton().onPressed, isNull);
+
+      await tester.tap(find.byKey(const ValueKey('terms-check')));
+      await tester.pump();
+      expect(boton().onPressed, isNull, reason: 'falta aceptar el aviso de privacidad');
+
+      await tester.tap(find.byKey(const ValueKey('privacy-check')));
+      await tester.pump();
+      expect(boton().onPressed, isNotNull);
+
+      await tester.tap(find.byKey(const ValueKey('terms-accept')));
+      await tester.pumpAndSettle();
+
+      expect(api.requests.where((r) => r.method == 'POST' && r.path == '/terms/accept'), hasLength(1));
+      expect(fake.accepts, 1);
+      expect(find.text('Clientes'), findsWidgets);
+    });
+
+    testWidgets('test_sin_aviso_aparte_no_aparecen_el_selector_ni_la_segunda_casilla', (tester) async {
+      useDesktopWindow(tester);
+      await pumpAppSignedIn(tester, FakeApi(role: 'RECEPTIONIST', handler: FakeTerms().handler()));
+
+      expect(find.byKey(const ValueKey('legal-selector')), findsNothing);
+      expect(find.byKey(const ValueKey('privacy-check')), findsNothing);
+    });
+
+    testWidgets('test_la_administracion_puede_leer_el_aviso_de_privacidad_en_su_seccion', (tester) async {
+      useDesktopWindow(tester);
+      await pumpAppSignedIn(tester, FakeApi(role: 'ADMIN', handler: FakeTerms(accepted: true, withPrivacy: true).handler()));
+      await openSection(tester, 'Términos y privacidad');
+
+      await tester.tap(privacidadTab());
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('AVISO DE PRIVACIDAD INTEGRAL'), findsOneWidget);
+    });
   });
 }

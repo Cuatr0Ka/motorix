@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/terms_provider.dart';
 import '../utils/formatters.dart';
 import '../utils/tokens.dart';
+import '../widgets/legal_texts_view.dart';
 import '../widgets/page_header.dart';
 import '../widgets/state_views.dart';
 
@@ -44,7 +45,10 @@ class _TermsAdminScreenState extends State<TermsAdminScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(current.title, style: theme.textTheme.titleMedium),
+                  Text(
+                    (current.privacyNotice ?? '').trim().isEmpty ? current.title : 'Términos y condiciones y aviso de privacidad',
+                    style: theme.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     'Versión vigente ${current.version}${current.publishedAt == null ? '' : ' · publicada el ${formatDate(current.publishedAt!.toLocal())}'}',
@@ -52,7 +56,7 @@ class _TermsAdminScreenState extends State<TermsAdminScreen> {
                     style: theme.textTheme.bodySmall,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  Text(current.body, style: theme.textTheme.bodyMedium),
+                  LegalTextsView(document: current),
                 ],
               ),
             ),
@@ -108,7 +112,7 @@ class _TermsAdminScreenState extends State<TermsAdminScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const PageHeader(title: 'Términos y condiciones', subtitle: 'Versión vigente y quién la ha aceptado'),
+          const PageHeader(title: 'Términos y privacidad', subtitle: 'Términos y condiciones, aviso de privacidad y quién los ha aceptado'),
           const SizedBox(height: AppSpacing.lg),
           Expanded(child: body),
         ],
